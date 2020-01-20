@@ -14,7 +14,6 @@ import { useParams } from "react-router-dom";
 import { AspectRatio } from "../../components/AspectRatio";
 import { Joep } from "../../dummy";
 import { useLocalState } from "../../hooks/useLocalState";
-import { useTimer } from "../../hooks/useTimer";
 import { useStyles } from "../../styles";
 import { Actor } from "../../types/State";
 import { eur } from "../../util/eur";
@@ -30,13 +29,13 @@ export function OutgoingVerifReq() {
 
     const [verifiee, setVerifiee] = useState<Actor | null>(null);
 
-    useTimer(() => setVerifiee(Joep), 10 * 1000);
+    const mockVerifiee = () => setVerifiee(Joep);
 
     return !req ? <div>Dit verzoek bestaat niet. </div> : (
         <div>
             {/* <Box p={1}></Box> */}
             <Box pt={1} pb={1}>
-                {!verifiee && <p>Deel deze QR code met de te verifieren persoon:</p>}
+                {!verifiee && <p onClick={mockVerifiee}>Deel deze QR code met de te verifieren persoon:</p>}
             </Box>
             <Paper className={classes.paper} >
                 {!verifiee ? (
