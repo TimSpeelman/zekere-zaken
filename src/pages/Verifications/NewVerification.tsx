@@ -47,7 +47,7 @@ export function NewVerification() {
     }
 
     const onCancel = () => {
-        window.location.assign("#/");
+        window.location.assign("#/home");
     }
 
     return (

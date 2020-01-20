@@ -95,9 +95,9 @@ export function OutgoingVerifReq() {
             <Box pb={2} pt={2}>
                 <Toolbar>
                     {verifiee ? (
-                        <Button variant={"contained"} component="a" href="#/verifs">Sluiten</Button>
+                        <Button variant={"contained"} component="a" href="#/home">Sluiten</Button>
                     ) : (
-                            <Button variant={"contained"} component="a" href="#/verifs">Annuleren</Button>
+                            <Button variant={"contained"} component="a" href="#/home">Annuleren</Button>
                         )}
                 </Toolbar>
             </Box>
