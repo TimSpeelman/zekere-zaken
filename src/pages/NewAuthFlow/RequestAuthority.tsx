@@ -20,7 +20,7 @@ export function RequestAuthority() {
 
     const { manager } = useLocalState();
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState(1);
 
     const canSubmit = type && amount > 0;
 

@@ -19,7 +19,7 @@ export function NewVerification() {
 
     const [chooseEntity, setChooseEntity] = useState(false);
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState(1);
     const [entity, setEntity] = useState<LegalEntity | null>(null);
 
     const canSubmit = type !== null && amount > 0;
