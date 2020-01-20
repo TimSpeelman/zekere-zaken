@@ -7,12 +7,10 @@ import { useParams } from "react-router-dom";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
-import { useStyles } from "../../styles";
 import { InAuthorizationRequest } from "../../types/State";
 import { eur } from "../../util/eur";
 
 export function OutgoingAuthReq() {
-    const classes = useStyles({});
     const { reqId: id } = useParams();
     const { state, manager } = useLocalState();
     const req = state.outgoingAuthReqs.find(r => r.id === id)

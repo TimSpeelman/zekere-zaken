@@ -51,12 +51,26 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
 
 export const AppBody: React.FC = () => {
     const { manager } = useLocalState();
+
     const onScanQR = (qr: string) => {
-        const id = uuid();
-        // @ts-ignore
-        manager.addInVerifReq({ ...JSON.parse(qr), id });
-        window.location.assign(`#/verifs/inbox/${id}`)
+        try {
+            const id = uuid();
+            const req = { ...JSON.parse(qr), id };
+
+            // TODO Improve verification
+            if (!req.from || !req.authority) {
+                return false;
+            }
+
+            // @ts-ignore
+            manager.addInVerifReq(req);
+            window.location.assign(`#/verifs/inbox/${id}`)
+            return true;
+        } catch (e) {
+            return false;
+        }
     };
+
     return (
         <Switch>
             <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
