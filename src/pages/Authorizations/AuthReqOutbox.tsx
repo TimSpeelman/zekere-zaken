@@ -24,6 +24,7 @@ export function AuthReqOutbox() {
                 </Box>
 
                 <ListSubheader>Openstaande Verzoeken</ListSubheader>
+                {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
                 {reqs.map(req => (
                     <ListItem button key={req.id} component="a" href={`#/authreqs/outbox/${req.id}`}>
                         <ListItemAvatar>

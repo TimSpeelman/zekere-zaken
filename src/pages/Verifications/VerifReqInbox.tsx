@@ -18,6 +18,7 @@ export function VerifReqInbox() {
         <div>
 
             <List component="nav" >
+                {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verificatieverzoeken.</ListItem>}
                 {reqs.map(req => (
                     <ListItem button key={req.id} component="a" href={`#/verifs/inbox/${req.id}`}>
                         <ListItemAvatar>

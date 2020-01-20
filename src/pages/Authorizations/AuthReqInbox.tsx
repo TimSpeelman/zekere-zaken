@@ -18,9 +18,10 @@ export function AuthReqInbox() {
 
             <List component="nav" >
                 <ListSubheader>Uitgegeven Machtigingen</ListSubheader>
-                <ListItem disabled>U heeft nog geen machtigingen uitgegeven</ListItem>
+                <ListItem disabled>U heeft nog geen machtigingen uitgegeven.</ListItem>
 
                 <ListSubheader>Openstaande Verzoeken</ListSubheader>
+                {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
                 {reqs.map(req => (
                     <ListItem button key={req.id} component="a" href={`#/authreqs/inbox/${req.id}`}>
                         <ListItemAvatar>

@@ -6,7 +6,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import ImageIcon from '@material-ui/icons/Image';
 import { format } from "date-fns";
-import { default as React, Fragment } from "react";
+import { default as React } from "react";
 import { useLocalState } from "../../hooks/useLocalState";
 import { reqText } from "../../util/intl";
 
@@ -18,12 +18,7 @@ export function VerifReqOutbox() {
         <div>
 
             <List component="nav" >
-                {reqs.length === 0 && (
-                    <Fragment >
-                        <ListItem disabled>Uw verificatiegeschiedenis is leeg.</ListItem>
-
-                    </Fragment>
-                )}
+                {reqs.length === 0 && <ListItem disabled>Uw verificatiegeschiedenis is leeg.</ListItem>}
                 {reqs.map(req => (
                     <ListItem button key={req.id} component="a" href={`#/verifs/outbox/${req.id}`}>
                         <ListItemAvatar>
