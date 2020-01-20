@@ -19,7 +19,7 @@ export function AuthReqOutbox() {
             <List component="nav" >
                 <ListSubheader>Actuele Bevoegdheden</ListSubheader>
                 <ListItem disabled>U heeft nog geen bevoegdheden</ListItem>
-                <Box style={{ textAlign: "center" }} >
+                <Box style={{ textAlign: "center" }} mt={2} mb={2} >
                     <Button variant="outlined" component="a" href="#/authreqs/new">Bevoegdheid Aanvragen</Button>
                 </Box>
 
