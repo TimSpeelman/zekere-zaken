@@ -1,14 +1,12 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from '@material-ui/core/Typography';
 import { default as React } from "react";
 import { useParams } from "react-router-dom";
+import { AuthorityCard } from "../../components/AuthorityCard";
+import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { InAuthorizationRequest } from "../../types/State";
@@ -60,34 +58,16 @@ export function IncomingVerifReq() {
                 <p><strong>{req.from.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
             </Box>
 
-            <Paper className={classes.paper} >
-                {req.legalEntity && <p>Bevoegd namens <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
-                gevestigd te <strong>{req.legalEntity.address}</strong> te handelen voor:</p>}
+            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
 
-                <List dense >
-                    <ListItem >
-                        <ListItemText
-                            primary={req.authority.type}
-                            secondary={"Type Handeling"} />
-                    </ListItem>
-                    <ListItem >
-                        <ListItemText
-                            primary={eur(req.authority.amount)}
-                            secondary={"Financiële Beperking"} />
-                    </ListItem>
-                </List>
-            </Paper>
-
-            <Box pt={1} pb={1}>
-                <p>Deze bevoegdheid zit niet in uw wallet:</p>
+            <Box pt={1} pb={1} className={classes.warning}>
+                <p>Deze bevoegdheid zit niet in uw wallet. </p>
             </Box>
 
-            <Box pb={2} pt={2}>
-                <Toolbar>
-                    <Button variant={"contained"} color={"primary"} component="a" href={getMsg()}>Bevoegdheid Aanvragen</Button>
-                    <Button variant={"contained"} style={{ marginLeft: 16 }}>Annuleren</Button>
-                </Toolbar>
-            </Box>
+            <FormActions>
+                <Button component="a" href="#/home">Annuleren</Button>
+                <Button variant={"contained"} color={"primary"} component="a" href={getMsg()}>Aanvragen</Button>
+            </FormActions>
         </div>
     );
 }

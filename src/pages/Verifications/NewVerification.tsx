@@ -1,13 +1,14 @@
+import { Divider } from "@material-ui/core";
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import Toolbar from "@material-ui/core/Toolbar";
 import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
 import uuid from "uuid/v4";
 import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
+import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
@@ -67,19 +68,19 @@ export function NewVerification() {
                     )}
             </Paper>
 
-            <Box pb={2} pt={2}>
-                <Toolbar style={{ display: "flex", justifyContent: "center" }}>
-                    <Button variant={"contained"} color={"primary"}
-                        disabled={!canSubmit}
-                        onClick={handleSubmit}>Doorgaan</Button>
+            <FormActions>
+                <Button
+                    onClick={onCancel}>Annuleren</Button>
 
-                    <Button variant={"contained"} style={{ marginLeft: 16 }}
-                        onClick={onCancel}>Annuleren</Button>
-                </Toolbar>
-            </Box>
+                <Button variant={"contained"} color={"primary"}
+                    disabled={!canSubmit}
+                    onClick={handleSubmit}>Volgende</Button>
+            </FormActions>
 
-            <Box style={{ textAlign: "center" }} mt={3}>
-                <Button variant="outlined" component="a" href="#/verifs/outbox">Verificatiegeschiedenis</Button>
+            <Divider />
+
+            <Box style={{ textAlign: "center" }} mt={2}>
+                <Button component="a" href="#/verifs/outbox">Toon Verificatiegeschiedenis</Button>
             </Box>
 
         </div>

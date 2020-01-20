@@ -1,17 +1,14 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from '@material-ui/core/Typography';
 import { default as React } from "react";
 import { useParams } from "react-router-dom";
+import { AuthorityCard } from "../../components/AuthorityCard";
+import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
-import { eur } from "../../util/eur";
 
 export function IncomingAuthReq() {
     const { reqId: id } = useParams();
@@ -49,30 +46,12 @@ export function IncomingAuthReq() {
                 <p><strong>{req.from.name}</strong> vraagt de volgende machtiging:</p>
             </Box>
 
-            <Paper className={classes.paper} >
-                {req.legalEntity && <p>Te verlenen door <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
-                gevestigd te <strong>{req.legalEntity.address}</strong>. Inhoud van de machtiging:</p>}
+            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
 
-                <List dense >
-                    <ListItem >
-                        <ListItemText
-                            primary={req.authority.type}
-                            secondary={"Type Handeling"} />
-                    </ListItem>
-                    <ListItem >
-                        <ListItemText
-                            primary={"Tot " + eur(req.authority.amount)}
-                            secondary={"Financiële Beperking"} />
-                    </ListItem>
-                </List>
-            </Paper>
-
-            <Box pb={2} pt={2}>
-                <Toolbar>
-                    <Button variant={"contained"} color={"primary"}>Machtigen</Button>
-                    <Button variant={"contained"} style={{ marginLeft: 16 }}>Afwijzen</Button>
-                </Toolbar>
-            </Box>
+            <FormActions>
+                <Button variant={"contained"}>Afwijzen</Button>
+                <Button variant={"contained"} color={"primary"}>Machtigen</Button>
+            </FormActions>
         </div>
     );
 }

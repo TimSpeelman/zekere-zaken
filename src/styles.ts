@@ -101,6 +101,10 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         flexDirection: "column",
     },
+    warning: {
+        color: "red",
+        fontWeight: "bold",
+    }
 }));
 
 export { useStyles };

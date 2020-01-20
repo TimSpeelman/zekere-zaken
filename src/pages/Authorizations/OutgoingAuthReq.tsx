@@ -1,13 +1,11 @@
 import { IconButton } from "@material-ui/core";
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { default as React } from "react";
 import { useParams } from "react-router-dom";
+import { AuthorityCard } from "../../components/AuthorityCard";
+import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { InAuthorizationRequest } from "../../types/State";
@@ -44,30 +42,14 @@ export function OutgoingAuthReq() {
             <Box pt={1} pb={1}>
                 <p>Deel de volgende link om uw bevoegdheid aan te vragen.</p>
             </Box>
-            <Paper className={classes.paper} >
-                {req.legalEntity && <Box pt={1} pb={1}>
-                    <p>Bevoegdheid namens <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
-                gevestigd te <strong>{req.legalEntity.address}</strong> voor het volgende:</p>
-                </Box>}
 
-                <List dense >
-                    <ListItem >
-                        <ListItemText
-                            primary={req.authority.type}
-                            secondary={"Type Handeling"} />
-                    </ListItem>
-                    <ListItem >
-                        <ListItemText
-                            primary={`Tot ${eur(req.authority.amount)}`}
-                            secondary={"Financiële Beperking"} />
-                    </ListItem>
-                </List>
-            </Paper>
+            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
 
-            <Box pb={2} pt={2} style={{ display: "flex", justifyContent: "space-between" }}>
-                <Button variant={"contained"} color={"primary"} component="a" href={getMsg()} >Delen via Whatsapp</Button>
+            <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>
-            </Box>
+
+                <Button variant={"contained"} color={"primary"} component="a" href={getMsg()} >Delen via Whatsapp</Button>
+            </FormActions>
         </div>
     );
 }

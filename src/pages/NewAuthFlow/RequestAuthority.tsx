@@ -1,7 +1,6 @@
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
@@ -9,6 +8,7 @@ import uuid from "uuid/v4";
 import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
+import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
@@ -65,13 +65,12 @@ export function RequestAuthority() {
                     )}
             </Paper>
 
-            <Box pb={2} pt={2}>
-                <Toolbar>
-                    <Button variant={"contained"} color={"primary"} onClick={handleSubmit} disabled={!canSubmit}>Doorgaan</Button>
-                    <Button variant={"contained"} style={{ marginLeft: 16 }} component="a" href="#/authreqs/outbox">Annuleren</Button>
-                </Toolbar>
-            </Box>
+            <FormActions>
+                <Button component="a" href="#/authreqs/outbox">Annuleren</Button>
 
+                <Button variant={"contained"} color={"primary"} onClick={handleSubmit} disabled={!canSubmit}>Doorgaan</Button>
+            </FormActions>
         </div>
+
     );
 }
