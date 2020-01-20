@@ -5,9 +5,10 @@ import { KVKAuthorityType } from "../../types/State";
 interface Props {
     value: KVKAuthorityType | null,
     onChange: (entity: KVKAuthorityType | null) => void;
+    helperText?: string;
 }
 
-export function KVKAuthorityTypeSelect({ value, onChange }: Props) {
+export function KVKAuthorityTypeSelect({ value, onChange, helperText }: Props) {
     return (
         <FormControl fullWidth>
             <InputLabel>Type Handeling</InputLabel>
@@ -27,7 +28,7 @@ export function KVKAuthorityTypeSelect({ value, onChange }: Props) {
                 <MenuItem value={KVKAuthorityType.Onderhoud}>Onderhoud</MenuItem>
                 <MenuItem value={KVKAuthorityType.Software}>Software</MenuItem>
             </Select>
-            <FormHelperText>Welke handeling wil de persoon uitvoeren?</FormHelperText>
+            {helperText && <FormHelperText>{helperText}</FormHelperText>}
         </FormControl>
     );
 }

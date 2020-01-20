@@ -1,12 +1,12 @@
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
 import uuid from "uuid/v4";
+import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { useLocalState } from "../../hooks/useLocalState";
@@ -15,20 +15,24 @@ import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
 
 export function RequestAuthority() {
     const classes = useStyles({});
-    const [business, setBusiness] = useState<LegalEntity | null>(null);
+    const [entity, setEntity] = useState<LegalEntity | null>(null);
+    const [chooseEntity, setChooseEntity] = useState(false);
+
     const { manager } = useLocalState();
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
     const [amount, setAmount] = useState(0);
 
+    const canSubmit = type && amount > 0;
+
     const handleSubmit = () => {
-        if (business && type && amount > 0) {
+        if (type && amount > 0) {
             const authority: Authority = { type, amount };
             const id = uuid();
             manager.addOutAuthReq({
                 authority,
                 datetime: new Date(),
                 id: id,
-                legalEntity: business,
+                legalEntity: entity ? entity : undefined,
             });
             window.location.assign(`#/authreqs/outbox/${id}`);
         }
@@ -46,28 +50,24 @@ export function RequestAuthority() {
 
             <Paper className={classes.paper} >
                 <Box mb={3}>
-                    <BusinessFinder onSelect={(val) => setBusiness(val)} />
-                </Box>
-
-                <Box mb={3}>
                     <KVKAuthorityTypeSelect value={type} onChange={setType} />
                 </Box>
 
-                <TextField
-                    label={"Bedrag"}
-                    value={amount}
-                    onChange={(e) => setAmount(parseFloat(e.target.value))}
-                    helperText={"Welk bedrag wil u mogen besteden?"}
-                    type={"number"}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">€</InputAdornment>
-                    }}
-                    fullWidth />
+                <Box mb={3}>
+                    <AmountInput value={amount} onChange={setAmount} helperText={"Welk bedrag wil u mogen besteden?"} />
+                </Box>
+
+                {chooseEntity ?
+                    (
+                        <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
+                    ) : (
+                        <Button startIcon={<AddIcon />} onClick={() => setChooseEntity(true)}>Organisatie Specificeren</Button>
+                    )}
             </Paper>
 
             <Box pb={2} pt={2}>
                 <Toolbar>
-                    <Button variant={"contained"} color={"primary"} onClick={handleSubmit}>Doorgaan</Button>
+                    <Button variant={"contained"} color={"primary"} onClick={handleSubmit} disabled={!canSubmit}>Doorgaan</Button>
                     <Button variant={"contained"} style={{ marginLeft: 16 }} component="a" href="#/authreqs/outbox">Annuleren</Button>
                 </Toolbar>
             </Box>

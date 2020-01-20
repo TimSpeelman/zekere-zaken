@@ -6,9 +6,10 @@ import { LegalEntity } from "../../types/State";
 
 interface Props {
     onSelect: (entity: LegalEntity) => void;
+    helperText?: string;
 }
 
-export function BusinessFinder({ onSelect }: Props) {
+export function BusinessFinder({ onSelect, helperText }: Props) {
     const [selectedBusiness, setSelectedBusiness] = useState<LegalEntity | null>(null);
 
     const handleSelect = (e: any, val: LegalEntity) => {
@@ -24,7 +25,7 @@ export function BusinessFinder({ onSelect }: Props) {
                     placeholder={"Zoek op bedrijf of KVK-nummer"}
                     InputLabelProps={{ shrink: true }}
                     label={"Organisatie (optioneel)"}
-                    helperText={"Namens welke organisatie moet de persoon bevoegd zijn?"}
+                    helperText={helperText}
                     fullWidth />
             )}
             value={selectedBusiness}
