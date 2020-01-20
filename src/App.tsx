@@ -13,9 +13,9 @@ import { OutgoingAuthReq } from "./pages/Authorizations/OutgoingAuthReq";
 import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
 import { RequestAuthority } from "./pages/NewAuthFlow/RequestAuthority";
-import { NewVerificationFlow } from "./pages/NewVerificationFlow/NewVerificationFlow";
 import { ScanQR } from "./pages/ScanQR";
 import { IncomingVerifReq } from "./pages/Verifications/IncomingVerifReq";
+import { NewVerification } from "./pages/Verifications/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifications/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifications/VerifReqOutbox";
 import { useStyles } from "./styles";
@@ -63,7 +63,7 @@ export const AppBody: React.FC = () => {
             <MyRoute title="Inkomend Verzoek" path="/in/:req"><ReqHandler /></MyRoute>
 
             {/* Verifiers */}
-            <MyRoute title="Verifiëren" path="/verifs/new"><NewVerificationFlow /></MyRoute>
+            <MyRoute title="Verifiëren" path="/verifs/new"><NewVerification /></MyRoute>
             <MyRoute title="Verifiëren" path="/verifs/outbox/:reqId"><OutgoingVerifReq /></MyRoute>
             <MyRoute title="Verificatiegeschiedenis" path="/verifs/outbox"><VerifReqOutbox /></MyRoute>
 

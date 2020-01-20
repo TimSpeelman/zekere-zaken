@@ -44,10 +44,10 @@ export function OutgoingAuthReq() {
                 <p>Deel de volgende link om uw bevoegdheid aan te vragen.</p>
             </Box>
             <Paper className={classes.paper} >
-                <Box pt={1} pb={1}>
+                {req.legalEntity && <Box pt={1} pb={1}>
                     <p>Bevoegdheid namens <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
                 gevestigd te <strong>{req.legalEntity.address}</strong> voor het volgende:</p>
-                </Box>
+                </Box>}
 
                 <List dense >
                     <ListItem >

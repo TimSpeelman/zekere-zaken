@@ -50,8 +50,8 @@ export function IncomingAuthReq() {
             </Box>
 
             <Paper className={classes.paper} >
-                <p>Te verlenen door <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
-                gevestigd te <strong>{req.legalEntity.address}</strong>. Inhoud van de machtiging:</p>
+                {req.legalEntity && <p>Te verlenen door <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
+                gevestigd te <strong>{req.legalEntity.address}</strong>. Inhoud van de machtiging:</p>}
 
                 <List dense >
                     <ListItem >

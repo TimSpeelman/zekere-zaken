@@ -9,33 +9,54 @@ import Paper from "@material-ui/core/Paper";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import Toolbar from "@material-ui/core/Toolbar";
-import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
+import uuid from "uuid/v4";
+import { BusinessFinder } from "../../components/form/BusinessFinder";
+import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
-import { Authority, KVKAuthorityType } from "../../types/State";
+import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
 
-interface Props {
-    onSucceed: (authority: Authority) => void,
-    onCancel: () => void,
-}
-
-export function SelectAuthority({ onSucceed, onCancel }: Props) {
+export function NewVerification() {
     const classes = useStyles({});
+
+    const { manager } = useLocalState();
+
+    const [chooseEntity, setChooseEntity] = useState(false);
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
     const [amount, setAmount] = useState(0);
+    const [entity, setEntity] = useState<LegalEntity | null>(null);
 
     const canSubmit = type !== null && amount > 0;
-    const handleSubmit = () =>
-        canSubmit && type !== null &&
-        onSucceed({ amount, type })
+
+    const handleSubmit = () => {
+        if (type) {
+            const requestId = uuid();
+
+            const authority: Authority = { type, amount };
+
+            manager.addOutVerifReq({
+                authority,
+                datetime: new Date(),
+                id: requestId,
+                legalEntity: entity!, // FIXME
+            });
+
+            window.location.assign(`#/verifs/outbox/${requestId}`);
+        }
+    }
+
+    const onCancel = () => {
+        window.location.assign("#/");
+    }
 
     return (
         <div>
             <Box p={1}></Box>
 
-            <Typography component="h2" variant="h6" color="inherit">
-                Stap 2: Gewenste Bevoegdheid
-                        </Typography>
+            {/* <Typography component="h2" variant="h6" color="inherit">
+                
+            </Typography> */}
             <p>Welke bevoegdheid moet de persoon hebben?</p>
 
             <Paper className={classes.paper} >
@@ -62,16 +83,25 @@ export function SelectAuthority({ onSucceed, onCancel }: Props) {
                     </FormControl>
                 </Box>
 
-                <TextField
-                    label={"Bedrag"}
-                    value={amount}
-                    onChange={(e) => setAmount(parseFloat(e.target.value))}
-                    helperText={"Welk bedrag wil de persoon besteden?"}
-                    type={"number"}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">€</InputAdornment>
-                    }}
-                    fullWidth />
+                <Box mb={3}>
+                    <TextField
+                        label={"Bedrag"}
+                        value={amount}
+                        onChange={(e) => setAmount(parseFloat(e.target.value))}
+                        helperText={"Welk bedrag wil de persoon besteden?"}
+                        type={"number"}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">€</InputAdornment>
+                        }}
+                        fullWidth />
+                </Box>
+
+                {chooseEntity ?
+                    (
+                        <BusinessFinder onSelect={setEntity} />
+                    ) : (
+                        <Button startIcon={<AddIcon />} onClick={() => setChooseEntity(true)}>Organisatie Specificeren</Button>
+                    )}
             </Paper>
 
             <Box pb={2} pt={2}>
@@ -79,6 +109,7 @@ export function SelectAuthority({ onSucceed, onCancel }: Props) {
                     <Button variant={"contained"} color={"primary"}
                         disabled={!canSubmit}
                         onClick={handleSubmit}>Doorgaan</Button>
+
                     <Button variant={"contained"} style={{ marginLeft: 16 }}
                         onClick={onCancel}>Annuleren</Button>
                 </Toolbar>

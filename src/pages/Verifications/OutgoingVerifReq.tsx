@@ -71,10 +71,10 @@ export function OutgoingVerifReq() {
                         </div>
                     )}
 
-                <Box pt={1} pb={1}>
+                {req.legalEntity && <Box pt={1} pb={1}>
                     <p>{!verifiee ? "Bent u bevoegd" : "Bevoegd"} namens <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
                 gevestigd te <strong>{req.legalEntity.address}</strong> voor het volgende:</p>
-                </Box>
+                </Box>}
 
                 <List dense >
                     <ListItem >

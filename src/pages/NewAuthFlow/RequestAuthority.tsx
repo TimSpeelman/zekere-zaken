@@ -1,18 +1,14 @@
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
 import Paper from "@material-ui/core/Paper";
-import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from '@material-ui/core/Typography';
 import { default as React, useState } from "react";
 import uuid from "uuid/v4";
-import { BusinessFinder } from "../../components/BusinessFinder";
+import { BusinessFinder } from "../../components/form/BusinessFinder";
+import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
@@ -54,33 +50,14 @@ export function RequestAuthority() {
                 </Box>
 
                 <Box mb={3}>
-                    <FormControl fullWidth>
-                        <InputLabel>Type Handeling</InputLabel>
-                        <Select
-                            value={type || ""}
-                            fullWidth
-                            onChange={e => setType(e.target.value as KVKAuthorityType)}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={KVKAuthorityType.Inkoop}>Inkoop</MenuItem>
-                            <MenuItem value={KVKAuthorityType.Verkoop}>Verkoop</MenuItem>
-                            <MenuItem value={KVKAuthorityType.Garantie}>Garantie</MenuItem>
-                            <MenuItem value={KVKAuthorityType.Lease}>Lease</MenuItem>
-                            <MenuItem value={KVKAuthorityType.Financiering}>Financiering</MenuItem>
-                            <MenuItem value={KVKAuthorityType.Onderhoud}>Onderhoud</MenuItem>
-                            <MenuItem value={KVKAuthorityType.Software}>Software</MenuItem>
-                        </Select>
-                        <FormHelperText>Welke handeling wil de persoon uitvoeren?</FormHelperText>
-                    </FormControl>
+                    <KVKAuthorityTypeSelect value={type} onChange={setType} />
                 </Box>
 
                 <TextField
                     label={"Bedrag"}
                     value={amount}
                     onChange={(e) => setAmount(parseFloat(e.target.value))}
-                    helperText={"Welk bedrag wil de persoon besteden?"}
+                    helperText={"Welk bedrag wil u mogen besteden?"}
                     type={"number"}
                     InputProps={{
                         startAdornment: <InputAdornment position="start">€</InputAdornment>

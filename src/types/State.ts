@@ -10,7 +10,7 @@ export interface IState {
 export interface InVerificationRequest {
     id: string;
     from: Actor;
-    legalEntity: LegalEntity;
+    legalEntity?: LegalEntity;
     authority: Authority;
     datetime: Date;
 }
@@ -18,21 +18,21 @@ export interface InVerificationRequest {
 export interface InAuthorizationRequest {
     id: string;
     from: Actor;
-    legalEntity: LegalEntity;
+    legalEntity?: LegalEntity;
     authority: Authority;
     datetime: Date;
 }
 
 export interface OutVerificationRequest {
     id: string;
-    legalEntity: LegalEntity;
+    legalEntity?: LegalEntity;
     authority: Authority;
     datetime: Date;
 }
 
 export interface OutAuthorizationRequest {
     id: string;
-    legalEntity: LegalEntity;
+    legalEntity?: LegalEntity;
     authority: Authority;
     datetime: Date;
 }

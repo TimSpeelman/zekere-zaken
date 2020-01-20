@@ -7,7 +7,7 @@ import ImageIcon from '@material-ui/icons/Image';
 import { format } from "date-fns";
 import { default as React } from "react";
 import { useLocalState } from "../../hooks/useLocalState";
-import { eur } from "../../util/eur";
+import { reqText } from "../../util/intl";
 
 export function VerifReqOutbox() {
     const { state } = useLocalState();
@@ -25,7 +25,7 @@ export function VerifReqOutbox() {
                             </Avatar>
                         </ListItemAvatar>
                         <ListItemText
-                            primary={`${req.authority.type} tot ${eur(req.authority.amount)} namens ${req.legalEntity.name}`}
+                            primary={reqText(req)}
                             secondary={format(req.datetime, 'dd-MM-yyyy HH:mm')} />
                     </ListItem>
                 ))}

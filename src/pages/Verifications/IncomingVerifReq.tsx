@@ -61,8 +61,8 @@ export function IncomingVerifReq() {
             </Box>
 
             <Paper className={classes.paper} >
-                <p>Bevoegd namens <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
-                gevestigd te <strong>{req.legalEntity.address}</strong> te handelen voor:</p>
+                {req.legalEntity && <p>Bevoegd namens <strong>{req.legalEntity.name}</strong> (KVK-nummer: <strong>{req.legalEntity.kvknr}</strong>),
+                gevestigd te <strong>{req.legalEntity.address}</strong> te handelen voor:</p>}
 
                 <List dense >
                     <ListItem >
