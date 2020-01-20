@@ -49,10 +49,7 @@ export function NewVerification() {
         <div>
             <Box p={1}></Box>
 
-            {/* <Typography component="h2" variant="h6" color="inherit">
-                
-            </Typography> */}
-            <p>Welke bevoegdheid moet de persoon hebben?</p>
+            <p>Omschrijf de bevoegdheid die u wilt verifiëren?</p>
 
             <Paper className={classes.paper} >
                 <Box mb={3}>
@@ -71,7 +68,7 @@ export function NewVerification() {
             </Paper>
 
             <Box pb={2} pt={2}>
-                <Toolbar>
+                <Toolbar style={{ display: "flex", justifyContent: "center" }}>
                     <Button variant={"contained"} color={"primary"}
                         disabled={!canSubmit}
                         onClick={handleSubmit}>Doorgaan</Button>
@@ -79,6 +76,10 @@ export function NewVerification() {
                     <Button variant={"contained"} style={{ marginLeft: 16 }}
                         onClick={onCancel}>Annuleren</Button>
                 </Toolbar>
+            </Box>
+
+            <Box style={{ textAlign: "center" }} mt={3}>
+                <Button variant="outlined" component="a" href="#/verifs/outbox">Verificatiegeschiedenis</Button>
             </Box>
 
         </div>
