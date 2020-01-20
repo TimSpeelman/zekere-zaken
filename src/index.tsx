@@ -11,7 +11,7 @@ import { theme } from "./theme";
 const stateMgr = new StateManager();
 stateMgr.setState(dummyState);
 
-
+// fullScreenOnClick();
 
 const root = (
     <ThemeProvider theme={theme}>
