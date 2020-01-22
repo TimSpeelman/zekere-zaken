@@ -29,7 +29,7 @@ export function AuthReqInbox() {
                                 <ImageIcon />
                             </Avatar>
                         </ListItemAvatar>
-                        <ListItemText primary={req.from.name} secondary={format(req.datetime, 'dd-MM-yyyy HH:mm')} />
+                        <ListItemText primary={req.from.name} secondary={format(new Date(req.datetime), 'dd-MM-yyyy HH:mm')} />
                     </ListItem>
                 ))}
             </List>

@@ -34,7 +34,7 @@ export function AuthReqOutbox() {
                         </ListItemAvatar>
                         <ListItemText
                             primary={reqText(req)}
-                            secondary={format(req.datetime, 'dd-MM-yyyy HH:mm')} />
+                            secondary={format(new Date(req.datetime), 'dd-MM-yyyy HH:mm')} />
                     </ListItem>
                 ))}
             </List>

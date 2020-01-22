@@ -7,12 +7,19 @@ export interface IState {
     outgoingAuthReqs: OutAuthorizationRequest[];
 }
 
+export interface VerificationRequest {
+    id: string;
+    legalEntity?: LegalEntity;
+    authority: Authority;
+    datetime: string;
+}
+
 export interface InVerificationRequest {
     id: string;
     from: Actor;
     legalEntity?: LegalEntity;
     authority: Authority;
-    datetime: Date;
+    datetime: string;
 }
 
 export interface InAuthorizationRequest {
@@ -20,21 +27,21 @@ export interface InAuthorizationRequest {
     from: Actor;
     legalEntity?: LegalEntity;
     authority: Authority;
-    datetime: Date;
+    datetime: string;
 }
 
 export interface OutVerificationRequest {
     id: string;
     legalEntity?: LegalEntity;
     authority: Authority;
-    datetime: Date;
+    datetime: string;
 }
 
 export interface OutAuthorizationRequest {
     id: string;
     legalEntity?: LegalEntity;
     authority: Authority;
-    datetime: Date;
+    datetime: string;
 }
 
 export interface Actor {

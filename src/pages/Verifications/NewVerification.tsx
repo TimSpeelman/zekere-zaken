@@ -33,7 +33,7 @@ export function NewVerification() {
 
             manager.addOutVerifReq({
                 authority,
-                datetime: new Date(),
+                datetime: new Date().toISOString(),
                 id: requestId,
                 legalEntity: entity!, // FIXME
             });

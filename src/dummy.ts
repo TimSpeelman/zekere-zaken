@@ -19,7 +19,7 @@ const Inkoop5k: Authority = { amount: 5000, type: KVKAuthorityType.Inkoop };
 // Kees (MeubelsEnZo) vraagt Piet om verificatie
 const OutVerifJanssenInkoop5k: OutVerificationRequest = {
     id: "1",
-    datetime: add(new Date(), { minutes: -3 }),
+    datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: JanssenBV,
     authority: Inkoop5k,
 };
@@ -29,7 +29,7 @@ const InVerifJanssenInkoop5k: InVerificationRequest =
 // Piet (Janssen BV) vraagt Jan (Janssen BV) om machtiging
 const OutAuthJanssenInkoop10k: OutAuthorizationRequest = {
     id: "2",
-    datetime: add(new Date(), { minutes: -3 }),
+    datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: JanssenBV,
     authority: Inkoop10k,
 };
@@ -52,7 +52,7 @@ const Financiering70k: Authority = { amount: 70000, type: KVKAuthorityType.Finan
 // David stuurt Joep een verificatie:
 const OutVerifDeBroodfabriekInkoop70k: OutVerificationRequest = {
     id: "3",
-    datetime: add(new Date(), { minutes: -3 }),
+    datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: DeBroodfabriek,
     authority: Financiering70k,
 };
@@ -62,7 +62,7 @@ const InVerifDeBroodfabriekFinanciering70k: InVerificationRequest =
 // Joep vraagt Sarah om een machtiging
 const OutAuthDeBroodfabriekFinanciering100k: OutAuthorizationRequest = {
     id: "4",
-    datetime: add(new Date(), { minutes: -3 }),
+    datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: DeBroodfabriek,
     authority: Financiering100k,
 };

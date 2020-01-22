@@ -20,7 +20,7 @@ export function OutgoingAuthReq() {
         if (req) {
             const inAuthReq: InAuthorizationRequest = { ...req, from: { name: "Tim Speelman" } }
             const uriReq = encodeURIComponent(JSON.stringify(inAuthReq))
-            textMsg = `Wil je mij machtigen voor '${req?.authority.type}' tot '${eur(req!.authority.amount)}'? https://machtigen.mualo.nl/#/in/${uriReq}`;
+            textMsg = `Wil je mij machtigen voor '${req?.authority.type}' tot '${eur(req!.authority.amount)}'? https://zekerezaken.nl/#/in/${uriReq}`;
         }
         return `https://wa.me/?text=${encodeURIComponent(textMsg)}`
     }

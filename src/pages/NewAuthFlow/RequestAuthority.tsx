@@ -30,7 +30,7 @@ export function RequestAuthority() {
             const id = uuid();
             manager.addOutAuthReq({
                 authority,
-                datetime: new Date(),
+                datetime: new Date().toISOString(),
                 id: id,
                 legalEntity: entity ? entity : undefined,
             });
