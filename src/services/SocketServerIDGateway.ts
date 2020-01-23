@@ -2,7 +2,7 @@ import { Dict } from "@tsow/ow-attest/dist/types/ipv8/types/Dict";
 import debug from "debug";
 import uuid from "uuid/v4";
 import { Agent, IPv8VerifReq, Me } from "../shared/Agent";
-import { Envelope, Msg, MsgReplyToVerifReq, MsgResolveReference, MsgSendVerificationRequestDetails } from "../shared/PeerMessaging";
+import { Envelope, Msg, MsgProfile, MsgReplyToVerifReq, MsgResolveReference, MsgSendVerificationRequestDetails } from "../shared/PeerMessaging";
 import { Profile, VerificationRequest } from "../types/State";
 import { Hook } from "../util/Hook";
 import { Timer } from "../util/timer";
@@ -58,6 +58,7 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
 
     public me?: Me;
     private profile?: Profile;
+    private profileSharedWith: string[] = [];
 
     /** When a peer sends a message to us, this hook fires */
     incomingMessageHook: Hook<InMsg> = new Hook();
@@ -160,6 +161,7 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
         }
 
         this.sendMessageToPeer(peerId, msg);
+        this.sendProfile(peerId);
     }
 
     /** We send a message directly to a peer. */
@@ -170,7 +172,6 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
             messageId: uuid(),
             message,
             senderId: this.me!.id,
-            senderProfile: this.profile!,
         }
 
         log("Sending to peer", peerId, ":", envelope);
@@ -185,16 +186,25 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
 
         const envelope: Envelope = JSON.parse(encodedMessage); // TODO VALIDATE
 
-        if (envelope.senderProfile) {
-            this.verifiedProfileHook.fire({ peerId: senderId, profile: envelope.senderProfile });
-        }
-
         switch (envelope.message.type) {
             case "ResolveReference": this.receiveResolveReference(senderId, envelope.message); break;
             case "SendVerificationRequestDetails": this.receiveVerificationRequest(senderId, envelope.message); break;
             case "ReplyToVerifReq": this.receiveVerificationResponse(senderId, envelope.message); break;
+            case "Profile": this.receiveProfile(senderId, envelope.message); break;
             default: console.warn("Unknown incoming message type:", envelope);
         }
+    }
+
+    protected sendProfile(peerId: string, ignoreCache?: boolean) {
+        if (!ignoreCache && this.profileSharedWith.indexOf(peerId) >= 0) {
+            return;
+        }
+        const message: MsgProfile = {
+            type: "Profile",
+            profile: this.profile!,
+        }
+        this.profileSharedWith.push(peerId);
+        this.sendMessageToPeer(peerId, message);
     }
 
     /**
@@ -219,6 +229,7 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
         }
 
         this.sendMessageToPeer(peerId, message);
+        this.sendProfile(peerId);
     }
 
     /**
@@ -259,6 +270,11 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
         if (msg.accept) {
             this.verifyPeerOverIPv8(senderId, request)
         }
+    }
+
+    protected receiveProfile(senderId: string, message: MsgProfile) {
+        log("received profile", senderId, message.profile);
+        this.verifiedProfileHook.fire({ peerId: senderId, profile: message.profile });
     }
 
     /** Verify a peer over IPv8 */
@@ -311,6 +327,12 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
     protected assertConnected() {
         if (!this.me) {
             throw new Error("Not connected to agent yet!");
+        }
+    }
+
+    protected assertProfileSet() {
+        if (!this.profile) {
+            throw new Error("Profile not yet set!");
         }
     }
 

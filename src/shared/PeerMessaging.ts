@@ -6,8 +6,6 @@ export interface Envelope {
     message: Msg;
     senderId: string;
     respondsToMessageId?: string;
-    sender?: any; // My details? Photo, Name, Id
-    senderProfile: Profile;
 }
 
 export type Msg =
@@ -15,7 +13,8 @@ export type Msg =
     MsgSendVerificationRequestDetails |
     MsgSendAuthRequestDetails |
     MsgReplyToVerifReq |
-    MsgReplyToAuthReq;
+    MsgReplyToAuthReq |
+    MsgProfile;
 
 export interface MsgResolveReference {
     type: "ResolveReference";
@@ -44,4 +43,9 @@ export interface MsgReplyToVerifReq {
 export interface MsgReplyToAuthReq {
     type: "ReplyToAuthReq";
     accept: boolean;
+}
+
+export interface MsgProfile {
+    type: "Profile";
+    profile: Profile;
 }
