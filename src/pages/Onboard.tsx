@@ -42,7 +42,7 @@ export function Onboard() {
     const canSubmit = photo && name;
     const handleSubmit = () => {
         if (canSubmit && photo && name) {
-            manager.storeProfile({ photo, name })
+            manager.setMyProfile({ photo, name })
             window.location.assign(`#/home`);
         }
     };

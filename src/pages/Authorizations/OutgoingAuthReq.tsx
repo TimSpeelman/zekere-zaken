@@ -7,24 +7,14 @@ import { useParams } from "react-router-dom";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { useLocalState } from "../../hooks/useLocalState";
-import { InAuthorizationRequest } from "../../types/State";
-import { eur } from "../../util/eur";
+import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 
 export function OutgoingAuthReq() {
     const { reqId: id } = useParams();
     const { state, manager } = useLocalState();
     const req = state.outgoingAuthReqs.find(r => r.id === id)
 
-    function getMsg() {
-        let textMsg = "";
-        if (req) {
-            const inAuthReq: InAuthorizationRequest = { ...req, from: { name: "Tim Speelman" } }
-            const uriReq = encodeURIComponent(JSON.stringify(inAuthReq))
-            textMsg = `Wil je mij machtigen voor '${req?.authority.type}' tot '${eur(req!.authority.amount)}'? https://zekerezaken.nl/#/in/${uriReq}`;
-        }
-        return `https://wa.me/?text=${encodeURIComponent(textMsg)}`
-    }
-
+    const { getURL } = useWhatsappURL();
 
     const deleteItem = () => {
         if (req) {
@@ -46,7 +36,7 @@ export function OutgoingAuthReq() {
             <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>
 
-                <Button variant={"contained"} color={"primary"} component="a" href={getMsg()} >Delen via Whatsapp</Button>
+                <Button variant={"contained"} color={"primary"} component="a" href={getURL(req)} >Delen via Whatsapp</Button>
             </FormActions>
         </div>
     );

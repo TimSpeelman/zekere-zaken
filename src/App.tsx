@@ -71,7 +71,7 @@ export const AppBody: React.FC = () => {
 
             idGateway.requestToResolveBroadcast(val).then((req) => {
                 const id = uuid();
-                manager.addInVerifReq({ ...req, id, from: { name: "FIXME" } });
+                manager.addInVerifReq({ ...req, id });
                 window.location.assign(`#/verifs/inbox/${id}`)
             }).catch((e) => {
                 alert("Timed out resolving reference");

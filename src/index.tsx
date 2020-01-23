@@ -21,6 +21,11 @@ const socket = socketIOClient.connect(url);
 const agent = new SockAgent(socket);
 const gateway: IdentityGatewayInterface = new SocketServerIDGateway(agent);
 
+stateMgr.hook.on((s) => gateway.setProfile(s.profile!));
+gateway.setProfile(stateMgr.state.profile!);
+
+gateway.verifiedProfileHook.on(({ peerId, profile }) => stateMgr.addProfile(peerId, profile));
+
 // fullScreenOnClick();
 
 const root = (

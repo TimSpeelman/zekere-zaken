@@ -1,4 +1,4 @@
-import { Authority, LegalEntity, VerificationRequest } from "../types/State";
+import { Authority, LegalEntity, Profile, VerificationRequest } from "../types/State";
 
 
 export interface Envelope {
@@ -7,6 +7,7 @@ export interface Envelope {
     senderId: string;
     respondsToMessageId?: string;
     sender?: any; // My details? Photo, Name, Id
+    senderProfile: Profile;
 }
 
 export type Msg =

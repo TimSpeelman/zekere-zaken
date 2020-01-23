@@ -24,6 +24,7 @@ export class StateManager {
             incomingVerifReqs: [],
             outgoingAuthReqs: [],
             outgoingVerifReqs: [],
+            profiles: {},
         }
 
     setState(state: Partial<IState>) {
@@ -32,9 +33,13 @@ export class StateManager {
         console.log("NEW STATE", this._state);
     }
 
-    storeProfile(profile: Profile) {
+    setMyProfile(profile: Profile) {
         localStorage.setItem("profile", JSON.stringify(profile));
         this.setState({ profile });
+    }
+
+    addProfile(peerId: string, profile: Profile) {
+        this.setState({ profiles: { [peerId]: profile } });
     }
 
     addInAuthReq(req: InAuthorizationRequest) {

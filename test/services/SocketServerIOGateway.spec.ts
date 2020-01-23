@@ -120,7 +120,7 @@ describe("IDGateway", () => {
     })
 
     function makeVerifReq(): OutVerificationRequest {
-        return { authority: { amount: 10, type: KVKAuthorityType.Inkoop }, datetime: new Date().toISOString(), id: "123" }
+        return { authority: { amount: 10, type: KVKAuthorityType.Inkoop }, datetime: new Date().toISOString(), id: "123", verifierId: "VERIF" }
     }
 
     function makeAgent(peerId: string): MockAgent {

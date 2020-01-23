@@ -3,7 +3,7 @@ import debug from "debug";
 import uuid from "uuid/v4";
 import { Agent, IPv8VerifReq, Me } from "../shared/Agent";
 import { Envelope, Msg, MsgReplyToVerifReq, MsgResolveReference, MsgSendVerificationRequestDetails } from "../shared/PeerMessaging";
-import { VerificationRequest } from "../types/State";
+import { Profile, VerificationRequest } from "../types/State";
 import { Hook } from "../util/Hook";
 import { Timer } from "../util/timer";
 import { AuthorizationSpec, BroadcastReference, IdentityGatewayInterface, InMsg, ResolveOptions, Result } from "./IdentityGatewayInterface";
@@ -57,9 +57,11 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
     private waitingForRefs: Dict<(req: VerificationRequest) => void> = {};
 
     public me?: Me;
+    private profile?: Profile;
 
     /** When a peer sends a message to us, this hook fires */
     incomingMessageHook: Hook<InMsg> = new Hook();
+    verifiedProfileHook: Hook<{ peerId: string, profile: Profile }> = new Hook();
 
     incomingVerifReqHook: Hook<InVer> = new Hook();
     completedVerifHook: Hook<VerifReport> = new Hook();
@@ -78,6 +80,10 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
             this.me = me;
             return me;
         });
+    }
+
+    public setProfile(profile: Profile) {
+        this.profile = profile;
     }
 
     /**
@@ -117,7 +123,7 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
             this.sendMessageToPeer(ref.senderId, msg);
         });
 
-        const millis = options?.timeout || 5 * 1000;
+        const millis = options?.timeout || 20 * 1000;
         const timeout: Promise<false> = new Timer(() => false, millis).promise().then(() => false);
 
         return Promise.race([success, timeout]).then((result) => {
@@ -164,6 +170,7 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
             messageId: uuid(),
             message,
             senderId: this.me!.id,
+            senderProfile: this.profile!,
         }
 
         log("Sending to peer", peerId, ":", envelope);
@@ -176,7 +183,11 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
     /** When we receive a message from a peer */
     protected handleIncomingMessage(senderId: string, encodedMessage: string) {
 
-        const envelope = JSON.parse(encodedMessage); // TODO VALIDATE
+        const envelope: Envelope = JSON.parse(encodedMessage); // TODO VALIDATE
+
+        if (envelope.senderProfile) {
+            this.verifiedProfileHook.fire({ peerId: senderId, profile: envelope.senderProfile });
+        }
 
         switch (envelope.message.type) {
             case "ResolveReference": this.receiveResolveReference(senderId, envelope.message); break;

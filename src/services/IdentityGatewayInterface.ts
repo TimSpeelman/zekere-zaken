@@ -1,14 +1,20 @@
 import { Me } from "../shared/Agent";
 import { Msg } from "../shared/PeerMessaging";
-import { VerificationRequest } from "../types/State";
+import { Profile, VerificationRequest } from "../types/State";
 import { Hook } from "../util/Hook";
 
 export interface IdentityGatewayInterface {
 
+    me?: Me;
+
     connect(): Promise<Me>;
+
+    setProfile(profile: Profile): void;
 
     /** When a peer sends a message to us, this hook fires */
     incomingMessageHook: Hook<InMsg>;
+
+    verifiedProfileHook: Hook<{ peerId: string, profile: Profile }>;
 
     makeReferenceToVerificationRequest(req: VerificationRequest): BroadcastReference
 

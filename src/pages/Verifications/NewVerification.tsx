@@ -9,6 +9,7 @@ import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { FormActions } from "../../components/FormActions";
+import { useIdentityGateway } from "../../hooks/useIdentityGateway";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
@@ -17,6 +18,7 @@ export function NewVerification() {
     const classes = useStyles({});
 
     const { manager } = useLocalState();
+    const { gateway } = useIdentityGateway();
 
     const [chooseEntity, setChooseEntity] = useState(false);
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
@@ -36,6 +38,7 @@ export function NewVerification() {
                 datetime: new Date().toISOString(),
                 id: requestId,
                 legalEntity: entity!, // FIXME
+                verifierId: gateway.me!.id,
             });
 
             window.location.assign(`#/verifs/outbox/${requestId}`);

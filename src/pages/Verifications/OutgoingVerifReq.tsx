@@ -25,8 +25,6 @@ export function OutgoingVerifReq() {
     const { gateway: idGateway } = useIdentityGateway();
     const req = state.outgoingVerifReqs.find(r => r.id === id)
 
-    const me: Actor = { name: "Tim Speelman" }; // FIXME
-
     const [qrValue, setQR] = useState("");
     useEffect(() => {
         if (req) {

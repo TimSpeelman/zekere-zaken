@@ -5,13 +5,13 @@ import { Actor, Authority, InAuthorizationRequest, InVerificationRequest, IState
 // Zijn zoon Piet wil voor 5.000 een bureau laten maken bij MeubelsEnZo
 // Hij wordt geverifieerd door Kees
 const JanssenBV: LegalEntity = { name: "Janssen B.V.", kvknr: "12341234", address: "Korteweg 1, Delft" }
-export const Jan: Actor = { name: "Jan Janssen" };
-export const Piet: Actor = { name: "Piet Janssen" };
+export const Jan: Actor = { name: "Jan Janssen", photo: "" };
+export const Piet: Actor = { name: "Piet Janssen", photo: "" };
 
 // Kees werkt bij MeubelsEnZo en verifieert of inkopers
 // bevoegd zijn namens hun onderneming.
 const MeubelsEnZo: LegalEntity = { name: "MeubelsEnZo", kvknr: "89089012", address: "Dertig 21, Den Haag" }
-const Kees: Actor = { name: "Kees Schoon" };
+const Kees: Actor = { name: "Kees Schoon", photo: "" };
 
 const Inkoop10k: Authority = { amount: 10000, type: KVKAuthorityType.Inkoop };
 const Inkoop5k: Authority = { amount: 5000, type: KVKAuthorityType.Inkoop };
@@ -22,9 +22,10 @@ const OutVerifJanssenInkoop5k: OutVerificationRequest = {
     datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: JanssenBV,
     authority: Inkoop5k,
+    verifierId: "kees",
 };
 const InVerifJanssenInkoop5k: InVerificationRequest =
-    { ...OutVerifJanssenInkoop5k, from: Kees }
+    { ...OutVerifJanssenInkoop5k }
 
 // Piet (Janssen BV) vraagt Jan (Janssen BV) om machtiging
 const OutAuthJanssenInkoop10k: OutAuthorizationRequest = {
@@ -32,19 +33,20 @@ const OutAuthJanssenInkoop10k: OutAuthorizationRequest = {
     datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: JanssenBV,
     authority: Inkoop10k,
+    subjectId: "piet",
 };
 const InAuthJanssenInkoop10k: InAuthorizationRequest =
-    { ...OutAuthJanssenInkoop10k, from: Piet }
+    { ...OutAuthJanssenInkoop10k }
 
 // De Broodfabriek wordt gerund door Sarah.
 // Joep werkt voor Sarah en wil voor een nieuw filiaal
 // financiering regelen bij de bank.
 const DeBroodfabriek: LegalEntity = { name: "De Broodfabriek", kvknr: "33123123", address: "Industrielaan 32, Amsterdam" }
-export const Sarah: Actor = { name: "Sarah Visser" };
-export const Joep: Actor = { name: "Joep Schoon" };
+export const Sarah: Actor = { name: "Sarah Visser", photo: "" };
+export const Joep: Actor = { name: "Joep Schoon", photo: "" };
 
 const OBARBank: LegalEntity = { name: "OBAR Bank", kvknr: "3321321", address: "Tolweg 3, Utrecht" };
-const David: Actor = { name: "David Putten" };
+const David: Actor = { name: "David Putten", photo: "" };
 
 const Financiering100k: Authority = { amount: 100000, type: KVKAuthorityType.Financiering };
 const Financiering70k: Authority = { amount: 70000, type: KVKAuthorityType.Financiering };
@@ -55,9 +57,10 @@ const OutVerifDeBroodfabriekInkoop70k: OutVerificationRequest = {
     datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: DeBroodfabriek,
     authority: Financiering70k,
+    verifierId: "david",
 };
 const InVerifDeBroodfabriekFinanciering70k: InVerificationRequest =
-    { ...OutVerifDeBroodfabriekInkoop70k, from: David }
+    { ...OutVerifDeBroodfabriekInkoop70k }
 
 // Joep vraagt Sarah om een machtiging
 const OutAuthDeBroodfabriekFinanciering100k: OutAuthorizationRequest = {
@@ -65,9 +68,10 @@ const OutAuthDeBroodfabriekFinanciering100k: OutAuthorizationRequest = {
     datetime: add(new Date(), { minutes: -3 }).toISOString(),
     legalEntity: DeBroodfabriek,
     authority: Financiering100k,
+    subjectId: "joep",
 };
 const InAuthDeBroodfabriekFinanciering100k: InAuthorizationRequest =
-    { ...OutAuthDeBroodfabriekFinanciering100k, from: Joep }
+    { ...OutAuthDeBroodfabriekFinanciering100k }
 
 
 export const dummyState: IState = {
@@ -89,6 +93,13 @@ export const dummyState: IState = {
         OutVerifDeBroodfabriekInkoop70k,
         OutVerifJanssenInkoop5k,
     ],
+
+    profiles: {
+        david: David,
+        kees: Kees,
+        joep: Joep,
+        piet: Piet,
+    },
 
 }
 

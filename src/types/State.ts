@@ -1,3 +1,4 @@
+import { Dict } from "./Dict";
 
 export interface IState {
     incomingVerifReqs: InVerificationRequest[];
@@ -7,6 +8,9 @@ export interface IState {
     outgoingAuthReqs: OutAuthorizationRequest[];
 
     profile?: Profile;
+
+    /** A profile per peerID */
+    profiles: Dict<Profile>;
 }
 
 export interface VerificationRequest {
@@ -14,19 +18,21 @@ export interface VerificationRequest {
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    verifierId: string;
 }
 
 export interface InVerificationRequest {
     id: string;
-    from: Actor;
+    // from: Actor;
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    verifierId: string;
 }
 
 export interface InAuthorizationRequest {
     id: string;
-    from: Actor;
+    subjectId: string;
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
@@ -37,6 +43,7 @@ export interface OutVerificationRequest {
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    verifierId: string;
 }
 
 export interface OutAuthorizationRequest {
@@ -44,11 +51,12 @@ export interface OutAuthorizationRequest {
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    subjectId: string;
 }
 
 export interface Actor {
     name: string;
-    photo?: string;
+    photo: string;
 }
 
 export interface LegalEntity {
