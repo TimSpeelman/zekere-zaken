@@ -16,9 +16,12 @@ import { theme } from "./theme";
 const stateMgr = new StateManager();
 stateMgr.setState(dummyState);
 
-const url = 'http://localhost:9090';
-const socket = socketIOClient.connect(url);
-const agent = new SockAgent(socket);
+const loc = window.location;
+const socketPort = 8080;
+const socketUrl = `${loc.protocol}//${loc.host}:${socketPort}`;
+const _socket = socketIOClient.connect(socketUrl);
+
+const agent = new SockAgent(_socket);
 const gateway: IdentityGatewayInterface = new SocketServerIDGateway(agent);
 
 stateMgr.hook.on((s) => gateway.setProfile(s.profile!));
