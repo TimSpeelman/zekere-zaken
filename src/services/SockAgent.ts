@@ -1,7 +1,10 @@
+import debug from "debug";
 import uuid from "uuid/v4";
 import { Agent, InVerifyHandler, IPv8VerifReq, Me } from "../shared/Agent";
 import { Hook } from "../util/Hook";
 import { Result } from "./IdentityGatewayInterface";
+
+const log = debug("oa:sock-agent");
 
 export class SockAgent implements Agent {
 
@@ -44,12 +47,13 @@ export class SockAgent implements Agent {
 
     protected subscribeToSocket() {
         this.socket.on("id", (id: string) => {
+            log("connected with ID", id)
             this.me = { id };
             this.meHook.fire(this.me);
         });
         this.socket.on("err", (e: any) => { throw new Error("Socket Reported:" + e) });
         this.socket.on("msg", (msg: InMsg) => {
-            console.log("Received", msg);
+            log("received message", msg);
 
             const { senderId, message } = msg;
             switch (message.type) {
@@ -66,6 +70,7 @@ export class SockAgent implements Agent {
     }
 
     protected send(peerId: string, message: any) {
+        log("sending message to peer", peerId, ":", message);
         this.socket.emit("msg", { peerId, message });
     }
 

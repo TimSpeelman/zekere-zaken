@@ -1,4 +1,5 @@
 import { Dict } from "@tsow/ow-attest/dist/types/ipv8/types/Dict";
+import debug from "debug";
 import uuid from "uuid/v4";
 import { Agent, IPv8VerifReq, Me } from "../shared/Agent";
 import { Envelope, Msg, MsgReplyToVerifReq, MsgResolveReference, MsgSendVerificationRequestDetails } from "../shared/PeerMessaging";
@@ -20,6 +21,8 @@ import { AuthorizationSpec, BroadcastReference, IdentityGatewayInterface, InMsg,
  * - [Subject] sends [IPv8:VerifyACK] to its Agent, triggering the IPv8 Verification procedure.
  * - [Verifier] receives [IPv8:VerifyResult] from its Agent.
  */
+
+const log = debug('oa:IDGateway');
 
 interface AllowedVerif {
     requestId: string;
@@ -163,7 +166,7 @@ export class SocketServerIDGateway implements IdentityGatewayInterface {
             senderId: this.me!.id,
         }
 
-        console.log("Sending to peer", peerId, ":", envelope);
+        log("Sending to peer", peerId, ":", envelope);
 
         const encodedMessage = JSON.stringify(envelope);
 

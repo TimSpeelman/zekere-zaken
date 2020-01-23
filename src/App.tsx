@@ -58,7 +58,6 @@ export const AppBody: React.FC = () => {
     const [isConnected, setConnected] = useState(false);
 
     idGateway.connect().then((id) => {
-        console.log("Connected, I am", id);
         setConnected(true);
     })
 
