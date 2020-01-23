@@ -18,7 +18,8 @@ stateMgr.setState(dummyState);
 
 const loc = window.location;
 const socketPort = 8080;
-const socketUrl = `${loc.protocol}//${loc.host}:${socketPort}`;
+const socketUrl = `${loc.protocol}//${loc.host.replace(/:[0-9]+/, "")}:${socketPort}`;
+console.log("TCL: socketUrl", socketUrl)
 const _socket = socketIOClient.connect(socketUrl);
 
 const agent = new SockAgent(_socket);
