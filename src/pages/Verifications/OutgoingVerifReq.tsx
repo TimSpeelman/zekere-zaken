@@ -6,13 +6,14 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import QRCode from "qrcode.react";
-import { default as React, useState } from "react";
+import { default as React, useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { AspectRatio } from "../../components/AspectRatio";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { Joep } from "../../dummy";
+import { useIdentityGateway } from "../../hooks/useIdentityGateway";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
 import { Actor } from "../../types/State";
@@ -21,10 +22,18 @@ export function OutgoingVerifReq() {
     const classes = useStyles({});
     const { reqId: id } = useParams();
     const { state, manager } = useLocalState();
+    const { gateway: idGateway } = useIdentityGateway();
     const req = state.outgoingVerifReqs.find(r => r.id === id)
 
     const me: Actor = { name: "Tim Speelman" }; // FIXME
-    const qrValue = JSON.stringify({ ...req, from: me });
+
+    const [qrValue, setQR] = useState("");
+    useEffect(() => {
+        if (req) {
+            const ref = idGateway.makeReferenceToVerificationRequest(req);
+            setQR(JSON.stringify(ref));
+        }
+    }, [req])
 
     const [verifiee, setVerifiee] = useState<Actor | null>(null);
 
@@ -41,11 +50,11 @@ export function OutgoingVerifReq() {
         <div>
             {/* <Box p={1}></Box> */}
             <Box pt={1} pb={1}>
-                {!verifiee && <p onClick={mockVerifiee}>Deel deze QR code met de te verifieren persoon:</p>}
+                {!verifiee && <p >Deel deze <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}><strong>QR</strong></CopyToClipboard> code met de te <span onClick={mockVerifiee}>verifiëren</span> persoon:</p>}
             </Box>
             <Paper className={classes.paper} >
                 {!verifiee ? (
-                    <CopyToClipboard text={qrValue}>
+                    <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
                         <AspectRatio heightOverWidth={1}>
                             <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
                         </AspectRatio>

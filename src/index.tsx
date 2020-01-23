@@ -1,11 +1,13 @@
 import { ThemeProvider } from "@material-ui/core";
 import React from 'react';
 import ReactDOM from 'react-dom';
+import socketIOClient from "socket.io-client";
 import { App } from "./App";
 import { dummyState } from "./dummy";
 import { IdentityGatewayContextProvider } from "./hooks/useIdentityGateway";
 import { LocalStateContextProvider } from "./hooks/useLocalState";
 import { IdentityGatewayInterface } from "./services/IdentityGatewayInterface";
+import { SockAgent } from "./services/SockAgent";
 import { SocketServerIDGateway } from "./services/SocketServerIDGateway";
 import { StateManager } from "./services/StateManager";
 import * as serviceWorker from './serviceWorker';
@@ -14,8 +16,10 @@ import { theme } from "./theme";
 const stateMgr = new StateManager();
 stateMgr.setState(dummyState);
 
-// @ts-ignore
-const gateway: IdentityGatewayInterface = new SocketServerIDGateway(null);
+const url = 'http://localhost:9090';
+const socket = socketIOClient.connect(url);
+const agent = new SockAgent(socket);
+const gateway: IdentityGatewayInterface = new SocketServerIDGateway(agent);
 
 // fullScreenOnClick();
 

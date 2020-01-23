@@ -1,10 +1,11 @@
 import { Container } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HashRouter as Router, Route, RouteProps, Switch, useParams } from "react-router-dom";
 import uuid from "uuid/v4";
 import './assets/css/font-awesome.min.css';
 import TopBar from "./components/TopBar";
+import { useIdentityGateway } from "./hooks/useIdentityGateway";
 import { useLocalState } from "./hooks/useLocalState";
 import { AuthReqInbox } from "./pages/Authorizations/AuthReqInbox";
 import { AuthReqOutbox } from "./pages/Authorizations/AuthReqOutbox";
@@ -18,6 +19,7 @@ import { IncomingVerifReq } from "./pages/Verifications/IncomingVerifReq";
 import { NewVerification } from "./pages/Verifications/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifications/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifications/VerifReqOutbox";
+import { isBroadcastReference } from "./services/IdentityGatewayInterface";
 import { useStyles } from "./styles";
 import { InAuthorizationRequest } from "./types/State";
 
@@ -51,27 +53,37 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
 
 export const AppBody: React.FC = () => {
     const { manager } = useLocalState();
+    const { gateway: idGateway } = useIdentityGateway();
+
+    const [isConnected, setConnected] = useState(false);
+
+    idGateway.connect().then((id) => {
+        console.log("Connected, I am", id);
+        setConnected(true);
+    })
 
     const onScanQR = (qr: string) => {
         try {
-            const id = uuid();
-            const req = { ...JSON.parse(qr), id };
-
-            // TODO Improve verification
-            if (!req.from || !req.authority) {
+            const val: any = JSON.parse(qr);
+            if (!isBroadcastReference(val)) {
                 return false;
             }
 
-            // @ts-ignore
-            manager.addInVerifReq(req);
-            window.location.assign(`#/verifs/inbox/${id}`)
+            idGateway.requestToResolveBroadcast(val).then((req) => {
+                const id = uuid();
+                manager.addInVerifReq({ ...req, id, from: { name: "FIXME" } });
+                window.location.assign(`#/verifs/inbox/${id}`)
+            }).catch((e) => {
+                alert("Timed out resolving reference");
+            });
+
             return true;
         } catch (e) {
             return false;
         }
     };
 
-    return (
+    return !isConnected ? <div>Connecting to ID Gateway</div> : (
         <Switch>
             <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute title="Inkomend Verzoek" path="/in/:req"><ReqHandler /></MyRoute>

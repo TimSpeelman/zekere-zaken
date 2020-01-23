@@ -4,7 +4,8 @@ import { Agent, IPv8VerifReq, Me } from "../shared/Agent";
 import { Envelope, Msg, MsgReplyToVerifReq, MsgResolveReference, MsgSendVerificationRequestDetails } from "../shared/PeerMessaging";
 import { VerificationRequest } from "../types/State";
 import { Hook } from "../util/Hook";
-import { AuthorizationSpec, Message, Result } from "./IdentityGatewayInterface";
+import { Timer } from "../util/timer";
+import { AuthorizationSpec, BroadcastReference, IdentityGatewayInterface, InMsg, ResolveOptions, Result } from "./IdentityGatewayInterface";
 
 /**
  * Verification Messaging Procedure:
@@ -32,10 +33,6 @@ interface AllowedAuth {
     spec: AuthorizationSpec;
 }
 
-interface BroadcastReference {
-    senderId: string;
-    reference: string;
-}
 
 interface InVer {
     peerId: string;
@@ -50,16 +47,16 @@ interface VerifReport {
 }
 
 /** Mocking the ID Gateway using a client-server model */
-export class SocketServerIDGateway {
+export class SocketServerIDGateway implements IdentityGatewayInterface {
 
     private allowedVerifs: AllowedVerif[] = [];
     private sentRefs: Dict<VerificationRequest> = {};
-    private waitingForRefs: string[] = [];
+    private waitingForRefs: Dict<(req: VerificationRequest) => void> = {};
 
     public me?: Me;
 
     /** When a peer sends a message to us, this hook fires */
-    incomingMessageHook: Hook<Message> = new Hook();
+    incomingMessageHook: Hook<InMsg> = new Hook();
 
     incomingVerifReqHook: Hook<InVer> = new Hook();
     completedVerifHook: Hook<VerifReport> = new Hook();
@@ -69,9 +66,14 @@ export class SocketServerIDGateway {
         this.agent.setIncomingMessageHandler(this.handleIncomingMessage.bind(this));
     }
 
+    get isConnected() {
+        return !!this.me;
+    }
+
     connect() {
         return this.agent.connect().then(me => {
             this.me = me;
+            return me;
         });
     }
 
@@ -97,16 +99,32 @@ export class SocketServerIDGateway {
      * The Subject gets a reference via QR or another channel, which decodes to a
      * BroadcastReference. It will try to resolve this by calling the sender. 
      */
-    public requestToResolveBroadcast(ref: BroadcastReference) {
+    public requestToResolveBroadcast(ref: BroadcastReference, options: ResolveOptions = {}): Promise<VerificationRequest> {
         const msg: MsgResolveReference = {
             type: "ResolveReference",
             ref: ref.reference,
         }
 
-        // We will only accept an answer if we have actually asked to resolve this.
-        this.waitingForRefs.push(ref.reference);
+        // Upon receiving the answer, resolve the returned promise.
+        const success = new Promise<VerificationRequest>((resolve) => {
+            this.waitingForRefs[ref.reference] = (req: VerificationRequest) => {
+                resolve(req);
+            };
 
-        this.sendMessageToPeer(ref.senderId, msg);
+            this.sendMessageToPeer(ref.senderId, msg);
+        });
+
+        const millis = options?.timeout || 5 * 1000;
+        const timeout: Promise<false> = new Timer(() => false, millis).promise().then(() => false);
+
+        return Promise.race([success, timeout]).then((result) => {
+            if (!result) {
+                throw new Error("Resolve timed out");
+            } else {
+                return result;
+            }
+        });
+
     }
 
     /**
@@ -145,6 +163,8 @@ export class SocketServerIDGateway {
             senderId: this.me!.id,
         }
 
+        console.log("Sending to peer", peerId, ":", envelope);
+
         const encodedMessage = JSON.stringify(envelope);
 
         return this.agent.sendMessage(peerId, encodedMessage);
@@ -159,6 +179,7 @@ export class SocketServerIDGateway {
             case "ResolveReference": this.receiveResolveReference(senderId, envelope.message); break;
             case "SendVerificationRequestDetails": this.receiveVerificationRequest(senderId, envelope.message); break;
             case "ReplyToVerifReq": this.receiveVerificationResponse(senderId, envelope.message); break;
+            default: console.warn("Unknown incoming message type:", envelope);
         }
     }
 
@@ -168,7 +189,6 @@ export class SocketServerIDGateway {
      * and send it to the Peer.
      */
     protected receiveResolveReference(peerId: string, incomingMessage: MsgResolveReference) {
-        // @ts-ignore FIXME
         const verifReq: VerificationRequest = this.sentRefs[incomingMessage.ref];
 
         if (!verifReq) {
@@ -198,16 +218,16 @@ export class SocketServerIDGateway {
      */
     protected receiveVerificationRequest(peerId: string, msg: MsgSendVerificationRequestDetails) {
 
-        if (msg.reference) {
-            const i = this.waitingForRefs.indexOf(msg.reference);
-            if (i >= 0) {
-                // Remove the reference, as we no longer wait for its resolution.
-                this.waitingForRefs.splice(i, 1);
+        if (msg.reference && msg.reference in this.waitingForRefs) {
+            // Call the callback
+            this.waitingForRefs[msg.reference](msg.request);
 
-                // Nofity the user of the incoming request.
-                this.incomingVerifReqHook.fire({ peerId, request: msg.request });
-                return;
-            }
+            // Remove the reference, as we no longer wait for its resolution.
+            delete this.waitingForRefs[msg.reference];
+
+            // Nofity the user of the incoming request.
+            this.incomingVerifReqHook.fire({ peerId, request: msg.request });
+            return;
         }
 
         console.warn("Ignored incoming Verification Request");
