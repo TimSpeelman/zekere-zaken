@@ -5,6 +5,8 @@ export interface IState {
 
     incomingAuthReqs: InAuthorizationRequest[];
     outgoingAuthReqs: OutAuthorizationRequest[];
+
+    profile?: Profile;
 }
 
 export interface VerificationRequest {
@@ -68,4 +70,9 @@ export enum KVKAuthorityType {
     Financiering = "Financiering",
     Software = "Software",
     Onderhoud = "Onderhoud",
+}
+
+export interface Profile {
+    name: string;
+    photo: string;
 }

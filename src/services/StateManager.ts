@@ -1,8 +1,18 @@
-import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, OutVerificationRequest } from "../types/State";
+import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, OutVerificationRequest, Profile } from "../types/State";
 import { Hook } from "../util/Hook";
 
 export class StateManager {
     public hook: Hook<IState> = new Hook();
+
+    constructor() {
+        const _profile = localStorage.getItem("profile");
+        if (_profile) {
+            const profile: Profile = JSON.parse(_profile);
+            if (profile) {
+                this.setState({ profile });
+            }
+        }
+    }
 
     get state() {
         return this._state;
@@ -20,6 +30,11 @@ export class StateManager {
         this._state = { ...this._state, ...state, };
         this.hook.fire(this._state);
         console.log("NEW STATE", this._state);
+    }
+
+    storeProfile(profile: Profile) {
+        localStorage.setItem("profile", JSON.stringify(profile));
+        this.setState({ profile });
     }
 
     addInAuthReq(req: InAuthorizationRequest) {

@@ -14,6 +14,7 @@ import { OutgoingAuthReq } from "./pages/Authorizations/OutgoingAuthReq";
 import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
 import { RequestAuthority } from "./pages/NewAuthFlow/RequestAuthority";
+import { Onboard } from "./pages/Onboard";
 import { ScanQR } from "./pages/ScanQR";
 import { IncomingVerifReq } from "./pages/Verifications/IncomingVerifReq";
 import { NewVerification } from "./pages/Verifications/NewVerification";
@@ -105,6 +106,7 @@ export const AppBody: React.FC = () => {
             <MyRoute title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId"><IncomingAuthReq /></MyRoute>
             <MyRoute title="Machtigingen" path="/authreqs/inbox"><AuthReqInbox /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/home"><Home /></MyRoute>
+            <MyRoute title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
             <MyRoute title="" path="/"><Cover /></MyRoute>
         </Switch>
     );

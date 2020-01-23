@@ -2,14 +2,16 @@ import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { default as React, PropsWithChildren } from "react";
 
 interface Props {
-    heightOverWidth: number
+    heightOverWidth: number,
+    style?: CSSProperties
 }
 
-export function AspectRatio({ heightOverWidth, children }: PropsWithChildren<Props>) {
+export function AspectRatio({ heightOverWidth, style, children }: PropsWithChildren<Props>) {
     const containerStyle: CSSProperties = {
         width: "100%",
         paddingTop: heightOverWidth * 100 + "%",
         position: "relative",
+        ...style,
     }
 
     const contentStyle: CSSProperties = {
