@@ -17,8 +17,9 @@ const stateMgr = new StateManager();
 stateMgr.setState(dummyState);
 
 const loc = window.location;
-const socketPort = 8080;
-const socketUrl = `${loc.protocol}//${loc.host.replace(/:[0-9]+/, "")}:${socketPort}`;
+const socketPort = 80;
+// const socketUrl = `${loc.protocol}//${loc.host.replace(/:[0-9]+/, "")}:${socketPort}`;
+const socketUrl = `${loc.protocol}//${loc.host.replace(/:[0-9]+/, "")}`;
 console.log("TCL: socketUrl", socketUrl)
 const _socket = socketIOClient.connect(socketUrl);
 
@@ -29,8 +30,6 @@ stateMgr.hook.on((s) => gateway.setProfile(s.profile!));
 gateway.setProfile(stateMgr.state.profile!);
 
 gateway.verifiedProfileHook.on(({ peerId, profile }) => stateMgr.addProfile(peerId, profile));
-
-// fullScreenOnClick();
 
 const root = (
     <ThemeProvider theme={theme}>
