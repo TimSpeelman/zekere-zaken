@@ -33,7 +33,7 @@ export const dummyState = (myId: string): IState => {
     const OutVerifJanssenInkoop5k: OutVerificationRequest = {
         id: "1",
         datetime: add(new Date(), { minutes: -3 }).toISOString(),
-        legalEntity: JanssenBV,
+        // legalEntity: JanssenBV,
         authority: Inkoop5k,
         verifierId: myId,
     };
@@ -88,6 +88,15 @@ export const dummyState = (myId: string): IState => {
         subjectId: myId,
     };
 
+    const AuthDeBroodfabriekInkoop5k: Authorization = {
+        id: "6",
+        issuedAt: add(new Date(), { minutes: -3 }).toISOString(),
+        legalEntity: DeBroodfabriek,
+        authority: Inkoop5k,
+        issuerId: "sarah",
+        subjectId: myId,
+    };
+
     return {
 
         incomingAuthReqs: [
@@ -118,6 +127,7 @@ export const dummyState = (myId: string): IState => {
 
         authorizations: [
             AuthJanssenInkoop10k,
+            AuthDeBroodfabriekInkoop5k,
         ],
 
     };

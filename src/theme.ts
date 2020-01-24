@@ -4,10 +4,13 @@ const kvkBlue = "#00526e";
 export const theme = createMuiTheme({
     palette: {
         primary: {
-            contrastText: "white",
+            contrastText: "#fff",
             dark: kvkBlue,
             light: kvkBlue,
             main: kvkBlue,
+        },
+        background: {
+            default: "#fff",
         }
     }
 });
