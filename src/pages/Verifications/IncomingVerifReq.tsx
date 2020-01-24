@@ -63,12 +63,12 @@ export function IncomingVerifReq() {
                 {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
                     <Fragment>
                         <Box pt={1} pb={1} >
-                            <p>Met welke organisatie wilt u deze verificatie beantwoorden?</p>
+                            <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
                             <List component="nav" >
                                 {entities.map(entity =>
                                     <ListItem key={entity.name}>
                                         <ListItemText primary={entityTxt(entity)} secondary={authorizedMark()} />
-                                        <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Kiezen</Button>
+                                        <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
                                     </ListItem>
                                 )}
                             </List>
