@@ -60,19 +60,7 @@ export function IncomingVerifReq() {
                     </Fragment>
                 }
 
-                {auths.length === 1 && // When we ONE authorization, we can offer the Subject to share with the Verifier.
-                    <Fragment>
-                        <Box pt={1} pb={1} >
-                            <p>Met welke organisatie wilt u deze verificatie beantwoorden?</p>
-                        </Box>
-                        <FormActions>
-                            <Button component="a" href="#/home">Annuleren</Button>
-                            <Button variant={"contained"} color={"primary"} component="a" href={getURL(req)}>Delen</Button>
-                        </FormActions>
-                    </Fragment>
-                }
-
-                {canChooseCompany && // When we have more Authorizations, the user must pick.
+                {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
                     <Fragment>
                         <Box pt={1} pb={1} >
                             <p>Met welke organisatie wilt u deze verificatie beantwoorden?</p>
