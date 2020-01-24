@@ -35,7 +35,7 @@ export const dummyState = (myId: string): IState => {
         datetime: add(new Date(), { minutes: -3 }).toISOString(),
         legalEntity: JanssenBV,
         authority: Inkoop5k,
-        verifierId: "myId",
+        verifierId: myId,
     };
     const InVerifJanssenInkoop5k: InVerificationRequest =
         { ...OutVerifJanssenInkoop5k, verifierId: "kees" }
