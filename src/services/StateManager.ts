@@ -25,6 +25,7 @@ export class StateManager {
             outgoingAuthReqs: [],
             outgoingVerifReqs: [],
             profiles: {},
+            authorizations: [],
         }
 
     setState(state: Partial<IState>) {

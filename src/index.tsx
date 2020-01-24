@@ -14,7 +14,6 @@ import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
 
 const stateMgr = new StateManager();
-stateMgr.setState(dummyState);
 
 const loc = window.location;
 const socketPort = 80;
@@ -26,6 +25,7 @@ const _socket = socketIOClient.connect(socketUrl);
 const agent = new SockAgent(_socket);
 const gateway: IdentityGatewayInterface = new SocketServerIDGateway(agent);
 
+gateway.connect().then((me) => stateMgr.setState(dummyState(me.id)));
 stateMgr.hook.on((s) => gateway.setProfile(s.profile!));
 gateway.setProfile(stateMgr.state.profile!);
 

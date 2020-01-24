@@ -7,6 +7,8 @@ export interface IState {
     incomingAuthReqs: InAuthorizationRequest[];
     outgoingAuthReqs: OutAuthorizationRequest[];
 
+    authorizations: Authorization[];
+
     profile?: Profile;
 
     /** A profile per peerID */
@@ -51,6 +53,15 @@ export interface OutAuthorizationRequest {
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    subjectId: string;
+}
+
+export interface Authorization {
+    id: string;
+    legalEntity: LegalEntity;
+    authority: Authority;
+    issuedAt: string;
+    issuerId: string;
     subjectId: string;
 }
 
