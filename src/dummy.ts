@@ -1,5 +1,5 @@
 import add from "date-fns/add";
-import { Actor, Authority, InAuthorizationRequest, InVerificationRequest, IState, KVKAuthorityType, LegalEntity, OutAuthorizationRequest, OutVerificationRequest } from "./types/State";
+import { Actor, Authority, Authorization, InAuthorizationRequest, InVerificationRequest, IState, KVKAuthorityType, LegalEntity, OutAuthorizationRequest, OutVerificationRequest } from "./types/State";
 
 export const Kees: Actor = { name: "Kees Schoon", photo: "" };
 export const Jan: Actor = { name: "Jan Janssen", photo: "" };
@@ -79,7 +79,14 @@ export const dummyState = (myId: string): IState => {
     const InAuthDeBroodfabriekFinanciering100k: InAuthorizationRequest =
         { ...OutAuthDeBroodfabriekFinanciering100k, subjectId: "joep" }
 
-
+    const AuthJanssenInkoop10k: Authorization = {
+        id: "5",
+        issuedAt: add(new Date(), { minutes: -3 }).toISOString(),
+        legalEntity: JanssenBV,
+        authority: Inkoop10k,
+        issuerId: "jan",
+        subjectId: myId,
+    };
 
     return {
 
@@ -102,13 +109,16 @@ export const dummyState = (myId: string): IState => {
         ],
 
         profiles: {
+            jan: Jan,
             kees: Kees,
             piet: Piet,
             david: David,
             joep: Joep,
         },
 
-        authorizations: [],
+        authorizations: [
+            AuthJanssenInkoop10k,
+        ],
 
     };
 }
