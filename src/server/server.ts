@@ -2,7 +2,7 @@ import socket from "socket.io";
 import uuid from "uuid/v4";
 import { Dict } from "../types/Dict";
 
-const port = 8080;
+const port = 80;
 const server = socket(port);
 
 const peers: Dict<socket.Socket> = {};
