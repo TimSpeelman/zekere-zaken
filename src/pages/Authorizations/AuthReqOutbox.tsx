@@ -7,21 +7,38 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { format } from "date-fns";
 import { default as React } from "react";
 import { useLocalState } from "../../hooks/useLocalState";
-import { reqText } from "../../util/intl";
+import { authText, reqText } from "../../util/intl";
 
 export function AuthReqOutbox() {
     const { state } = useLocalState();
     const reqs = state.outgoingAuthReqs;
-
+    const auths = state.authorizations;
     return (
         <div>
 
             <List component="nav" >
                 <ListSubheader>Actuele Bevoegdheden</ListSubheader>
-                <ListItem disabled>U heeft nog geen bevoegdheden</ListItem>
-                <Box style={{ textAlign: "center" }} mt={2} mb={2} >
-                    <Button variant="outlined" component="a" href="#/authreqs/new">Bevoegdheid Aanvragen</Button>
-                </Box>
+                {auths.length === 0 ?
+                    <div>
+                        <ListItem disabled>U heeft nog geen bevoegdheden.</ListItem>
+                        <Box style={{ textAlign: "center" }} mt={2} mb={2} >
+                            <Button variant="outlined" component="a" href="#/authreqs/new">Bevoegdheid Aanvragen</Button>
+                        </Box>
+                    </div>
+                    :
+                    auths.map(auth => (
+                        <ListItem button key={auth.id} component="a" href={`#/auths/${auth.id}`}>
+                            <ListItemAvatar>
+                                <Avatar>
+                                    <i className="material-icons">check</i>
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={authText(auth)}
+                                secondary={format(new Date(auth.issuedAt), 'dd-MM-yyyy HH:mm')} />
+                        </ListItem>
+                    ))
+                }
 
                 <ListSubheader>Openstaande Verzoeken</ListSubheader>
                 {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
