@@ -40,8 +40,13 @@ export class VerifyManager implements IReceiveMessages<VerificationMessage> {
     /** Start a verification negotiation */
     startVerify(subjectId: string, spec: Partial<VerificationSpec>, reference?: string) {
         const session = this.createSession(subjectId, uuid());
+        session.iVerify = true;
         session.offer(spec, reference);
         return session;
+    }
+
+    getSessionById(peerId: string, id: string) {
+        return (this.sessions[peerId] || {})[id];
     }
 
     protected getOrCreateSession(peerId: string, sessionId: string) {
@@ -134,6 +139,8 @@ class VerificationSession {
 
     /** When we receive a Verification offer, we notify through our hook. */
     protected receiveOfferVerification(senderId: string, msg: MsgOfferVerification) {
+        // TODO Check that it matches the reqs
+
         this.spec = msg.spec;
         this.newDraftHook.fire({
             draftId: `${this.peerId}:${this.id}`,
@@ -141,6 +148,10 @@ class VerificationSession {
             subjectId: this.subjectId,
             verifierId: this.verifierId,
         });
+
+        if (this.iVerify && specIsComplete(msg.spec)) {
+            this.accept();
+        }
     }
 
     /** When the offer is accepted, the Verifier starts the procedure. */
@@ -164,8 +175,8 @@ class VerificationSession {
             this.verifier.verify({
                 sessionId: this.id,
                 spec: this.spec,
-                subjectId: this.peerId,
-                verifierId: "FIXME",
+                subjectId: this.subjectId,
+                verifierId: this.verifierId,
             });
         }
     }
@@ -176,8 +187,8 @@ class VerificationSession {
             this.verifiee.allowToVerify({
                 sessionId: this.id,
                 spec: this.spec,
-                subjectId: this.peerId,
-                verifierId: "FIXME",
+                subjectId: this.subjectId,
+                verifierId: this.verifierId,
             })
         }
     }

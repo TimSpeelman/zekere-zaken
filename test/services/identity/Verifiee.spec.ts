@@ -43,7 +43,7 @@ describe("Verifiee", () => {
 
         const verifiee = new Verifiee();
 
-        verifiee.allowToVerify(transactionA); // allow an unrelated transaction
+        verifiee.allowToVerify(transactionA); // allow a transaction
 
         const alteredRequest: IPv8VerifReq =
             { ...incomingRequestA, credentials: [] } // TODO alter

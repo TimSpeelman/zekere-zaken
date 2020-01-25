@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
+import { useIdentityGateway } from "../../hooks/useIdentityGateway";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { useWhatsappURL } from "../../hooks/useWhatsappURL";
@@ -19,6 +20,7 @@ export function IncomingVerifReq() {
     console.log("Render");
 
     const { reqId: id } = useParams();
+    const { gateway } = useIdentityGateway();
     const { state } = useLocalState();
     const classes = useStyles({});
     const req = state.incomingVerifReqs.find(r => r.id === id)
@@ -32,7 +34,11 @@ export function IncomingVerifReq() {
     const { getURL } = useWhatsappURL();
 
     function goVerify(entity: LegalEntity) {
-        // TODO
+        const newReq = {
+            ...req!,
+            legalEntity: entity,
+        }
+        gateway.answerVerificationRequest(req!.verifierId, req!.id, newReq, true);
     }
 
     return !req ? <div>Dit verzoek bestaat niet.</div> :

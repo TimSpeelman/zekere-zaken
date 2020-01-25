@@ -28,3 +28,12 @@ export interface Agent {
     /** Handle a verification request */
     setVerificationRequestHandler(handler: InVerifyHandler): void;
 }
+
+export interface IVerify {
+    /**  Verify a peer */
+    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerificationResult>;
+}
+
+export interface IBeVerified {
+    handleVerificationRequest(req: any): Promise<boolean>;
+}

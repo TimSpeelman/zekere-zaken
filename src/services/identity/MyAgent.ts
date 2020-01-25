@@ -45,7 +45,9 @@ export class MyAgent implements IdentityGatewayInterface {
         this.messenger.addRecipient(this.referenceResolver);
 
         this.verifier = new Verifier(agent);
-        this.verifiee = new Verifiee(agent);
+        this.verifiee = new Verifiee();
+        agent.setVerificationRequestHandler((r) => this.verifiee.handleVerificationRequest(r));
+
         this.verifyManager = new VerifyManager(this.messenger, this.verifier, this.verifiee);
         this.messenger.addRecipient(this.verifyManager);
 
@@ -91,7 +93,12 @@ export class MyAgent implements IdentityGatewayInterface {
     }
 
     answerVerificationRequest(peerId: string, requestId: string, req: VerificationRequest, accept: boolean): void {
-        throw new Error("Method not implemented.");
+        // FIXME
+        const session = this.verifyManager.getSessionById(peerId, requestId.replace(`${peerId}:`, ""));
+        session.offer({
+            authority: req.authority,
+            legalEntity: req.legalEntity,
+        })
     }
 
 }
