@@ -20,7 +20,7 @@ import { IncomingVerifReq } from "./pages/Verifications/IncomingVerifReq";
 import { NewVerification } from "./pages/Verifications/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifications/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifications/VerifReqOutbox";
-import { isBroadcastReference } from "./services/IdentityGatewayInterface";
+import { isBroadcastReference } from "./services/identity/IdentityGatewayInterface";
 import { useStyles } from "./styles";
 import { InAuthorizationRequest } from "./types/State";
 
@@ -69,10 +69,11 @@ export const AppBody: React.FC = () => {
                 return false;
             }
 
-            idGateway.requestToResolveBroadcast(val).then((req) => {
-                const id = uuid();
-                manager.addInVerifReq({ ...req, id });
-                window.location.assign(`#/verifs/inbox/${id}`)
+            idGateway.requestToResolveBroadcast(val).then((envelope) => {
+                if (envelope.message.type === "OfferVerification") {
+                    // manager.addInVerifReq({ ...envelope.message, id });
+                    window.location.assign(`#/verifs/inbox/${envelope.senderId}:${envelope.message.sessionId}`)
+                }
             }).catch((e) => {
                 alert("Timed out resolving reference");
             });

@@ -6,9 +6,9 @@ import { App } from "./App";
 import { dummyState } from "./dummy";
 import { IdentityGatewayContextProvider } from "./hooks/useIdentityGateway";
 import { LocalStateContextProvider } from "./hooks/useLocalState";
-import { IdentityGatewayInterface } from "./services/IdentityGatewayInterface";
-import { SockAgent } from "./services/SockAgent";
-import { SocketServerIDGateway } from "./services/SocketServerIDGateway";
+import { IdentityGatewayInterface } from "./services/identity/IdentityGatewayInterface";
+import { MyAgent } from "./services/identity/MyAgent";
+import { SockAgent } from "./services/identity/SockAgent";
 import { StateManager } from "./services/StateManager";
 import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
@@ -23,7 +23,7 @@ console.log("TCL: socketUrl", socketUrl)
 const _socket = socketIOClient.connect(socketUrl);
 
 const agent = new SockAgent(_socket);
-const gateway: IdentityGatewayInterface = new SocketServerIDGateway(agent);
+const gateway: IdentityGatewayInterface = new MyAgent(agent, stateMgr);
 
 gateway.connect().then((me) => stateMgr.setState(dummyState(me.id)));
 stateMgr.hook.on((s) => gateway.setProfile(s.profile!));

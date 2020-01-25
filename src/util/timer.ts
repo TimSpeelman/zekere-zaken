@@ -33,6 +33,12 @@ export class Timer {
     promise() {
         return !this.timerHandle
             ? Promise.resolve()
-            : new Promise((resolve) => { this.hook.on(resolve); });
+            : new Promise((resolve, reject) => {
+                try {
+                    this.hook.on(resolve);
+                } catch (e) {
+                    reject(e);
+                }
+            });
     }
 }

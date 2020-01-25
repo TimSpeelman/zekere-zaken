@@ -25,11 +25,10 @@ export interface VerificationRequest {
 
 export interface InVerificationRequest {
     id: string;
-    // from: Actor;
-    legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
     verifierId: string;
+    legalEntity?: LegalEntity;
 }
 
 export interface InAuthorizationRequest {

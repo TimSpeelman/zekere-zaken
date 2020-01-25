@@ -1,4 +1,4 @@
-import { Result } from "../services/IdentityGatewayInterface";
+import { VerificationResult } from "../services/identity/verification/types";
 
 export interface Me {
     id: string;
@@ -23,7 +23,7 @@ export interface Agent {
     setIncomingMessageHandler(handler: (senderId: string, message: string) => void): void;
 
     /**  Verify a peer */
-    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<Result>;
+    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerificationResult>;
 
     /** Handle a verification request */
     setVerificationRequestHandler(handler: InVerifyHandler): void;
