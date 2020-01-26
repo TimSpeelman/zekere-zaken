@@ -1,3 +1,4 @@
+import uuid from "uuid/v4";
 import { Agent, Me } from "../../shared/Agent";
 import { Dict } from "../../types/Dict";
 import { Profile, VerificationRequest } from "../../types/State";
@@ -82,12 +83,14 @@ export class MyAgent implements IdentityGatewayInterface {
 
     makeReferenceToVerificationRequest(req: VerificationRequest): BroadcastReference {
         const reference = this.referenceResolver.registerCallback((peerId) => {
-            const session = this.verifyManager.startVerify(peerId, {
+
+            const session = this.verifyManager.createSession(peerId, uuid());
+            session.iVerify = true;
+            session.offer({
                 authority: req.authority,
                 legalEntity: req.legalEntity
-            }, reference)
-            // const session = new VerificationSession(this.messenger, this.verifier, this.verifiee);
-            // this.sessionsV.addSession(session);
+            }, reference);
+
         })
         return { reference, senderId: this.me!.id };
     }

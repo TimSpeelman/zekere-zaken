@@ -1,10 +1,8 @@
-import uuid from "uuid/v4";
 import { Dict } from "../../../types/Dict";
 import { Hook } from "../../../util/Hook";
 import { Envelope, IReceiveMessages, ISendMessages } from "../messaging/types";
-import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, VerificationMessage, VerificationSpec, VerifyDraft } from "./types";
-import { Verifiee } from "./Verifiee";
-import { Verifier } from "./Verifier";
+import { IVerifiee, IVerifier, VerificationMessage, VerifyDraft } from "./types";
+import { VerifySession } from "./VerifySession";
 
 /** VerifyManager wraps together all verification logic */
 export class VerifyManager implements IReceiveMessages<VerificationMessage> {
@@ -12,15 +10,20 @@ export class VerifyManager implements IReceiveMessages<VerificationMessage> {
     public myId = ""; // FIXME
 
     public newDraftHook: Hook<VerifyDraft> = new Hook();
+    public newSessionHook: Hook<VerifySession> = new Hook();
 
-    protected sessions: Dict<Dict<VerificationSession>> = {};
+    protected sessions: Dict<Dict<VerifySession>> = {};
 
     constructor(
         private sender: ISendMessages<VerificationMessage>,
-        private verifier: Verifier,
-        private verifiee: Verifiee) { }
+        private verifier: IVerifier,
+        private verifiee: IVerifiee) { }
 
-    receive(envelope: Envelope<VerificationMessage>): boolean {
+    public getSessionById(peerId: string, id: string) {
+        return (this.sessions[peerId] || {})[id];
+    }
+
+    public receive(envelope: Envelope<VerificationMessage>): boolean {
         const { message, senderId, } = envelope;
         const knownTypes = ["OfferVerification", "AcceptVerification", "RejectVerification"];
 
@@ -37,16 +40,19 @@ export class VerifyManager implements IReceiveMessages<VerificationMessage> {
         return true;
     }
 
-    /** Start a verification negotiation */
-    startVerify(subjectId: string, spec: Partial<VerificationSpec>, reference?: string) {
-        const session = this.createSession(subjectId, uuid());
-        session.iVerify = true;
-        session.offer(spec, reference);
+    public createSession(peerId: string, sessionId: string) {
+        const session = new VerifySession(peerId, sessionId, this.sender, this.verifier, this.verifiee);
+        this.sessions = {
+            ...this.sessions,
+            [peerId]: {
+                ...this.sessions[peerId],
+                [sessionId]: session
+            },
+        };
+        session.myId = this.myId;
+        session.newDraftHook.pipe(this.newDraftHook);
+        this.newSessionHook.fire(session);
         return session;
-    }
-
-    getSessionById(peerId: string, id: string) {
-        return (this.sessions[peerId] || {})[id];
     }
 
     protected getOrCreateSession(peerId: string, sessionId: string) {
@@ -57,148 +63,4 @@ export class VerifyManager implements IReceiveMessages<VerificationMessage> {
         return !!session ? session : this.createSession(peerId, sessionId);
     }
 
-    protected createSession(peerId: string, sessionId: string) {
-        const session = new VerificationSession(peerId, sessionId, this.sender, this.verifier, this.verifiee);
-        this.sessions = {
-            ...this.sessions,
-            [peerId]: {
-                ...this.sessions[peerId],
-                [sessionId]: session
-            },
-        };
-        session.myId = this.myId;
-        session.newDraftHook.pipe(this.newDraftHook);
-        return session;
-    }
-}
-
-export enum VerificationStatus {
-    Negotiating = "Negotiating",
-    Verifying = "Verifying",
-    Rejected = "Rejected",
-    Failed = "Failed",
-}
-
-class VerificationSession {
-    iVerify = false;
-    myId = ""; // FIXME
-
-    public status: VerificationStatus = VerificationStatus.Negotiating;
-    public spec?: Partial<VerificationSpec>;
-
-    public newDraftHook: Hook<VerifyDraft> = new Hook();
-
-    constructor(
-        readonly peerId: string,
-        readonly id: string,
-        protected sender: ISendMessages<VerificationMessage>,
-        protected verifier: Verifier,
-        protected verifiee: Verifiee) { }
-
-    get verifierId() {
-        return this.iVerify ? this.myId : this.peerId;
-    }
-
-    get subjectId() {
-        return this.iVerify ? this.peerId : this.myId;
-    }
-
-    public offer(spec: Partial<VerificationSpec>, reference?: string) {
-        this.spec = spec;
-        this.sender.send<MsgOfferVerification>(this.peerId, {
-            type: "OfferVerification",
-            sessionId: this.id,
-            spec
-        }, reference);
-    }
-
-    /** Accept the current offer. */
-    public accept() {
-        this.sender.send<MsgAcceptVerification>(this.peerId, {
-            type: "AcceptVerification",
-            sessionId: this.id,
-        });
-    }
-
-    /** Reject the session. */
-    public reject() {
-        this.sender.send<MsgRejectVerification>(this.peerId, {
-            type: "RejectVerification",
-            sessionId: this.id,
-        });
-    }
-
-    /** Inject messages that are meant for this session */
-    public receive({ message, senderId }: Envelope<VerificationMessage>) {
-        switch (message.type) {
-            case "OfferVerification": return this.receiveOfferVerification(senderId, message);
-            case "AcceptVerification": return this.receiveAcceptVerification(senderId, message);
-            case "RejectVerification": return this.receiveRejectVerification(senderId, message);
-        }
-    }
-
-    /** When we receive a Verification offer, we notify through our hook. */
-    protected receiveOfferVerification(senderId: string, msg: MsgOfferVerification) {
-        // TODO Check that it matches the reqs
-
-        this.spec = msg.spec;
-        this.newDraftHook.fire({
-            draftId: `${this.peerId}:${this.id}`,
-            spec: this.spec,
-            subjectId: this.subjectId,
-            verifierId: this.verifierId,
-        });
-
-        if (this.iVerify && specIsComplete(msg.spec)) {
-            this.accept();
-        }
-    }
-
-    /** When the offer is accepted, the Verifier starts the procedure. */
-    protected receiveAcceptVerification(senderId: string, msg: MsgAcceptVerification) {
-        this.setStatus(VerificationStatus.Verifying);
-        if (this.iVerify) {
-            this.triggerIPv8Verification();
-        } else {
-            this.allowIPv8Verification();
-        }
-    }
-
-    /** When the offer is rejected, we notify and close. */
-    protected receiveRejectVerification(senderId: string, msg: MsgRejectVerification) {
-        this.setStatus(VerificationStatus.Rejected);
-    }
-
-    /** Trigger a VerifyTransaction. */
-    protected triggerIPv8Verification() {
-        if (specIsComplete(this.spec)) {
-            this.verifier.verify({
-                sessionId: this.id,
-                spec: this.spec,
-                subjectId: this.subjectId,
-                verifierId: this.verifierId,
-            });
-        }
-    }
-
-    /** Allow a VerifyTransaction. */
-    protected allowIPv8Verification() {
-        if (specIsComplete(this.spec)) {
-            this.verifiee.allowToVerify({
-                sessionId: this.id,
-                spec: this.spec,
-                subjectId: this.subjectId,
-                verifierId: this.verifierId,
-            })
-        }
-    }
-
-    /** Set and notify status */
-    protected setStatus(status: VerificationStatus) {
-        this.status = status;
-    }
-}
-
-function specIsComplete(spec: Partial<VerificationSpec> | undefined): spec is VerificationSpec {
-    return !!spec && !!spec.authority && !!spec.legalEntity;
 }

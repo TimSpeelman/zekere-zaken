@@ -1,7 +1,7 @@
 import debug from "debug";
 import { IBeVerified, IPv8VerifReq } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
-import { VerificationResult, VerificationTransaction } from "./types";
+import { IVerifiee, VerificationResult, VerificationTransaction, VerifyResult } from "./types";
 
 const log = debug('oa:verifiee');
 
@@ -11,7 +11,7 @@ const log = debug('oa:verifiee');
  * It's main function is to check that the Verifier sticks to the agreed
  * upon transaction.
  */
-export class Verifiee implements IBeVerified {
+export class Verifiee implements IBeVerified, IVerifiee {
 
     public allowedTransactions: VerificationTransaction[] = [];
     readonly completedVerifyHook: Hook<VerifyResult> = new Hook();
@@ -49,9 +49,4 @@ export class Verifiee implements IBeVerified {
     protected verifyMatchesTransaction(request: IPv8VerifReq, allowedTransaction: VerificationTransaction) {
         return true; // FIXME
     }
-}
-
-interface VerifyResult {
-    sessionId: string;
-    result: VerificationResult;
 }

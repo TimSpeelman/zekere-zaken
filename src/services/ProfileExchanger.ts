@@ -18,11 +18,7 @@ export class ProfileExchanger implements IReceiveMessages<MsgProfile> {
     private profile?: Profile;
     private profileSharedWith: string[] = [];
 
-    constructor(
-        private sender: ISendMessages<MsgProfile | any>) {
-
-        // this.listenToIncomingMessages();
-    }
+    constructor(private sender: ISendMessages<MsgProfile | any>) { }
 
     public receive(envelope: Envelope<MsgProfile | any>): boolean {
         const { message, senderId } = envelope;
@@ -57,24 +53,6 @@ export class ProfileExchanger implements IReceiveMessages<MsgProfile> {
 
         this.sender.send(peerId, message);
     }
-
-
-
-    // protected listenToIncomingMessages() {
-    //     this.messenger.addHandler((m) => this.handleIncomingMessage(m));
-    // }
-
-    // protected handleIncomingMessage(envelope: Envelope<MsgProfile>) {
-    //     const { message, senderId } = envelope;
-
-    //     if (message.type === "Profile") {
-    //         // TODO Verify
-    //         this.verifiedProfileHook.fire({ peerId: senderId, profile: message.profile })
-    //         return true;
-    //     }
-
-    //     return false;
-    // }
 
     protected assertProfileSet() {
         if (!this.profile) {

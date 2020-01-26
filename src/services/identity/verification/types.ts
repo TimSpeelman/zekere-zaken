@@ -1,3 +1,4 @@
+import { IPv8VerifReq } from "../../../shared/Agent";
 import { Authority, LegalEntity } from "../../../types/State";
 
 /** A specification of what is to be Verified. */
@@ -72,4 +73,18 @@ export type VerificationMessage =
 
 interface HasSessionId {
     sessionId: string;
+}
+
+export interface IVerifier {
+    verify(transaction: VerificationTransaction): Promise<VerificationResult>;
+}
+
+export interface IVerifiee {
+    allowToVerify(transaction: VerificationTransaction): void;
+    handleVerificationRequest(request: IPv8VerifReq): Promise<boolean>;
+}
+
+export interface VerifyResult {
+    sessionId: string;
+    result: VerificationResult;
 }
