@@ -1,8 +1,8 @@
-import { IDVerifier } from "../../../src/services/identity/id-layer/IDVerifier";
-import { VerificationResult, VerificationTransaction } from "../../../src/services/identity/verification/types";
-import { IVerify } from "../../../src/shared/Agent";
-import { Authority, KVKAuthorityType, LegalEntity } from "../../../src/types/State";
-import { describe, expect, it, makeDone } from "../../setup";
+import { IDVerifier } from "../../../../src/services/identity/id-layer/IDVerifier";
+import { VerificationResult, VerificationTransaction } from "../../../../src/services/identity/verification/types";
+import { IVerify } from "../../../../src/shared/Agent";
+import { Authority, KVKAuthorityType, LegalEntity } from "../../../../src/types/State";
+import { describe, expect, it, makeDone } from "../../../setup";
 
 describe("IDVerifier", () => {
 
