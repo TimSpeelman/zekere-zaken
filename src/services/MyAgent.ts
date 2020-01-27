@@ -7,7 +7,7 @@ import { Hook } from "../util/Hook";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
 import { IDVerifier } from "./identity/id-layer/IDVerifier";
 import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
-import { VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./identity/verification/types";
+import { VerificationSpec, VerificationTransaction, VerifyNegotiation, VerifyNegotiationResult } from "./identity/verification/types";
 import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./identity/verification/VerifyManager";
 import { Messenger } from "./messaging/Messenger";
 import { Msg } from "./messaging/types";
@@ -105,7 +105,7 @@ export class MyAgent {
 
         verifier.completedVerifyHook.on((result) => {
             const neg = stageMgr.state.negotiations.find(n => n.sessionId === result.sessionId);
-            if (neg && result.result === VerificationResult.Succeeded) {
+            if (neg && result.result === VerifyNegotiationResult.Succeeded) {
                 stageMgr.addVerified({
                     templateId: neg.fromTemplateId!,
                     sessionId: neg.sessionId,

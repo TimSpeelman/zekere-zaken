@@ -1,11 +1,9 @@
 import debug from "debug";
 import uuid from "uuid/v4";
 import { DomainEvent, RefResolvedToVerify } from "../../../commands/Event";
-import { Dict } from "../../../types/Dict";
 import { Hook } from "../../../util/Hook";
 import { Envelope, IHandleMessages, ISendMessages } from "../../messaging/types";
 import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, MsgRequestVerification, NegStatus, VerificationMessage, VerificationSpec, VerifyNegotiation } from "./types";
-import { VerifySession } from "./VerifySession";
 
 const log = debug("oa:verify-manager");
 
@@ -16,9 +14,6 @@ export class VerifyManager implements IHandleMessages<VerificationMessage> {
     public myId = ""; // FIXME
 
     public negHook: Hook<VerifyNegotiation> = new Hook('verify-manager:neg');
-    public newSessionHook: Hook<VerifySession> = new Hook('verifiy-manager:session');
-
-    protected sessions: Dict<Dict<VerifySession>> = {};
 
     constructor(
         private verifierStrategy: VerifierNegotiationStrategy,

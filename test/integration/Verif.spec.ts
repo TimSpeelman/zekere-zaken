@@ -1,5 +1,5 @@
 import { AcceptNegWithLegalEntity, CreateVReqTemplate, ResolveReference } from "../../src/commands/Command";
-import { VerificationResult } from "../../src/services/identity/verification/types";
+import { VerifyNegotiationResult } from "../../src/services/identity/verification/types";
 import { describe, expect, it, makeDone, TestSequence } from "../setup";
 import { createMyAgent, mockAuthority, mockEntity, mockIDPair } from "./mocks";
 
@@ -65,14 +65,14 @@ describe("Verification Integration Test", () => {
         // We now expect both to receive a completed verification
         subject.eventHook.on((e) => {
             if (e.type === "IDVerifyCompleted") {
-                expect(e.result).to.eq(VerificationResult.Succeeded);
+                expect(e.result).to.eq(VerifyNegotiationResult.Succeeded);
                 done();
             }
         });
 
         verifier.eventHook.on((e) => {
             if (e.type === "IDVerifyCompleted") {
-                expect(e.result).to.eq(VerificationResult.Succeeded);
+                expect(e.result).to.eq(VerifyNegotiationResult.Succeeded);
                 done();
             }
         });

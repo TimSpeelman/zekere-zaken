@@ -1,7 +1,7 @@
 import debug from "debug";
 import { IBeVerified as IHandleIDVerifyRequests, IPv8VerifReq } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
-import { VerificationResult, VerificationTransaction, VerifyResult } from "../verification/types";
+import { IDVerifyResult, VerificationTransaction, VerifyNegotiationResult } from "../verification/types";
 
 const log = debug('oa:verifiee');
 
@@ -18,7 +18,7 @@ const log = debug('oa:verifiee');
  */
 export class IDVerifiee implements IHandleIDVerifyRequests {
 
-    readonly completedVerifyHook: Hook<VerifyResult> = new Hook('id-verifiee:completed-verify');
+    readonly completedVerifyHook: Hook<IDVerifyResult> = new Hook('id-verifiee:completed-verify');
 
     /**
      * Create a Verifiee
@@ -34,19 +34,19 @@ export class IDVerifiee implements IHandleIDVerifyRequests {
         if (!allowedTransaction) {
             log(`Incoming IPv8 Request ignored.`);
 
-            this.completedVerifyHook.fire({ sessionId, result: VerificationResult.Cancelled });
+            this.completedVerifyHook.fire({ sessionId, result: VerifyNegotiationResult.Cancelled });
             return Promise.resolve(false);
 
         } else if (!this.verifyMatchesTransaction(request, allowedTransaction)) {
             log(`Incoming IPv8 request did not match the allowed transction. Cheater?`);
 
-            this.completedVerifyHook.fire({ sessionId, result: VerificationResult.Cancelled });
+            this.completedVerifyHook.fire({ sessionId, result: VerifyNegotiationResult.Cancelled });
             return Promise.resolve(false);
 
         } else {
             log('Accepted IPv8 request');
 
-            this.completedVerifyHook.fire({ sessionId, result: VerificationResult.Succeeded });
+            this.completedVerifyHook.fire({ sessionId, result: VerifyNegotiationResult.Succeeded });
             return Promise.resolve(true);
         }
     }

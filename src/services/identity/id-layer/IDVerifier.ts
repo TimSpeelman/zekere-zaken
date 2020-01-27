@@ -1,7 +1,7 @@
 import debug from "debug";
 import { IVerify } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
-import { IVerifier, VerificationTransaction, VerifyResult } from "../verification/types";
+import { IDVerifyResult, VerificationTransaction } from "../verification/types";
 
 const log = debug('oa:verifiee');
 
@@ -11,9 +11,9 @@ const log = debug('oa:verifiee');
  * 
  * When it completes (succeeds, rejects or fails) an IDVerify, it fires its hook.
  */
-export class IDVerifier implements IVerifier {
+export class IDVerifier {
 
-    readonly completedVerifyHook: Hook<VerifyResult> = new Hook('id-verifier:completed-verify');
+    readonly completedVerifyHook: Hook<IDVerifyResult> = new Hook('id-verifier:completed-verify');
 
     constructor(private agent: IVerify) { }
 

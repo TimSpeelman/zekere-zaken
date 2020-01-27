@@ -1,4 +1,4 @@
-import { VerificationResult } from "../../src/services/identity/verification/types";
+import { VerifyNegotiationResult } from "../../src/services/identity/verification/types";
 import { describe, expect, it, makeDone } from "../setup";
 import { mockIDPair } from "./mocks";
 
@@ -29,7 +29,7 @@ describe("IDAgentMock Integration Test", () => {
             meta: "",
             verifierId: "VERIF" // WHY?
         }).then((res) => {
-            expect(res).to.equal(VerificationResult.Succeeded);
+            expect(res).to.equal(VerifyNegotiationResult.Succeeded);
             done();
         }).catch(done);
     });
@@ -46,7 +46,7 @@ describe("IDAgentMock Integration Test", () => {
             meta: "",
             verifierId: "VERIF" // WHY?
         }).then((res) => {
-            expect(res).to.equal(VerificationResult.Cancelled);
+            expect(res).to.equal(VerifyNegotiationResult.Cancelled);
             done();
         }).catch(done);
     });

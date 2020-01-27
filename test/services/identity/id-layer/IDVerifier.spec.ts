@@ -1,5 +1,5 @@
 import { IDVerifier } from "../../../../src/services/identity/id-layer/IDVerifier";
-import { VerificationResult, VerificationTransaction } from "../../../../src/services/identity/verification/types";
+import { VerificationTransaction, VerifyNegotiationResult } from "../../../../src/services/identity/verification/types";
 import { IVerify } from "../../../../src/shared/Agent";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../../src/types/State";
 import { describe, expect, it, makeDone } from "../../../setup";
@@ -13,13 +13,13 @@ describe("IDVerifier", () => {
 
         // Test how the Verifier calls the underlying ID layer.
         const mockVerifier: IVerify = {
-            verifyPeer: (peerId: string, req: any): Promise<VerificationResult> => {
+            verifyPeer: (peerId: string, req: any): Promise<VerifyNegotiationResult> => {
                 expect(peerId).to.equal(transactionA.subjectId);
                 expect(req.credentials).to.deep.equal([]);
                 expect(req.meta).to.equal(transactionA.sessionId);
                 expect(req.verifierId).to.equal(transactionA.verifierId);
                 done();
-                return Promise.resolve(VerificationResult.Succeeded);
+                return Promise.resolve(VerifyNegotiationResult.Succeeded);
             }
         }
 

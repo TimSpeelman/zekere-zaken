@@ -1,4 +1,4 @@
-import { VerificationResult, VerificationTransaction, VerifyNegotiation } from "../services/identity/verification/types";
+import { VerificationTransaction, VerifyNegotiation, VerifyNegotiationResult } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
 
 export type DomainEvent =
@@ -52,7 +52,7 @@ export const NegotiationUpdated =
 export interface EventIDVerifyCompleted {
     type: "IDVerifyCompleted",
     negotiationId: string,
-    result: VerificationResult,
+    result: VerifyNegotiationResult,
 }
 
 export const IDVerifyCompleted =

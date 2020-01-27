@@ -1,5 +1,5 @@
 import uuid from "uuid/v4";
-import { VerificationResult } from "../../src/services/identity/verification/types";
+import { VerifyNegotiationResult } from "../../src/services/identity/verification/types";
 import { MyAgent } from "../../src/services/MyAgent";
 import { StateManager } from "../../src/services/state/StateManager";
 import { Agent, InVerifyHandler, IPv8VerifReq } from "../../src/shared/Agent";
@@ -34,7 +34,7 @@ export interface MockIDVerifAns {
     id: string;
     senderId: string,
     targetId: string,
-    answer: VerificationResult
+    answer: VerifyNegotiationResult
 }
 
 export function createIDAgent(
@@ -55,7 +55,7 @@ export function createIDAgent(
             msgHook.on((msg) => (msg.targetId === agentId) && handler(msg.senderId, msg.message));
         },
 
-        verifyPeer: (verifieeId: string, request: IPv8VerifReq): Promise<VerificationResult> => {
+        verifyPeer: (verifieeId: string, request: IPv8VerifReq): Promise<VerifyNegotiationResult> => {
             const requestId = uuid();
 
             idVerifRequestHook.fire({
@@ -79,7 +79,7 @@ export function createIDAgent(
 
                 // Send our answer back to the Verifier
                 idVerifAnswerHook.fire({
-                    answer: subjectAccepts ? VerificationResult.Succeeded : VerificationResult.Cancelled,
+                    answer: subjectAccepts ? VerifyNegotiationResult.Succeeded : VerifyNegotiationResult.Cancelled,
                     id: request.id,
                     senderId: agentId,
                     targetId: request.senderId,
