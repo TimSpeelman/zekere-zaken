@@ -73,7 +73,7 @@ export const AppBody: React.FC = () => {
             }
 
             dispatch(ResolveReference({ reference }))
-            window.location.assign(`#/resolve/${reference}`); // Or do upon command?
+            window.location.assign(`#/resolve/${reference.senderId}/${reference.reference}`); // Or do upon command?
 
             return true;
         } catch (e) {
@@ -83,7 +83,7 @@ export const AppBody: React.FC = () => {
 
     return !isConnected ? <div>Connecting to ID Gateway</div> : (
         <Switch>
-            <MyRoute title="Verbinden met peer.." path="/resolve/:ref"><div>Resolving reference..</div></MyRoute>
+            <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference"><div>Resolving reference..</div></MyRoute>
             <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute title="Inkomend Verzoek" path="/in/:req"><ReqHandler /></MyRoute>
 

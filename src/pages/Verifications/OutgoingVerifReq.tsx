@@ -1,22 +1,26 @@
 import { IconButton } from "@material-ui/core";
-import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import QRCode from "qrcode.react";
-import { default as React, useEffect, useState } from "react";
+import { default as React } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { RemoveVReqTemplate } from "../../commands/Command";
 import { AspectRatio } from "../../components/AspectRatio";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
+import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
 import { useIdentityGateway } from "../../hooks/useIdentityGateway";
 import { useLocalState } from "../../hooks/useLocalState";
+import { useSelector } from "../../hooks/useSelector";
+import { selectOutVerReqByTemplateId } from "../../selectors/selectOutVerReqs";
+import { selectProfileById } from "../../selectors/selectProfile";
 import { useStyles } from "../../styles";
+import { last } from "../../util/last";
 
 export function OutgoingVerifReq() {
     const classes = useStyles({});
@@ -24,25 +28,14 @@ export function OutgoingVerifReq() {
     const { dispatch } = useCommand();
     const { state } = useLocalState();
     const { gateway: idGateway } = useIdentityGateway();
-    const req = state.outgoingVerifTemplates.find(r => r.id === id)
 
-    const [qrValue, setQR] = useState("");
-    useEffect(() => {
-        if (req) {
-            const reference = req.id;
-            const senderId = idGateway.me!.id
-            setQR(JSON.stringify({ reference, senderId }));
-        }
-    }, [req])
+    const outReq = useSelector(id ? selectOutVerReqByTemplateId(id) : undefined);
+    const req = outReq?.template;
+    const completedTransactions = outReq?.transactions;
+    const lastCompleted = last(completedTransactions);
+    const lastVerifiee = useSelector(lastCompleted ? selectProfileById(lastCompleted.subjectId) : undefined);
 
-    // const [verifiee, setVerifiee] = useState<Actor | null>(null);
-
-    const mockVerifiee = () => { /* setVerifiee(Joep); */ }
-
-    const verified = state.verified.find(v => v.templateId === id);
-    const session = verified && state.negotiations.find(n => n.sessionId === verified?.sessionId);
-    const verifiee = session && state.profiles[session.subjectId];
-    const verifiedSpec = session && session.conceptSpec!;
+    const qrValue = !req ? "" : JSON.stringify({ reference: req.id, senderId: idGateway.me!.id });
 
     const deleteItem = () => {
         if (req) {
@@ -56,44 +49,27 @@ export function OutgoingVerifReq() {
         <div>
             {/* <Box p={1}></Box> */}
             <Box pt={1} pb={1}>
-                {!verifiee && <p >Deel deze <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}><strong>QR</strong></CopyToClipboard> code met de te <span onClick={mockVerifiee}>verifiëren</span> persoon:</p>}
+                {!lastVerifiee && <p >Deel deze <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}><strong>QR</strong></CopyToClipboard> code met de te verifiëren persoon:</p>}
             </Box>
-            <Paper className={classes.paper} >
-                {!verifiee ? (
+            {!lastVerifiee ? (
+                <Paper className={classes.paper} >
                     <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
                         <AspectRatio heightOverWidth={1}>
                             <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
                         </AspectRatio>
                     </CopyToClipboard>
-                ) : (
-                        <div>
-                            <Typography component="h2" variant="h6" color="inherit">
-                                Geverifieerd
-                            </Typography>
-                            <Box
-                                display="flex"
-                                alignItems="center"
-                                bgcolor="background.paper"
-                                css={{ height: 100 }}
-                            >
-                                <Box p={1}>
-                                    <Avatar src="http://bwphoto.nl/wp-content/uploads/2017/07/pasfoto-bianca.jpg"
-                                        style={{ width: 80, height: 80 }} />
-                                </Box>
-                                <Box p={1}>
-                                    <Typography component="h2" variant="h6" color="inherit">
-                                        {verifiee.name}
-                                    </Typography>
-                                </Box>
+                </Paper>
+            ) : (
+                    <div>
+                        <Typography component="h2" variant="h6" color="inherit">
+                            Geverifieerd
+                        </Typography>
+                        <PersonCard profile={lastVerifiee} />
+                    </div>
+                )}
 
-                            </Box>
-
-                        </div>
-                    )}
-            </Paper>
-
-            <AuthorityCard legalEntity={verifiee ? verifiedSpec?.legalEntity : req.legalEntity}
-                authority={verifiedSpec ? verifiedSpec.authority! : req.authority} />
+            <AuthorityCard legalEntity={lastCompleted ? lastCompleted.spec.legalEntity : req.legalEntity}
+                authority={lastCompleted ? lastCompleted.spec.authority : req.authority} />
 
             <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>

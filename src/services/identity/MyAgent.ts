@@ -6,7 +6,6 @@ import { Profile } from "../../types/State";
 import { failIfFalsy } from "../../util/failIfFalsy";
 import { Hook } from "../../util/Hook";
 import { ProfileExchanger } from "../ProfileExchanger";
-import { StateManager } from "../StateManager";
 import { IDVerifiee } from "./id-layer/IDVerifiee";
 import { IDVerifier } from "./id-layer/IDVerifier";
 import { IdentityGatewayInterface } from "./IdentityGatewayInterface";
@@ -14,6 +13,7 @@ import { Messenger } from "./messaging/Messenger";
 import { Envelope, Msg } from "./messaging/types";
 import { ReferenceClient } from "./references/ReferenceClient";
 import { ReferenceServer } from "./references/ReferenceServer";
+import { StateManager } from "./state/StateManager";
 import { NegStatus, VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./verification/types";
 import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./verification/VerifyManager";
 

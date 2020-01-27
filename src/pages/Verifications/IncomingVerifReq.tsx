@@ -10,42 +10,30 @@ import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
-import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
+import { selectOpenInVerReqById } from "../../selectors/selectOpenInVerReqs";
+import { selectProfileById } from "../../selectors/selectProfile";
 import { useStyles } from "../../styles";
-import { InVerificationRequest, LegalEntity } from "../../types/State";
+import { LegalEntity } from "../../types/State";
 
 export function IncomingVerifReq() {
     console.log("Render");
 
     const { dispatch } = useCommand();
     const { reqId: id } = useParams();
-    const { state } = useLocalState();
     const classes = useStyles({});
 
-    const neg = state.negotiations.find(r => r.sessionId === id);
-    const req: InVerificationRequest | undefined = neg && {
-        authority: neg.conceptSpec!.authority!,
-        legalEntity: neg.conceptSpec!.legalEntity,
-        datetime: new Date().toISOString(), // FIXME
-        id: neg.sessionId,
-        verifierId: neg.verifierId,
-    }
-    const profile = req && state.profiles[req.verifierId];
-
-    const auths = useSelector((s) => !req ? [] : selectMatchingAuthorizations(req)(s));
+    const req = useSelector(id ? selectOpenInVerReqById(id) : undefined);
+    const profile = useSelector(req ? selectProfileById(req.verifierId) : undefined);
+    const auths = useSelector(req ? selectMatchingAuthorizations(req) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
-
-    const canChooseCompany = entities.length > 1;
 
     const { getURL } = useWhatsappURL();
 
     function goVerify(legalEntity: LegalEntity) {
-        // Could/should these not be one?
         dispatch(AcceptNegWithLegalEntity({ negotiationId: req!.id, legalEntity }))
-        // dispatch(AcceptNegotiation({ negotiationId: req!.id }))
     }
 
     return !req ? <div>Dit verzoek bestaat niet.</div> :

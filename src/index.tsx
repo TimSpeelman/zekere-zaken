@@ -10,7 +10,7 @@ import { LocalStateContextProvider } from "./hooks/useLocalState";
 import { IdentityGatewayInterface } from "./services/identity/IdentityGatewayInterface";
 import { MyAgent } from "./services/identity/MyAgent";
 import { SockAgent } from "./services/identity/SockAgent";
-import { StateManager } from "./services/StateManager";
+import { StateManager } from "./services/identity/state/StateManager";
 import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
 
