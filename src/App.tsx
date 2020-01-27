@@ -22,7 +22,7 @@ import { IncomingVerifReq } from "./pages/Verifiee/IncomingVerifReq";
 import { NewVerification } from "./pages/Verifier/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
-import { isBroadcastReference } from "./services/identity/IdentityGatewayInterface";
+import { isBroadcastReference } from "./services/identity/id-layer/IdentityGatewayInterface";
 import { useStyles } from "./styles";
 import { InAuthorizationRequest } from "./types/State";
 

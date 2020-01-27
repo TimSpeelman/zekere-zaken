@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { StateManager } from "../services/identity/state/StateManager";
+import { StateManager } from "../services/state/StateManager";
 import { IState } from "../types/State";
 
 /** The Context object available to consumers */

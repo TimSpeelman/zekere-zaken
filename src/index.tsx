@@ -6,11 +6,11 @@ import { dummyState } from "./dummy";
 import { CommandContextProvider } from "./hooks/useCommand";
 import { IdentityGatewayContextProvider } from "./hooks/useIdentityGateway";
 import { LocalStateContextProvider } from "./hooks/useLocalState";
-import { IdentityGatewayInterface } from "./services/identity/IdentityGatewayInterface";
+import { IdentityGatewayInterface } from "./services/identity/id-layer/IdentityGatewayInterface";
+import { SockAgent } from "./services/identity/id-layer/SockAgent";
 import { MyAgent } from "./services/identity/MyAgent";
-import { SockAgent } from "./services/identity/SockAgent";
-import { StateManager } from "./services/identity/state/StateManager";
 import { SocketConnection } from "./services/socket";
+import { StateManager } from "./services/state/StateManager";
 import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
 

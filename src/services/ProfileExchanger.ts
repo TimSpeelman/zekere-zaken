@@ -2,7 +2,7 @@ import debug from "debug";
 import { Profile } from "../types/State";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
-import { Envelope, IHandleMessages, ISendMessages, MsgProfile } from "./identity/messaging/types";
+import { Envelope, IHandleMessages, ISendMessages, MsgProfile } from "./messaging/types";
 
 const log = debug('oa:profile-exchanger');
 

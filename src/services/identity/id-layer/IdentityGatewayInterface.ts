@@ -1,7 +1,7 @@
-import { UserCommand } from "../../commands/Command";
-import { Me } from "../../shared/Agent";
-import { Profile } from "../../types/State";
-import { Hook } from "../../util/Hook";
+import { UserCommand } from "../../../commands/Command";
+import { Me } from "../../../shared/Agent";
+import { Profile } from "../../../types/State";
+import { Hook } from "../../../util/Hook";
 
 export interface IdentityGatewayInterface {
 

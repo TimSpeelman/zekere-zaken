@@ -3,7 +3,7 @@ import uuid from "uuid/v4";
 import { DomainEvent, RefResolvedToVerify } from "../../../commands/Event";
 import { Dict } from "../../../types/Dict";
 import { Hook } from "../../../util/Hook";
-import { Envelope, IHandleMessages, ISendMessages } from "../messaging/types";
+import { Envelope, IHandleMessages, ISendMessages } from "../../messaging/types";
 import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, MsgRequestVerification, NegStatus, VerificationMessage, VerificationSpec, VerifyDraft, VerifyNegotiation } from "./types";
 import { VerifySession } from "./VerifySession";
 

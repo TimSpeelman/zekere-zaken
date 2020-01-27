@@ -2,8 +2,8 @@ import { Dict } from "../../types/Dict";
 import { arr } from "../../util/arr";
 import { fallback1 } from "../../util/fallbackFn";
 import { Hook } from "../../util/Hook";
-import { Messenger } from "../identity/messaging/Messenger";
-import { Envelope } from "../identity/messaging/types";
+import { Messenger } from "../messaging/Messenger";
+import { Envelope } from "../messaging/types";
 import { ISession } from "./ISession";
 
 /** Connect messages to sessions that they belong to */

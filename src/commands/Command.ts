@@ -1,4 +1,4 @@
-import { BroadcastReference } from "../services/identity/IdentityGatewayInterface";
+import { BroadcastReference } from "../services/identity/id-layer/IdentityGatewayInterface";
 import { VerificationTransaction } from "../services/identity/verification/types";
 import { LegalEntity, VerificationTemplate } from "../types/State";
 

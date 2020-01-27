@@ -1,5 +1,5 @@
 import debug from "debug";
-import { CommandChain } from "../../../util/CommandChain";
+import { CommandChain } from "../../util/CommandChain";
 import { Envelope, IHandleMessages, MsgResolveReference } from "../messaging/types";
 
 const log = debug('oa:reference-server');

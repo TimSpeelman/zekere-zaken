@@ -1,4 +1,4 @@
-import { Envelope } from "../identity/messaging/types";
+import { Envelope } from "../messaging/types";
 
 export interface ISession<M> {
     peerId: string;

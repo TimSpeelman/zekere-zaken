@@ -1,6 +1,6 @@
-import { Envelope, ISendMessages } from "../../../src/services/identity/messaging/types";
 import { IVerifiee, IVerifier, VerificationMessage, VerificationResult } from "../../../src/services/identity/verification/types";
 import { VerifySession } from "../../../src/services/identity/verification/VerifySession";
+import { Envelope, ISendMessages } from "../../../src/services/messaging/types";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../src/types/State";
 import { Hook } from "../../../src/util/Hook";
 import { Timer } from "../../../src/util/timer";

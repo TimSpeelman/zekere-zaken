@@ -1,7 +1,7 @@
 import debug from "debug";
 import { DomainEvent, NegotiationCompleted } from "../../../commands/Event";
 import { Hook } from "../../../util/Hook";
-import { Envelope, ISendMessages } from "../messaging/types";
+import { Envelope, ISendMessages } from "../../messaging/types";
 import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, VerificationMessage, VerificationSpec, VerificationTransaction, VerifyDraft } from "./types";
 
 export enum VerificationStatus {

@@ -1,6 +1,6 @@
-import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, Profile, VerificationTemplate, Verified } from "../../../types/State";
-import { Hook } from "../../../util/Hook";
-import { VerifyNegotiation } from "../verification/types";
+import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, Profile, VerificationTemplate, Verified } from "../../types/State";
+import { Hook } from "../../util/Hook";
+import { VerifyNegotiation } from "../identity/verification/types";
 
 export class StateManager {
     public hook: Hook<IState> = new Hook('state-manager');

@@ -1,8 +1,8 @@
 import debug from "debug";
 import uuid from "uuid/v4";
-import { Agent, InVerifyHandler, IPv8VerifReq, Me } from "../../shared/Agent";
-import { Hook } from "../../util/Hook";
-import { VerificationResult } from "./verification/types";
+import { Agent, InVerifyHandler, IPv8VerifReq, Me } from "../../../shared/Agent";
+import { Hook } from "../../../util/Hook";
+import { VerificationResult } from "../verification/types";
 
 const log = debug("oa:sock-agent");
 

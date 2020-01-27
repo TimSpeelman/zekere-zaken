@@ -1,5 +1,5 @@
 import { AuthorizationMessage } from "../../shared/Authorization";
-import { Envelope } from "../identity/messaging/types";
+import { Envelope } from "../messaging/types";
 import { ISession } from "./ISession";
 
 export class AuthorizationSession implements ISession<AuthorizationMessage | any> {

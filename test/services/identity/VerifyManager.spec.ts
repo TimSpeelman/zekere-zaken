@@ -1,6 +1,6 @@
-import { Envelope, ISendMessages } from "../../../src/services/identity/messaging/types";
 import { IVerifiee, IVerifier, MsgOfferVerification, VerificationMessage, VerificationResult } from "../../../src/services/identity/verification/types";
 import { VerifyManager } from "../../../src/services/identity/verification/VerifyManager";
+import { Envelope, ISendMessages } from "../../../src/services/messaging/types";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../src/types/State";
 import { describe, expect, it, makeDone } from "../../setup";
 

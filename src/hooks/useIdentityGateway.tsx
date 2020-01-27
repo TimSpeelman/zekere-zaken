@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { IdentityGatewayInterface } from "../services/identity/IdentityGatewayInterface";
+import { IdentityGatewayInterface } from "../services/identity/id-layer/IdentityGatewayInterface";
 
 /** The Context object available to consumers */
 export interface IdentityGatewayContext {

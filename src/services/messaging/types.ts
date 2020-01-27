@@ -1,6 +1,6 @@
-import { AuthorizationMessage } from "../../../shared/Authorization";
-import { Profile } from "../../../types/State";
-import { VerificationMessage } from "../verification/types";
+import { AuthorizationMessage } from "../../shared/Authorization";
+import { Profile } from "../../types/State";
+import { VerificationMessage } from "../identity/verification/types";
 
 export interface Envelope<M> {
     messageId: string;
