@@ -1,4 +1,5 @@
 import { Authority, LegalEntity } from "../../../types/State";
+import { BroadcastReference } from "../../references/types";
 
 /** A specification of what is to be Verified. This content should be dynamic! */
 export interface VerificationSpec {
@@ -77,6 +78,7 @@ export interface IDVerifyResult {
  * - S->V Ok
  */
 export interface VerifyNegotiation {
+    fromReference?: BroadcastReference;
     fromTemplateId?: string;
     sessionId: string;
     status: NegStatus;

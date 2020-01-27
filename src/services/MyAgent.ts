@@ -1,5 +1,5 @@
 import { InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
-import { DomainEvent, IDVerifyCompleted, NegotiationUpdated } from "../commands/Event";
+import { DomainEvent, IDVerifyCompleted, NegotiationUpdated, RefResolvedToVerify } from "../commands/Event";
 import { selectTransactionById } from "../selectors/selectTransactionById";
 import { Agent, Me } from "../shared/Agent";
 import { failIfFalsy } from "../util/failIfFalsy";
@@ -128,7 +128,13 @@ export class MyAgent {
 
         const negHook = new Hook<VerifyNegotiation>('neg-hook');
         negHook.on((negotiation) => {
+            const isNew = !stateMgr.state.negotiations.find(n => n.sessionId === negotiation.sessionId);
+
             this.eventHook.fire(NegotiationUpdated({ negotiation }))
+
+            if (isNew && negotiation.fromReference) {
+                this.eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
+            }
         })
         const stgVerifier = new VerifierNegotiationStrategy(messenger, negHook);
         const stgVerifiee = new VerifieeNegotiationStrategy(messenger, negHook);
@@ -136,7 +142,7 @@ export class MyAgent {
         const getSessionById = (sessionId: string) => {
             return stateMgr.state.negotiations.find(n => n.sessionId === sessionId);
         }
-        const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById, this.eventHook);
+        const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById);
 
         messenger.addRecipient(verifyManager);
 

@@ -1,8 +1,8 @@
 import debug from "debug";
 import uuid from "uuid/v4";
-import { DomainEvent, RefResolvedToVerify } from "../../../commands/Event";
 import { Hook } from "../../../util/Hook";
 import { Envelope, IHandleMessages, ISendMessages } from "../../messaging/types";
+import { BroadcastReference } from "../../references/types";
 import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, MsgRequestVerification, NegStatus, VerificationMessage, VerificationSpec, VerifyNegotiation } from "./types";
 
 const log = debug("oa:verify-manager");
@@ -18,59 +18,44 @@ export class VerifyManager implements IHandleMessages<VerificationMessage> {
     constructor(
         private verifierStrategy: VerifierNegotiationStrategy,
         private verifieeStrategy: VerifieeNegotiationStrategy,
-        protected getSessionById: (sessionId: string) => VerifyNegotiation | undefined,
-        private eventHook: Hook<DomainEvent>) { }
+        protected getSessionById: (sessionId: string) => VerifyNegotiation | undefined) { }
 
     public receive(envelope: Envelope<VerificationMessage>): boolean {
         if (!this.canAcceptMessage(envelope)) return false;
 
-        const session = this.tryToGetSessionFromMessage(envelope);
+        if (!this.tryForwardToExistingSession(envelope) &&
+            !this.tryForwardToNewSession(envelope)) {
 
-        if (session) {
-            this.handleMessage(session, envelope);
-
-            if (envelope.reference) {
-                const reference = { senderId: envelope.senderId, reference: envelope.reference }
-                this.eventHook.fire(RefResolvedToVerify({ negotiationId: session.sessionId, reference }))
-            }
-        } else {
             log("could not create session for some reason");
         }
 
         return true;
     }
 
-    protected tryToGetSessionFromMessage(envelope: Envelope<VerificationMessage>) {
-        const { senderId, message } = envelope;
+    protected tryForwardToExistingSession(envelope: Envelope<VerificationMessage>) {
+        const session = this.getSessionById(envelope.message.sessionId);
 
-        // Discard unknown messages
-        const knownTypes: VerificationMessage["type"][] = ["OfferVerification", "RequestVerification", "AcceptVerification", "RejectVerification"];
-        if (knownTypes.indexOf(message.type) < 0) return false;
-
-        // Check existing sessions
-        const session = this.getSessionById(message.sessionId);
         if (session) {
             log('forwarding message to existing session', envelope);
-            return session;
-        }
 
-        // Create if possible
-        {
-            const session = this.tryToCreateFromMessage(senderId, message);
-            if (session) {
-                log('forwarding message to new session', envelope);
-            } else {
-                log('could not create new session from message', envelope);
-            }
-            return session;
+            this.handleMessage(session, envelope);
+            return true;
         }
     }
 
-    protected tryToCreateFromMessage(senderId: string, message: VerificationMessage) {
-        const invokeTypes = ["OfferVerification", "RequestVerification"];
-        if (invokeTypes.indexOf(message.type) >= 0) {
+    protected tryForwardToNewSession(envelope: Envelope<VerificationMessage>) {
+        const { senderId, message, reference } = envelope;
+
+        if (message.type == "OfferVerification" ||
+            message.type === "RequestVerification") {
+
             const iVerify = message.type === "OfferVerification";
-            return this.createSession(senderId, message.sessionId, iVerify)
+            const ref = reference ? { reference, senderId } : undefined;
+            const session = this.createSession(senderId, message.sessionId, iVerify, ref);
+
+            log('forwarding message to new session', envelope);
+            this.handleMessage(session, envelope);
+            return true;
         }
     }
 
@@ -87,8 +72,9 @@ export class VerifyManager implements IHandleMessages<VerificationMessage> {
         }
     }
 
-    public createSession(peerId: string, sessionId: string, iVerify: boolean): VerifyNegotiation {
+    public createSession(peerId: string, sessionId: string, iVerify: boolean, reference?: BroadcastReference): VerifyNegotiation {
         return {
+            fromReference: reference,
             sessionId,
             verifierId: iVerify ? this.myId : peerId,
             subjectId: iVerify ? peerId : this.myId,
@@ -110,8 +96,6 @@ export class VerifyManager implements IHandleMessages<VerificationMessage> {
  * When we are the verifier.
  */
 export class VerifierNegotiationStrategy {
-
-    // myId = ""; // FIXME
 
     constructor(private sender: ISendMessages<VerificationMessage>, private negHook: Hook<VerifyNegotiation>) { }
 
