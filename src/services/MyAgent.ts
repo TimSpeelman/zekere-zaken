@@ -1,12 +1,13 @@
 import { InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
 import { DomainEvent, IDVerifyCompleted, NegotiationUpdated } from "../commands/Event";
+import { selectTransactionById } from "../selectors/selectTransactionById";
 import { Agent, Me } from "../shared/Agent";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
 import { IDVerifier } from "./identity/id-layer/IDVerifier";
 import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
-import { NegStatus, VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./identity/verification/types";
+import { VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./identity/verification/types";
 import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./identity/verification/VerifyManager";
 import { Messenger } from "./messaging/Messenger";
 import { Msg } from "./messaging/types";
@@ -87,17 +88,20 @@ export class MyAgent {
 
     protected setupIDVerify(agent: Agent, stageMgr: StateManager) {
 
+        const getTransactionById = (transactionId: string) =>
+            selectTransactionById(transactionId)(stageMgr.state);
 
-        const getTransactionById = (tId: string): VerificationTransaction | undefined => {
-            const neg = stageMgr.state.negotiations.find(n => n.sessionId === tId && n.status === NegStatus.Successful);
 
-            return !neg || !specIsComplete(neg.conceptSpec) ? undefined : {
-                sessionId: neg.sessionId,
-                spec: neg.conceptSpec,
-                subjectId: neg.subjectId,
-                verifierId: neg.verifierId,
-            };
-        };
+        // const getTransactionById = (tId: string): VerificationTransaction | undefined => {
+        //     const neg = stageMgr.state.negotiations.find(n => n.sessionId === tId && n.status === NegStatus.Successful);
+
+        //     return !neg || !specIsComplete(neg.conceptSpec) ? undefined : {
+        //         sessionId: neg.sessionId,
+        //         spec: neg.conceptSpec,
+        //         subjectId: neg.subjectId,
+        //         verifierId: neg.verifierId,
+        //     };
+        // };
 
         const verifier = new IDVerifier(agent);
 
@@ -147,18 +151,6 @@ export class MyAgent {
         const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById, this.eventHook);
 
         messenger.addRecipient(verifyManager);
-
-        // verifyManager.newDraftHook.on(
-        //     (draft) => {
-        //         stateMgr.addInVerifReq({
-        //             id: draft.draftId,
-        //             verifierId: draft.verifierId,
-        //             authority: draft.spec?.authority!,
-        //             legalEntity: draft.spec?.legalEntity,
-        //             datetime: new Date().toISOString(), // FIXME
-        //         })
-        //     }
-        // );
 
         agent.connect().then((me) => { verifyManager.myId = me.id; })
 
