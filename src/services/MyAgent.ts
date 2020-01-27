@@ -1,21 +1,21 @@
-import { AllowIDVerify, InvokeIDVerify, UserCommand } from "../../commands/Command";
-import { DomainEvent, NegotiationUpdated } from "../../commands/Event";
-import { Agent, Me } from "../../shared/Agent";
-import { Dict } from "../../types/Dict";
-import { Profile } from "../../types/State";
-import { failIfFalsy } from "../../util/failIfFalsy";
-import { Hook } from "../../util/Hook";
-import { Messenger } from "../messaging/Messenger";
-import { Envelope, Msg } from "../messaging/types";
-import { ProfileExchanger } from "../ProfileExchanger";
-import { ReferenceClient } from "../references/ReferenceClient";
-import { ReferenceServer } from "../references/ReferenceServer";
-import { StateManager } from "../state/StateManager";
-import { IdentityGatewayInterface } from "./id-layer/IdentityGatewayInterface";
-import { IDVerifiee } from "./id-layer/IDVerifiee";
-import { IDVerifier } from "./id-layer/IDVerifier";
-import { NegStatus, VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./verification/types";
-import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./verification/VerifyManager";
+import { AllowIDVerify, InvokeIDVerify, UserCommand } from "../commands/Command";
+import { DomainEvent, NegotiationUpdated } from "../commands/Event";
+import { Agent, Me } from "../shared/Agent";
+import { Dict } from "../types/Dict";
+import { Profile } from "../types/State";
+import { failIfFalsy } from "../util/failIfFalsy";
+import { Hook } from "../util/Hook";
+import { IdentityGatewayInterface } from "./identity/id-layer/IdentityGatewayInterface";
+import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
+import { IDVerifier } from "./identity/id-layer/IDVerifier";
+import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
+import { NegStatus, VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./identity/verification/types";
+import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./identity/verification/VerifyManager";
+import { Messenger } from "./messaging/Messenger";
+import { Envelope, Msg } from "./messaging/types";
+import { ReferenceClient } from "./references/ReferenceClient";
+import { ReferenceServer } from "./references/ReferenceServer";
+import { StateManager } from "./state/StateManager";
 
 /** MyAgent wraps all services together */
 export class MyAgent implements IdentityGatewayInterface {
