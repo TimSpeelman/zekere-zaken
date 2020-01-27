@@ -43,6 +43,7 @@ export const ScanQR: React.FC<Props> = ({ onScanQR }) => {
 
                 <div style={{ textAlign: "center" }}>
                     <p>Scan een QR Code</p>
+                    <p>Let op: op Apple apparaten kan dit alleen in de Safari browser.</p>
                     <Box mb={3}>
                         <QrReader
                             delay={300}
