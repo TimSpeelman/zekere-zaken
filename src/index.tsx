@@ -1,7 +1,6 @@
 import { ThemeProvider } from "@material-ui/core";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import socketIOClient from "socket.io-client";
 import { App } from "./App";
 import { dummyState } from "./dummy";
 import { CommandContextProvider } from "./hooks/useCommand";
@@ -11,26 +10,20 @@ import { IdentityGatewayInterface } from "./services/identity/IdentityGatewayInt
 import { MyAgent } from "./services/identity/MyAgent";
 import { SockAgent } from "./services/identity/SockAgent";
 import { StateManager } from "./services/identity/state/StateManager";
+import { SocketConnection } from "./services/socket";
 import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
 
-const stateMgr = new StateManager();
+const stateManager = new StateManager();
+const socketAgent = new SockAgent(SocketConnection);
+const gateway: IdentityGatewayInterface = new MyAgent(socketAgent, stateManager);
 
-const loc = window.location;
-const socketPort = 80;
-// const socketUrl = `${loc.protocol}//${loc.host.replace(/:[0-9]+/, "")}:${socketPort}`;
-const socketUrl = `${loc.protocol}//${loc.host.replace(/:[0-9]+/, "")}`;
-console.log("TCL: socketUrl", socketUrl)
-const _socket = socketIOClient.connect(socketUrl);
-
-const agent = new SockAgent(_socket);
-const gateway: IdentityGatewayInterface = new MyAgent(agent, stateMgr);
-
-gateway.connect().then((me) => stateMgr.setState(dummyState(me.id)));
+// For demo purposes, we use a dummy state to prefill the app.
+gateway.connect().then((me) => stateManager.setState(dummyState(me.id)));
 
 const root = (
     <ThemeProvider theme={theme}>
-        <LocalStateContextProvider stateMgr={stateMgr}>
+        <LocalStateContextProvider stateMgr={stateManager}>
             <IdentityGatewayContextProvider gateway={gateway} >
                 <CommandContextProvider dispatch={(a) => gateway.dispatch(a)}>
                     <App />
