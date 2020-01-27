@@ -11,7 +11,6 @@ import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager
 import { Messenger } from "./messaging/Messenger";
 import { Msg } from "./messaging/types";
 import { ReferenceClient } from "./references/ReferenceClient";
-import { ReferenceServer } from "./references/ReferenceServer";
 import { StateManager } from "./state/StateManager";
 
 /** MyAgent wraps all services together */
@@ -31,7 +30,7 @@ export class MyAgent {
 
         this.setupProfileExchange(this.messenger, this.stateMgr);
 
-        const { referenceServer } = this.setupReferenceSystem(this.messenger);
+        this.setupReferenceSystem(this.messenger);
 
         this.setupIDVerify(this.agent, this.stateMgr);
 
@@ -39,7 +38,7 @@ export class MyAgent {
 
         this.setupSaveTemplatesToState();
 
-        this.setupTriggerVerifyOnResolve(referenceServer, stgVerifier);
+        this.setupTriggerVerifyOnResolve(this.messenger, stgVerifier);
 
         this.eventHook.on((e) => {
             switch (e.type) {
@@ -76,10 +75,6 @@ export class MyAgent {
 
     protected setupReferenceSystem(messenger: Messenger<Msg>) {
 
-        // Ensure that references we create can be resolved
-        const referenceServer = new ReferenceServer();
-        messenger.addRecipient(referenceServer);
-
         // Resolves references created by other peers
         const referenceClient = new ReferenceClient<Msg>(messenger);
         messenger.addRecipient(referenceClient);
@@ -88,7 +83,6 @@ export class MyAgent {
         this.commandHook.on((a) => a.type === "ResolveReference" &&
             referenceClient.requestToResolveBroadcast(a.reference));
 
-        return { referenceServer };
     }
 
     protected setupIDVerify(agent: Agent, stageMgr: StateManager) {
@@ -242,16 +236,19 @@ export class MyAgent {
         })
     }
 
-    protected setupTriggerVerifyOnResolve(referenceServer: ReferenceServer, stgVerifier: VerifierNegotiationStrategy) {
+    protected setupTriggerVerifyOnResolve(messenger: Messenger<Msg>, stgVerifier: VerifierNegotiationStrategy) {
 
-        referenceServer.addHandler(({ requesterId, reference }) => {
-            const template = this.stateMgr.state.outgoingVerifTemplates.find(t => t.id === reference);
-            if (template) {
-                const { legalEntity, authority } = template
+        messenger.addHandler(({ senderId, message }) => {
+            if (message.type === "ResolveReference") {
+                const reference = message.ref;
+                const template = this.stateMgr.state.outgoingVerifTemplates.find(t => t.id === reference);
+                if (template) {
+                    const { legalEntity, authority } = template
 
-                stgVerifier.startVerify(this.me!.id, requesterId, { legalEntity, authority }, reference, template.id);
+                    stgVerifier.startVerify(this.me!.id, senderId, { legalEntity, authority }, reference, template.id);
 
-                return true;
+                    return true;
+                }
             }
             return false;
         });
