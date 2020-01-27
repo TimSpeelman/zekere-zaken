@@ -14,7 +14,7 @@ export class Hook<T> {
 
     public fire(arg: T): void {
         if (this.async) {
-            setTimeout(() => this._fire(arg), 1);
+            setTimeout(() => this._fire(arg), 0);
         } else {
             this._fire(arg);
         }

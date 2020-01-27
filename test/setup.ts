@@ -24,13 +24,31 @@ export const makeDone = (done: (e?: any) => void, numberOfCallsExpected = 1, tim
  * For async-test readability, add a few actions to the list and execute them at the end.
  */
 export class TestSequence {
-    private actions: (() => void)[] = [];
+    private actions: Entry[] = [];
 
-    then(fn: () => void) {
-        this.actions.push(fn);
+    then(action: () => void, msWait = -1) {
+        this.actions.push({ action, msWait });
     }
 
     go() {
-        this.actions.forEach(d => d());
+        this.next();
     }
+
+    protected next() {
+        if (this.actions.length === 0) return;
+        const a = this.actions.shift();
+        if (a!.msWait >= 0) {
+            setTimeout(() => {
+                a!.action();
+                this.next();
+            }, a!.msWait);
+        } else {
+            a!.action();
+        }
+    }
+}
+
+interface Entry {
+    msWait: number,
+    action: () => void,
 }

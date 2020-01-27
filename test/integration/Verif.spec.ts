@@ -1,6 +1,6 @@
 import { AcceptNegWithLegalEntity, CreateVReqTemplate, ResolveReference } from "../../src/commands/Command";
 import { VerificationResult } from "../../src/services/identity/verification/types";
-import { describe, expect, it, makeDone } from "../setup";
+import { describe, expect, it, makeDone, TestSequence } from "../setup";
 import { createMyAgent, mockAuthority, mockEntity, mockIDPair } from "./mocks";
 
 describe("Verification Integration Test", () => {
@@ -23,32 +23,53 @@ describe("Verification Integration Test", () => {
         const [verifier, verifierState] = createMyAgent(vAgent);
         const [subject, subjectState] = createMyAgent(sAgent);
 
-        verifierState.setMyProfile({
-            name: "TheVerifier",
-            photo: ""
-        })
+        const seq = new TestSequence();
 
-        subjectState.setMyProfile({
-            name: "TheSubject",
-            photo: ""
-        })
+        // Both need a profile before interacting.
+        verifierState.setMyProfile({ name: "TheVerifier", photo: "" })
+        subjectState.setMyProfile({ name: "TheSubject", photo: "" })
 
+        // Verifier first makes a Verification Template
+        const authority = mockAuthority();
+        const legalEntity = mockEntity();
+        const verifierTemplateId = "template1";
+        seq.then(() => verifier.dispatch(CreateVReqTemplate({
+            template: {
+                authority,
+                datetime: new Date().toISOString(),
+                id: verifierTemplateId,
+                legalEntity,
+            }
+        })), 10);
+
+        // It sends its QR code to the Verifier
+        const qr = {
+            reference: verifierTemplateId,
+            senderId: "VERIF",
+        };
+
+        // Subject requests to resolve this
+        seq.then(() => subject.dispatch(ResolveReference({ reference: qr })), 10);
+
+        // Upon resolving, the Verifier sends its VerifyRequest
+        // The Subject then receives this request and accepts it
         subject.eventHook.on((e) => {
             if (e.type === "RefResolvedToVerify") {
-                setTimeout(() => {
-
-                    subject.dispatch(AcceptNegWithLegalEntity({
-                        legalEntity,
-                        negotiationId: e.negotiationId,
-                    }))
-
-                }, 10)
+                subject.dispatch(AcceptNegWithLegalEntity({
+                    legalEntity,
+                    negotiationId: e.negotiationId,
+                }))
             }
+        })
+
+        // We now expect both to receive a completed verification
+        subject.eventHook.on((e) => {
             if (e.type === "IDVerifyCompleted") {
                 expect(e.result).to.eq(VerificationResult.Succeeded);
                 done();
             }
-        })
+        });
+
         verifier.eventHook.on((e) => {
             if (e.type === "IDVerifyCompleted") {
                 expect(e.result).to.eq(VerificationResult.Succeeded);
@@ -56,39 +77,7 @@ describe("Verification Integration Test", () => {
             }
         });
 
-        const authority = mockAuthority();
-        const legalEntity = mockEntity();
-
-        const verifierTemplateId = "template1";
-
-        setTimeout(() => {
-
-            // Verifier creates a template
-            verifier.dispatch(CreateVReqTemplate({
-                template: {
-                    authority,
-                    datetime: new Date().toISOString(),
-                    id: verifierTemplateId,
-                    legalEntity,
-                }
-            }))
-
-        }, 10);
-
-        // Verifier sends QR to Subject
-
-        setTimeout(() => {
-
-            // Subject requests to resolve this
-            subject.dispatch(ResolveReference({
-                reference: {
-                    reference: verifierTemplateId,
-                    senderId: "VERIF",
-                }
-            }))
-
-        }, 20);
-
+        seq.go();
     })
 
 });
