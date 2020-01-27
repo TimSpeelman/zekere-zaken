@@ -15,7 +15,6 @@ import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
 import { useIdentityGateway } from "../../hooks/useIdentityGateway";
-import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { selectOutVerReqByTemplateId } from "../../selectors/selectOutVerReqs";
 import { selectProfileById } from "../../selectors/selectProfile";
@@ -26,7 +25,6 @@ export function OutgoingVerifReq() {
     const classes = useStyles({});
     const { reqId: id } = useParams();
     const { dispatch } = useCommand();
-    const { state } = useLocalState();
     const { gateway: idGateway } = useIdentityGateway();
 
     const outReq = useSelector(id ? selectOutVerReqByTemplateId(id) : undefined);
@@ -40,7 +38,6 @@ export function OutgoingVerifReq() {
     const deleteItem = () => {
         if (req) {
             dispatch(RemoveVReqTemplate({ templateId: req.id }))
-
             window.location.assign("#/verifs/outbox");
         }
     }

@@ -2,7 +2,6 @@ import { Divider } from "@material-ui/core";
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
 import uuid from "uuid/v4";
 import { CreateVReqTemplate } from "../../commands/Command";
@@ -10,16 +9,18 @@ import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { FormActions } from "../../components/FormActions";
+import { OptionalField } from "../../components/OptionalField";
 import { useCommand } from "../../hooks/useCommand";
 import { useStyles } from "../../styles";
 import { KVKAuthorityType, LegalEntity } from "../../types/State";
 
 export function NewVerification() {
     const classes = useStyles({});
-
     const { dispatch } = useCommand();
 
-    const [chooseEntity, setChooseEntity] = useState(false);
+    const onCancel = () => window.location.assign("#/home");
+
+    // Form Data
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
     const [amount, setAmount] = useState(1);
     const [legalEntity, setEntity] = useState<LegalEntity | null>(null);
@@ -43,10 +44,6 @@ export function NewVerification() {
         }
     }
 
-    const onCancel = () => {
-        window.location.assign("#/home");
-    }
-
     return (
         <div>
             <Box p={1}></Box>
@@ -60,22 +57,14 @@ export function NewVerification() {
                 <Box mb={3}>
                     <AmountInput value={amount} onChange={setAmount} helperText={"Welk bedrag wil de persoon besteden?"} />
                 </Box>
-
-                {chooseEntity ?
-                    (
-                        <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
-                    ) : (
-                        <Button startIcon={<AddIcon />} onClick={() => setChooseEntity(true)}>Organisatie Specificeren</Button>
-                    )}
+                <OptionalField label={"Organisatie Specificeren"}>
+                    <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
+                </OptionalField>
             </Paper>
 
             <FormActions>
-                <Button
-                    onClick={onCancel}>Annuleren</Button>
-
-                <Button variant={"contained"} color={"primary"}
-                    disabled={!canSubmit}
-                    onClick={handleSubmit}>Volgende</Button>
+                <Button onClick={onCancel}>Annuleren</Button>
+                <Button variant={"contained"} color={"primary"} disabled={!canSubmit} onClick={handleSubmit}>Volgende</Button>
             </FormActions>
 
             <Divider />
@@ -83,7 +72,6 @@ export function NewVerification() {
             <Box style={{ textAlign: "center" }} mt={2}>
                 <Button component="a" href="#/verifs/outbox">Toon Verificatiegeschiedenis</Button>
             </Box>
-
         </div>
     );
 }
