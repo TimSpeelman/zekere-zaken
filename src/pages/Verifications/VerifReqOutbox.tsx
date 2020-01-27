@@ -12,7 +12,7 @@ import { reqText } from "../../util/intl";
 
 export function VerifReqOutbox() {
     const { state } = useLocalState();
-    const reqs = state.outgoingVerifReqs;
+    const reqs = state.outgoingVerifTemplates;
 
     return (
         <div>

@@ -1,6 +1,8 @@
+import debug from "debug";
+import { DomainEvent, NegotiationCompleted } from "../../../commands/Event";
 import { Hook } from "../../../util/Hook";
 import { Envelope, ISendMessages } from "../messaging/types";
-import { IVerifiee, IVerifier, MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, VerificationMessage, VerificationSpec, VerifyDraft } from "./types";
+import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, VerificationMessage, VerificationSpec, VerificationTransaction, VerifyDraft } from "./types";
 
 export enum VerificationStatus {
     Negotiating = "Negotiating",
@@ -9,6 +11,8 @@ export enum VerificationStatus {
     Failed = "Failed",
 }
 
+const log = debug("oa:verify-session");
+
 export class VerifySession {
     iVerify = false;
     myId = ""; // FIXME
@@ -16,14 +20,14 @@ export class VerifySession {
     public status: VerificationStatus = VerificationStatus.Negotiating;
     public spec?: Partial<VerificationSpec>;
 
-    public newDraftHook: Hook<VerifyDraft> = new Hook();
+    public eventHook: Hook<DomainEvent> = new Hook('verify-session:event');
+    public newDraftHook: Hook<VerifyDraft> = new Hook('verify-session:draft');
 
     constructor(
         readonly peerId: string,
         readonly id: string,
         protected sender: ISendMessages<VerificationMessage>,
-        protected verifier: IVerifier,
-        protected verifiee: IVerifiee) { }
+    ) { }
 
     get verifierId() {
         return this.iVerify ? this.myId : this.peerId;
@@ -49,6 +53,7 @@ export class VerifySession {
             type: "AcceptVerification",
             sessionId: this.id,
         });
+        this.complete();
     }
 
     /** Reject the session. */
@@ -70,6 +75,7 @@ export class VerifySession {
 
     /** When we receive a Verification offer, we notify through our hook. */
     protected receiveOfferVerification(senderId: string, msg: MsgOfferVerification) {
+        log("received offer", msg.spec);
         // TODO Check that it matches the reqs
         this.spec = msg.spec;
         this.notifyOfNewDraft();
@@ -81,41 +87,36 @@ export class VerifySession {
 
     /** When the offer is accepted, the Verifier starts the procedure. */
     protected receiveAcceptVerification(senderId: string, msg: MsgAcceptVerification) {
+        log("received accept", msg.sessionId);
+
         this.setStatus(VerificationStatus.Verifying);
-        if (this.iVerify) {
-            this.triggerIPv8Verification();
-        } else {
-            this.allowIPv8Verification();
-        }
+
+        this.complete();
     }
 
     /** When the offer is rejected, we notify and close. */
     protected receiveRejectVerification(senderId: string, msg: MsgRejectVerification) {
+        log("received reject", msg.sessionId);
+
         this.setStatus(VerificationStatus.Rejected);
     }
 
-    /** Trigger a VerifyTransaction. */
-    protected triggerIPv8Verification() {
+
+    public getTransaction(): VerificationTransaction | undefined {
         if (specIsComplete(this.spec)) {
-            this.verifier.verify({
+            return {
                 sessionId: this.id,
-                spec: this.spec,
+                spec: this.spec!,
                 subjectId: this.subjectId,
                 verifierId: this.verifierId,
-            });
+            };
+        } else {
+            return undefined;
         }
     }
 
-    /** Allow a VerifyTransaction. */
-    protected allowIPv8Verification() {
-        if (specIsComplete(this.spec)) {
-            this.verifiee.allowToVerify({
-                sessionId: this.id,
-                spec: this.spec,
-                subjectId: this.subjectId,
-                verifierId: this.verifierId,
-            })
-        }
+    protected complete() {
+        this.eventHook.fire(NegotiationCompleted({ transaction: this.getTransaction()! }))
     }
 
     /** Set and notify status */
@@ -125,7 +126,7 @@ export class VerifySession {
 
     protected notifyOfNewDraft() {
         this.newDraftHook.fire({
-            draftId: `${this.peerId}:${this.id}`,
+            draftId: this.id,
             spec: this.spec!,
             subjectId: this.subjectId,
             verifierId: this.verifierId,

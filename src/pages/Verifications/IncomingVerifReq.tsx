@@ -5,25 +5,34 @@ import CheckIcon from "@material-ui/icons/Check";
 import { isEqual, uniqWith } from "lodash";
 import { default as React, Fragment } from "react";
 import { useParams } from "react-router-dom";
+import { AcceptNegWithLegalEntity as AcceptNegWithLegalEntity } from "../../commands/Command";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
-import { useIdentityGateway } from "../../hooks/useIdentityGateway";
+import { useCommand } from "../../hooks/useCommand";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
 import { useStyles } from "../../styles";
-import { LegalEntity } from "../../types/State";
+import { InVerificationRequest, LegalEntity } from "../../types/State";
 
 export function IncomingVerifReq() {
     console.log("Render");
 
+    const { dispatch } = useCommand();
     const { reqId: id } = useParams();
-    const { gateway } = useIdentityGateway();
     const { state } = useLocalState();
     const classes = useStyles({});
-    const req = state.incomingVerifReqs.find(r => r.id === id)
+
+    const neg = state.negotiations.find(r => r.sessionId === id);
+    const req: InVerificationRequest | undefined = neg && {
+        authority: neg.conceptSpec!.authority!,
+        legalEntity: neg.conceptSpec!.legalEntity,
+        datetime: new Date().toISOString(), // FIXME
+        id: neg.sessionId,
+        verifierId: neg.verifierId,
+    }
     const profile = req && state.profiles[req.verifierId];
 
     const auths = useSelector((s) => !req ? [] : selectMatchingAuthorizations(req)(s));
@@ -33,12 +42,10 @@ export function IncomingVerifReq() {
 
     const { getURL } = useWhatsappURL();
 
-    function goVerify(entity: LegalEntity) {
-        const newReq = {
-            ...req!,
-            legalEntity: entity,
-        }
-        gateway.answerVerificationRequest(req!.verifierId, req!.id, newReq, true);
+    function goVerify(legalEntity: LegalEntity) {
+        // Could/should these not be one?
+        dispatch(AcceptNegWithLegalEntity({ negotiationId: req!.id, legalEntity }))
+        // dispatch(AcceptNegotiation({ negotiationId: req!.id }))
     }
 
     return !req ? <div>Dit verzoek bestaat niet.</div> :
@@ -54,7 +61,7 @@ export function IncomingVerifReq() {
 
                 <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
 
-                {auths.length === 0 && // When we ZERO authorizations, we can ask the Subject to request one.
+                {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                     <Fragment>
                         <Box pt={1} pb={1} className={classes.warning}>
                             <p>Deze bevoegdheid zit niet in uw wallet. </p>

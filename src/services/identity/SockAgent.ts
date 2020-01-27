@@ -11,8 +11,8 @@ export class SockAgent implements Agent {
     private inMsgHandler: (senderId: string, message: string) => void = () => { throw new Error("Not implemented") };
     private inVerifHandler: InVerifyHandler = () => { throw new Error("Not implemented") };
     private me?: Me;
-    private meHook: Hook<Me> = new Hook();
-    private verifAnsHook: Hook<{ id: string, result: VerificationResult }> = new Hook();
+    private meHook: Hook<Me> = new Hook('sock-agent:me');
+    private verifAnsHook: Hook<{ id: string, result: VerificationResult }> = new Hook('sock-agent:verif-ans');
 
     constructor(private socket: SocketIOClient.Socket) {
         this.subscribeToSocket();

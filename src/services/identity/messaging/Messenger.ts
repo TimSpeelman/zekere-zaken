@@ -2,8 +2,8 @@ import debug from "debug";
 import uuid from "uuid/v4";
 import { Agent, Me } from "../../../shared/Agent";
 import { arr } from "../../../util/arr";
-import { fallback1 } from "../../../util/fallbackFn";
-import { Envelope, IReceiveMessages, ISendMessages } from "./types";
+import { CommandChain } from "../../../util/CommandChain";
+import { Envelope, IHandleMessages, ISendMessages } from "./types";
 
 const log = debug('oa:messaging');
 
@@ -16,8 +16,7 @@ const log = debug('oa:messaging');
  */
 export class Messenger<M> implements ISendMessages<M> {
 
-    /** A list of handlers that will try to handle the incoming message. */
-    handlers: MessageHandler<M>[] = [];
+    chain = new CommandChain<Envelope<M>>('messages');
 
     me?: Me;
 
@@ -31,14 +30,11 @@ export class Messenger<M> implements ISendMessages<M> {
     }
 
     public addHandler(handler: MessageHandler<M> | MessageHandler<M>[]) {
-        const handlers = arr(handler);
-        handlers.forEach(h => this.handlers.push(h));
+        this.chain.addHandler(handler);
     }
 
-    public addRecipient(recipient: IReceiveMessages<M> | IReceiveMessages<M>[]) {
-        const recipients = arr(recipient);
-        recipients.forEach(h => this.handlers.push(h.receive.bind(h)));
-        return this;
+    public addRecipient(recipient: IHandleMessages<M> | IHandleMessages<M>[]) {
+        arr(recipient).forEach(r => this.addHandler(r.receive.bind(r)));
     }
 
     /** Encodes (and signs?) messages for sending to a peer. */
@@ -57,20 +53,12 @@ export class Messenger<M> implements ISendMessages<M> {
         return this.agent.sendMessage(peerId, encodedMessage);
     }
 
-    /** Decodes and dispatches received messages. */
     protected handleIncomingMessage(senderId: string, encodedEnvelope: string) {
         const envelope = this.decodeEnvelope(encodedEnvelope)
-
         log("received message ", envelope);
 
         if (envelope) {
-            // A fallback allows us to see when all handlers have ignored the message
-            const tryToHandle = fallback1(this.handlers, false);
-
-            if (tryToHandle(envelope) === false) {
-                log("ignored message ", envelope);
-            } else {
-            }
+            this.dispatchEnvelope(envelope);
         }
     }
 
@@ -84,9 +72,9 @@ export class Messenger<M> implements ISendMessages<M> {
         }
     }
 
-    protected assertConnected() {
-        if (!this.me) {
-            throw new Error("Not connected to agent yet!");
+    protected dispatchEnvelope(envelope: Envelope<M>) {
+        if (this.chain.fire(envelope) === false) {
+            log("ignored message", envelope);
         }
     }
 

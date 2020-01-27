@@ -9,7 +9,7 @@ import { ISession } from "./ISession";
 /** Connect messages to sessions that they belong to */
 export abstract class SessionManager<M extends HasSessionId> {
 
-    public newSessionHook: Hook<ISession<M>> = new Hook();
+    public newSessionHook: Hook<ISession<M>> = new Hook('session-manager:new');
 
     /** We will scope sessions by peer id and session id to avoid conflicts */
     protected sessions: Dict<Dict<ISession<M>>> = {};

@@ -3,7 +3,7 @@ import uuid from "uuid/v4";
 import { Dict } from "../types/Dict";
 import { Timer } from "../util/timer";
 import { BroadcastReference, ResolveOptions } from "./identity/IdentityGatewayInterface";
-import { Envelope, IReceiveMessages, ISendMessages, Msg, MsgResolveReference } from "./identity/messaging/types";
+import { Envelope, IHandleMessages, ISendMessages, Msg, MsgResolveReference } from "./identity/messaging/types";
 
 const log = debug('oa:reference-resolver');
 
@@ -12,7 +12,7 @@ const log = debug('oa:reference-resolver');
  * with a Peer. When the Peer asks to resolve this reference, we fire the
  * callback and respond to the Peer with a message.
  */
-export class ReferenceResolver<ResponseMsg> implements IReceiveMessages<MsgResolveReference> {
+export class ReferenceResolver<ResponseMsg> implements IHandleMessages<MsgResolveReference> {
 
     private myReferences: Dict<Resolver<ResponseMsg>> = {};
     private sentRequests: Dict<(envelope: Envelope<Msg>) => void> = {};

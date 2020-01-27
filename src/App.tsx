@@ -4,7 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { HashRouter as Router, Route, RouteProps, Switch, useParams } from "react-router-dom";
 import uuid from "uuid/v4";
 import './assets/css/font-awesome.min.css';
+import { ResolveReference } from "./commands/Command";
 import TopBar from "./components/TopBar";
+import { useCommand } from "./hooks/useCommand";
 import { useIdentityGateway } from "./hooks/useIdentityGateway";
 import { useLocalState } from "./hooks/useLocalState";
 import { AuthReqInbox } from "./pages/Authorizations/AuthReqInbox";
@@ -55,6 +57,7 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
 export const AppBody: React.FC = () => {
     const { manager } = useLocalState();
     const { gateway: idGateway } = useIdentityGateway();
+    const { dispatch } = useCommand();
 
     const [isConnected, setConnected] = useState(false);
 
@@ -64,19 +67,13 @@ export const AppBody: React.FC = () => {
 
     const onScanQR = (qr: string) => {
         try {
-            const val: any = JSON.parse(qr);
-            if (!isBroadcastReference(val)) {
+            const reference: any = JSON.parse(qr);
+            if (!isBroadcastReference(reference)) {
                 return false;
             }
 
-            idGateway.requestToResolveBroadcast(val).then((envelope) => {
-                if (envelope.message.type === "OfferVerification") {
-                    // manager.addInVerifReq({ ...envelope.message, id });
-                    window.location.assign(`#/verifs/inbox/${envelope.senderId}:${envelope.message.sessionId}`)
-                }
-            }).catch((e) => {
-                alert("Timed out resolving reference");
-            });
+            dispatch(ResolveReference({ reference }))
+            window.location.assign(`#/resolve/${reference}`); // Or do upon command?
 
             return true;
         } catch (e) {
@@ -86,6 +83,7 @@ export const AppBody: React.FC = () => {
 
     return !isConnected ? <div>Connecting to ID Gateway</div> : (
         <Switch>
+            <MyRoute title="Verbinden met peer.." path="/resolve/:ref"><div>Resolving reference..</div></MyRoute>
             <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute title="Inkomend Verzoek" path="/in/:req"><ReqHandler /></MyRoute>
 

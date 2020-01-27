@@ -1,5 +1,5 @@
 import add from "date-fns/add";
-import { Actor, Authority, Authorization, InAuthorizationRequest, InVerificationRequest, IState, KVKAuthorityType, LegalEntity, OutAuthorizationRequest, OutVerificationRequest } from "./types/State";
+import { Actor, Authority, Authorization, InAuthorizationRequest, InVerificationRequest, IState, KVKAuthorityType, LegalEntity, OutAuthorizationRequest, VerificationTemplate } from "./types/State";
 
 export const Kees: Actor = { name: "Kees Schoon", photo: "" };
 export const Jan: Actor = { name: "Jan Janssen", photo: "" };
@@ -30,12 +30,11 @@ export const dummyState = (myId: string): IState => {
     // bevoegd zijn namens hun onderneming.
 
     // Kees (MeubelsEnZo) vraagt Piet om verificatie
-    const OutVerifJanssenInkoop5k: OutVerificationRequest = {
+    const OutVerifJanssenInkoop5k: VerificationTemplate = {
         id: "1",
         datetime: add(new Date(), { minutes: -3 }).toISOString(),
         // legalEntity: JanssenBV,
         authority: Inkoop5k,
-        verifierId: myId,
     };
     const InVerifJanssenInkoop5k: InVerificationRequest =
         { ...OutVerifJanssenInkoop5k, verifierId: "kees" }
@@ -58,12 +57,11 @@ export const dummyState = (myId: string): IState => {
 
 
     // David stuurt Joep een verificatie:
-    const OutVerifDeBroodfabriekInkoop70k: OutVerificationRequest = {
+    const OutVerifDeBroodfabriekInkoop70k: VerificationTemplate = {
         id: "3",
         datetime: add(new Date(), { minutes: -3 }).toISOString(),
         legalEntity: DeBroodfabriek,
         authority: Financiering70k,
-        verifierId: myId,
     };
     const InVerifDeBroodfabriekFinanciering70k: InVerificationRequest =
         { ...OutVerifDeBroodfabriekInkoop70k, verifierId: "david" }
@@ -98,7 +96,8 @@ export const dummyState = (myId: string): IState => {
     };
 
     return {
-
+        verified: [],
+        negotiations: [],
         incomingAuthReqs: [
             InAuthDeBroodfabriekFinanciering100k,
             InAuthJanssenInkoop10k,
@@ -112,7 +111,7 @@ export const dummyState = (myId: string): IState => {
             OutAuthDeBroodfabriekFinanciering100k,
             OutAuthJanssenInkoop10k,
         ],
-        outgoingVerifReqs: [
+        outgoingVerifTemplates: [
             OutVerifDeBroodfabriekInkoop70k,
             OutVerifJanssenInkoop5k,
         ],

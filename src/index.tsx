@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import socketIOClient from "socket.io-client";
 import { App } from "./App";
 import { dummyState } from "./dummy";
+import { CommandContextProvider } from "./hooks/useCommand";
 import { IdentityGatewayContextProvider } from "./hooks/useIdentityGateway";
 import { LocalStateContextProvider } from "./hooks/useLocalState";
 import { IdentityGatewayInterface } from "./services/identity/IdentityGatewayInterface";
@@ -26,16 +27,14 @@ const agent = new SockAgent(_socket);
 const gateway: IdentityGatewayInterface = new MyAgent(agent, stateMgr);
 
 gateway.connect().then((me) => stateMgr.setState(dummyState(me.id)));
-stateMgr.hook.on((s) => gateway.setProfile(s.profile!));
-gateway.setProfile(stateMgr.state.profile!);
-
-gateway.verifiedProfileHook.on(({ peerId, profile }) => stateMgr.addProfile(peerId, profile));
 
 const root = (
     <ThemeProvider theme={theme}>
         <LocalStateContextProvider stateMgr={stateMgr}>
             <IdentityGatewayContextProvider gateway={gateway} >
-                <App />
+                <CommandContextProvider dispatch={(a) => gateway.dispatch(a)}>
+                    <App />
+                </CommandContextProvider>
             </IdentityGatewayContextProvider>
         </LocalStateContextProvider>
     </ThemeProvider>

@@ -31,7 +31,7 @@ export const ScanQR: React.FC<Props> = ({ onScanQR }) => {
     }
 
     const [manualInput, setManualInput] = useState<string>("");
-    const [showManual, setShowManual] = useState<boolean>(false);
+    const [showManual, setShowManual] = useState<boolean>(true);
 
     // Clear the error when we do another attempt
     useEffect(() => setError(""), [manualInput, lastScan]);

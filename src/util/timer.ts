@@ -2,7 +2,7 @@ import { Hook } from "./Hook";
 
 export class Timer {
 
-    private hook: Hook<void> = new Hook();
+    private hook: Hook<void> = new Hook('timer');
     private index = 0;
     private timerHandle: any = null;
 

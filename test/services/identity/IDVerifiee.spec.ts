@@ -1,10 +1,10 @@
+import { IDVerifiee } from "../../../src/services/identity/id-layer/IDVerifiee";
 import { VerificationTransaction } from "../../../src/services/identity/verification/types";
-import { Verifiee } from "../../../src/services/identity/verification/Verifiee";
 import { IPv8VerifReq } from "../../../src/shared/Agent";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../src/types/State";
 import { describe, expect, it, makeDone } from "../../setup";
 
-describe("Verifiee", () => {
+describe("IDVerifiee", () => {
 
     const transactionA = mockVerifTransaction("A");
     const transactionB = mockVerifTransaction("B");
@@ -13,9 +13,9 @@ describe("Verifiee", () => {
     it("accepts a verification that is allowed", (_done) => {
         const done = makeDone(_done, 1);
 
-        const verifiee = new Verifiee();
+        const getById = (id: string) => id === "A" ? transactionA : undefined;
 
-        verifiee.allowToVerify(transactionA)
+        const verifiee = new IDVerifiee(getById);
 
         verifiee.handleVerificationRequest(incomingRequestA)
             .then((answer) => {
@@ -27,9 +27,8 @@ describe("Verifiee", () => {
     it("rejects a verification that is not allowed (by session)", (_done) => {
         const done = makeDone(_done, 1);
 
-        const verifiee = new Verifiee();
-
-        verifiee.allowToVerify(transactionB); // allow an unrelated transaction
+        const getById = (id: string) => id === "B" ? transactionB : undefined;
+        const verifiee = new IDVerifiee(getById);
 
         verifiee.handleVerificationRequest(incomingRequestA)
             .then((answer) => {
@@ -41,9 +40,8 @@ describe("Verifiee", () => {
     it("rejects a verification when it differs from the allowed", (_done) => {
         const done = makeDone(_done, 1);
 
-        const verifiee = new Verifiee();
-
-        verifiee.allowToVerify(transactionA); // allow a transaction
+        const getById = (id: string) => id === "A" ? transactionB : undefined;
+        const verifiee = new IDVerifiee(getById);
 
         const alteredRequest: IPv8VerifReq =
             { ...incomingRequestA, credentials: [] } // TODO alter
@@ -60,6 +58,7 @@ describe("Verifiee", () => {
 
 function mockVerifTransaction(sessionId: string): VerificationTransaction {
     return {
+        // iVerify: true, // FIXME
         sessionId,
         spec: {
             authority: mockAuthority(),

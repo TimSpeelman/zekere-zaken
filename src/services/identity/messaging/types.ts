@@ -27,9 +27,14 @@ export interface MsgProfile {
     profile: Profile;
 }
 
-export interface IReceiveMessages<MessageType> {
+export interface IHandleMessages<MessageType> {
     /** Returns true if this message is meant for this handler. */
     receive(envelope: Envelope<MessageType>): boolean;
+}
+
+export interface ISpyOnMessages<MessageType> {
+    /** Always returns false, to let the message pass. */
+    receive(envelope: Envelope<MessageType>): false;
 }
 
 export interface ISendMessages<MessageType> {

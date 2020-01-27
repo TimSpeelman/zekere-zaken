@@ -10,6 +10,7 @@ import { useLocalState } from "../../hooks/useLocalState";
 import { InAuthorizationRequest } from "../../types/State";
 
 export function AuthReqInbox() {
+
     const { state } = useLocalState();
     const reqs = state.incomingAuthReqs;
     const getProfile = (req: InAuthorizationRequest) => state.profiles[req.subjectId];

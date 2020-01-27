@@ -1,7 +1,7 @@
+import { UserCommand } from "../../commands/Command";
 import { Me } from "../../shared/Agent";
-import { Profile, VerificationRequest } from "../../types/State";
+import { Profile } from "../../types/State";
 import { Hook } from "../../util/Hook";
-import { Envelope, Msg } from "./messaging/types";
 
 export interface IdentityGatewayInterface {
 
@@ -9,15 +9,9 @@ export interface IdentityGatewayInterface {
 
     connect(): Promise<Me>;
 
-    setProfile(profile: Profile): void;
-
     verifiedProfileHook: Hook<{ peerId: string, profile: Profile }>;
 
-    makeReferenceToVerificationRequest(req: VerificationRequest): BroadcastReference
-
-    requestToResolveBroadcast(ref: BroadcastReference, options?: ResolveOptions): Promise<Envelope<Msg>>;
-
-    answerVerificationRequest(peerId: string, requestId: string, req: VerificationRequest, accept: boolean): void;
+    dispatch(command: UserCommand): void;
 }
 
 export interface ResolveOptions {

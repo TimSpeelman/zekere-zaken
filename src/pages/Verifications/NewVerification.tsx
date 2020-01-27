@@ -5,43 +5,41 @@ import Paper from "@material-ui/core/Paper";
 import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
 import uuid from "uuid/v4";
+import { CreateVReqTemplate } from "../../commands/Command";
 import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { FormActions } from "../../components/FormActions";
-import { useIdentityGateway } from "../../hooks/useIdentityGateway";
-import { useLocalState } from "../../hooks/useLocalState";
+import { useCommand } from "../../hooks/useCommand";
 import { useStyles } from "../../styles";
-import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
+import { KVKAuthorityType, LegalEntity } from "../../types/State";
 
 export function NewVerification() {
     const classes = useStyles({});
 
-    const { manager } = useLocalState();
-    const { gateway } = useIdentityGateway();
+    const { dispatch } = useCommand();
 
     const [chooseEntity, setChooseEntity] = useState(false);
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
     const [amount, setAmount] = useState(1);
-    const [entity, setEntity] = useState<LegalEntity | null>(null);
+    const [legalEntity, setEntity] = useState<LegalEntity | null>(null);
 
     const canSubmit = type !== null && amount > 0;
 
     const handleSubmit = () => {
         if (type) {
-            const requestId = uuid();
+            const templateId = uuid();
 
-            const authority: Authority = { type, amount };
+            dispatch(CreateVReqTemplate({
+                template: {
+                    id: templateId,
+                    datetime: new Date().toISOString(),
+                    authority: { type, amount },
+                    legalEntity: legalEntity || undefined,
+                },
+            }));
 
-            manager.addOutVerifReq({
-                authority,
-                datetime: new Date().toISOString(),
-                id: requestId,
-                legalEntity: entity!, // FIXME
-                verifierId: gateway.me!.id,
-            });
-
-            window.location.assign(`#/verifs/outbox/${requestId}`);
+            window.location.assign(`#/verifs/outbox/${templateId}`);
         }
     }
 

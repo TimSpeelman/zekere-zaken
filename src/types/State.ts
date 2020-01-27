@@ -1,8 +1,12 @@
+import { VerificationSpec, VerifyNegotiation } from "../services/identity/verification/types";
 import { Dict } from "./Dict";
 
 export interface IState {
+    negotiations: VerifyNegotiation[];
+    verified: Verified[];
+
     incomingVerifReqs: InVerificationRequest[];
-    outgoingVerifReqs: OutVerificationRequest[];
+    outgoingVerifTemplates: VerificationTemplate[];
 
     incomingAuthReqs: InAuthorizationRequest[];
     outgoingAuthReqs: OutAuthorizationRequest[];
@@ -13,6 +17,13 @@ export interface IState {
 
     /** A profile per peerID */
     profiles: Dict<Profile>;
+}
+
+
+export interface Verified {
+    templateId: string;
+    sessionId: string;
+    spec: VerificationSpec;
 }
 
 export interface VerificationRequest {
@@ -39,12 +50,11 @@ export interface InAuthorizationRequest {
     datetime: string;
 }
 
-export interface OutVerificationRequest {
+export interface VerificationTemplate {
     id: string;
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
-    verifierId: string;
 }
 
 export interface OutAuthorizationRequest {

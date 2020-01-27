@@ -1,8 +1,9 @@
-import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, OutVerificationRequest, Profile } from "../types/State";
+import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, Profile, VerificationTemplate, Verified } from "../types/State";
 import { Hook } from "../util/Hook";
+import { VerifyNegotiation } from "./identity/verification/types";
 
 export class StateManager {
-    public hook: Hook<IState> = new Hook();
+    public hook: Hook<IState> = new Hook('state-manager');
 
     constructor() {
         const _profile = localStorage.getItem("profile");
@@ -20,10 +21,12 @@ export class StateManager {
 
     private _state: IState =
         {
+            verified: [],
+            negotiations: [],
             incomingAuthReqs: [],
             incomingVerifReqs: [],
             outgoingAuthReqs: [],
-            outgoingVerifReqs: [],
+            outgoingVerifTemplates: [],
             profiles: {},
             authorizations: [],
         }
@@ -43,6 +46,14 @@ export class StateManager {
         this.setState({ profiles: { [peerId]: profile } });
     }
 
+    addVerified(verified: Verified) {
+        this.setState({ verified: [...this.state.verified, verified] })
+    }
+
+    updateNeg(neg: VerifyNegotiation) {
+        this.setState({ negotiations: [...this.state.negotiations.filter(n => n.sessionId !== neg.sessionId), neg] })
+    }
+
     addInAuthReq(req: InAuthorizationRequest) {
         this.setState({ incomingAuthReqs: [...this.state.incomingAuthReqs, req] })
     }
@@ -52,8 +63,8 @@ export class StateManager {
     addInVerifReq(req: InVerificationRequest) {
         this.setState({ incomingVerifReqs: [...this.state.incomingVerifReqs, req] })
     }
-    addOutVerifReq(req: OutVerificationRequest) {
-        this.setState({ outgoingVerifReqs: [...this.state.outgoingVerifReqs, req] })
+    addOutVerifTemplate(template: VerificationTemplate) {
+        this.setState({ outgoingVerifTemplates: [...this.state.outgoingVerifTemplates, template] })
     }
 
     removeInAuthReq(id: string) {
@@ -65,7 +76,7 @@ export class StateManager {
     removeInVerifReq(id: string) {
         this.setState({ incomingVerifReqs: this.state.incomingVerifReqs.filter(req => req.id !== id) })
     }
-    removeOutVerifReq(id: string) {
-        this.setState({ outgoingVerifReqs: this.state.outgoingVerifReqs.filter(req => req.id !== id) })
+    removeOutVerifTemplate(id: string) {
+        this.setState({ outgoingVerifTemplates: this.state.outgoingVerifTemplates.filter(template => template.id !== id) })
     }
 }

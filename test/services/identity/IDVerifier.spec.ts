@@ -1,10 +1,10 @@
+import { IDVerifier } from "../../../src/services/identity/id-layer/IDVerifier";
 import { VerificationResult, VerificationTransaction } from "../../../src/services/identity/verification/types";
-import { Verifier } from "../../../src/services/identity/verification/Verifier";
 import { IVerify } from "../../../src/shared/Agent";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../src/types/State";
 import { describe, expect, it, makeDone } from "../../setup";
 
-describe("Verifier", () => {
+describe("IDVerifier", () => {
 
     const transactionA = mockVerifTransaction("A");
 
@@ -23,7 +23,7 @@ describe("Verifier", () => {
             }
         }
 
-        const verifier = new Verifier(mockVerifier);
+        const verifier = new IDVerifier(mockVerifier);
 
         verifier.verify(transactionA).catch(done);
     });
@@ -32,6 +32,7 @@ describe("Verifier", () => {
 
 function mockVerifTransaction(sessionId: string): VerificationTransaction {
     return {
+        // iVerify: true, // FIXME
         sessionId,
         spec: {
             authority: mockAuthority(),

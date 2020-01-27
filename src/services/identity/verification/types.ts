@@ -32,6 +32,7 @@ export interface VerifyDraft {
  * verify using the underlying layer.
  */
 export interface VerificationTransaction {
+    // iVerify: boolean; // FIXME can we do without?
     sessionId: string;
     verifierId: string;
     subjectId: string;
@@ -41,6 +42,14 @@ export interface VerificationTransaction {
 /** Offer a VerificationSpec to another Peer, perhaps in response to an earlier offer. */
 export interface MsgOfferVerification extends HasSessionId {
     type: "OfferVerification";
+    spec: Partial<VerificationSpec>;
+    /** This should be locally name spaced using the PeerID, to prevent conflicts. */
+    sessionId: string;
+}
+
+/** Request a Verification by another Peer, perhaps in response to an earlier offer. */
+export interface MsgRequestVerification extends HasSessionId {
+    type: "RequestVerification";
     spec: Partial<VerificationSpec>;
     /** This should be locally name spaced using the PeerID, to prevent conflicts. */
     sessionId: string;
@@ -69,6 +78,7 @@ export enum VerificationResult {
 export type VerificationMessage =
     MsgOfferVerification |
     MsgAcceptVerification |
+    MsgRequestVerification |
     MsgRejectVerification;
 
 interface HasSessionId {
@@ -80,11 +90,42 @@ export interface IVerifier {
 }
 
 export interface IVerifiee {
-    allowToVerify(transaction: VerificationTransaction): void;
     handleVerificationRequest(request: IPv8VerifReq): Promise<boolean>;
 }
 
 export interface VerifyResult {
     sessionId: string;
     result: VerificationResult;
+}
+
+
+/**
+ * Example:
+ * - V->S Request (AuthInk5k)
+ * - S->V Offer (AuthInk5k, JanssenBV)
+ * - V->S IDVReq
+ * - S->V IDVOk
+ * 
+ * - V->S Request (AuthInk5, JanssenBV)
+ * - S->V Ok
+ */
+export interface VerifyNegotiation {
+    fromTemplateId?: string;
+    sessionId: string;
+    status: NegStatus;
+    subjectId: string;
+    verifierId: string;
+    steps: NegStep[];
+    conceptSpec?: Partial<VerificationSpec>;
+    verifierAccepts: boolean;
+    subjectAccepts: boolean;
+}
+
+export type NegStep =
+    MsgOfferVerification | MsgRequestVerification | MsgAcceptVerification | MsgRejectVerification;
+
+export enum NegStatus {
+    Pending,
+    Successful,
+    Terminated
 }

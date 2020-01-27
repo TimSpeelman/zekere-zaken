@@ -1,29 +1,35 @@
 import debug from "debug";
-import { IBeVerified, IPv8VerifReq } from "../../../shared/Agent";
+import { IBeVerified as IHandleIDVerifyRequests, IPv8VerifReq } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
-import { IVerifiee, VerificationResult, VerificationTransaction, VerifyResult } from "./types";
+import { VerificationResult, VerificationTransaction, VerifyResult } from "../verification/types";
 
 const log = debug('oa:verifiee');
 
 /**
- * Handles allowed VerificationTransactions in which we are the Subject. 
+ * The Verifiee accepts or rejects incoming IDVerifyRequests. Each request comes in with
+ * a SessionId passed in the metadata. When this session is known and accepted, the Verifiee
+ * will check if the mapping to IDVerifyRequest was done correctly, i.e. the Verifier is 
+ * not cheating.
  * 
- * It's main function is to check that the Verifier sticks to the agreed
- * upon transaction.
+ * We pass in a selector function for finding accepted transactions (this allows the Verifiee
+ * to remain stateless).
+ * 
+ * When it completes (succeeds, rejects or fails) an IDVerify, it fires its hook.
  */
-export class Verifiee implements IBeVerified, IVerifiee {
+export class IDVerifiee implements IHandleIDVerifyRequests {
 
-    public allowedTransactions: VerificationTransaction[] = [];
-    readonly completedVerifyHook: Hook<VerifyResult> = new Hook();
+    readonly completedVerifyHook: Hook<VerifyResult> = new Hook('id-verifiee:completed-verify');
 
-    public allowToVerify(transaction: VerificationTransaction) {
-        this.allowedTransactions.push(transaction);
-    }
+    /**
+     * Create a Verifiee
+     * @param getTransactionById - 
+     */
+    constructor(private getTransactionById: (id: string) => VerificationTransaction | undefined) { }
 
     /** Returns true to accept the verification, false to reject. */
     public handleVerificationRequest(request: IPv8VerifReq): Promise<boolean> {
         const sessionId = request.meta;
-        const allowedTransaction = this.allowedTransactions.find(v => v.sessionId === sessionId);
+        const allowedTransaction = this.getTransactionById(sessionId);
 
         if (!allowedTransaction) {
             log(`Incoming IPv8 Request ignored.`);

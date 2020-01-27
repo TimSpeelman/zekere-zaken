@@ -9,37 +9,45 @@ import QRCode from "qrcode.react";
 import { default as React, useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
+import { RemoveVReqTemplate } from "../../commands/Command";
 import { AspectRatio } from "../../components/AspectRatio";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
-import { Joep } from "../../dummy";
+import { useCommand } from "../../hooks/useCommand";
 import { useIdentityGateway } from "../../hooks/useIdentityGateway";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useStyles } from "../../styles";
-import { Actor } from "../../types/State";
 
 export function OutgoingVerifReq() {
     const classes = useStyles({});
     const { reqId: id } = useParams();
-    const { state, manager } = useLocalState();
+    const { dispatch } = useCommand();
+    const { state } = useLocalState();
     const { gateway: idGateway } = useIdentityGateway();
-    const req = state.outgoingVerifReqs.find(r => r.id === id)
+    const req = state.outgoingVerifTemplates.find(r => r.id === id)
 
     const [qrValue, setQR] = useState("");
     useEffect(() => {
         if (req) {
-            const ref = idGateway.makeReferenceToVerificationRequest(req);
-            setQR(JSON.stringify(ref));
+            const reference = req.id;
+            const senderId = idGateway.me!.id
+            setQR(JSON.stringify({ reference, senderId }));
         }
     }, [req])
 
-    const [verifiee, setVerifiee] = useState<Actor | null>(null);
+    // const [verifiee, setVerifiee] = useState<Actor | null>(null);
 
-    const mockVerifiee = () => setVerifiee(Joep);
+    const mockVerifiee = () => { /* setVerifiee(Joep); */ }
+
+    const verified = state.verified.find(v => v.templateId === id);
+    const session = verified && state.negotiations.find(n => n.sessionId === verified?.sessionId);
+    const verifiee = session && state.profiles[session.subjectId];
+    const verifiedSpec = session && session.conceptSpec!;
 
     const deleteItem = () => {
         if (req) {
-            manager.removeOutVerifReq(req.id);
+            dispatch(RemoveVReqTemplate({ templateId: req.id }))
+
             window.location.assign("#/verifs/outbox");
         }
     }
@@ -84,7 +92,8 @@ export function OutgoingVerifReq() {
                     )}
             </Paper>
 
-            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
+            <AuthorityCard legalEntity={verifiee ? verifiedSpec?.legalEntity : req.legalEntity}
+                authority={verifiedSpec ? verifiedSpec.authority! : req.authority} />
 
             <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>

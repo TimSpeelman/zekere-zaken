@@ -2,7 +2,7 @@ import { Hook } from "./Hook";
 
 export class Interval {
 
-    private hook: Hook<number> = new Hook();
+    private hook: Hook<number> = new Hook('interval');
     private index = 0;
     private intervalHandle: any = null;
 

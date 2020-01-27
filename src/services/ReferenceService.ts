@@ -103,9 +103,9 @@ class ReferenceHandle<T> implements IReferenceHandle<T> {
 
     public references: Reference[] = [];
 
-    private freshRefHook: Hook<Reference> = new Hook();
-    private invalidationHook: Hook<Reference> = new Hook();
-    private destroyHook: Hook<void> = new Hook();
+    private freshRefHook: Hook<Reference> = new Hook('ref-handle:fresh');
+    private invalidationHook: Hook<Reference> = new Hook('ref-handle:invalidation');
+    private destroyHook: Hook<void> = new Hook('ref-handle:destroy');
 
     private interval: Interval = new Interval();
 
