@@ -36,7 +36,7 @@
     "start": "react-scripts start",
     "server": "ts-node --project tsconfig.commonjs.json ./src/server/server.ts",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "set TS_NODE_PROJECT=tsconfig.commonjs.json&& mocha --watch ./test/**/*.ts",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
