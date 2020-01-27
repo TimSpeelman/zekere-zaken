@@ -1,4 +1,4 @@
-import { NegStatus, VerificationSpec, VerificationTransaction } from "../services/identity/verification/types";
+import { NegStatus, specIsComplete, VerificationTransaction } from "../services/identity/verification/types";
 import { IState } from "../types/State";
 
 export function selectTransactionById(tId: string) {
@@ -14,7 +14,3 @@ export function selectTransactionById(tId: string) {
     };
 
 };
-
-function specIsComplete(spec?: Partial<VerificationSpec>): spec is VerificationSpec {
-    return !!spec && !!spec.authority && !!spec.legalEntity;
-}

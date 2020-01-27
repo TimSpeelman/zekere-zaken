@@ -7,6 +7,10 @@ export interface VerificationSpec {
     authority: Authority;
 }
 
+export function specIsComplete(spec?: Partial<VerificationSpec>): spec is VerificationSpec {
+    return !!spec && !!spec.authority && !!spec.legalEntity;
+}
+
 /**
  * A fully defined transaction which has all the details to
  * verify using the underlying layer.

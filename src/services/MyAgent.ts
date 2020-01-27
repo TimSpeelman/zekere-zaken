@@ -7,7 +7,7 @@ import { Hook } from "../util/Hook";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
 import { IDVerifier } from "./identity/id-layer/IDVerifier";
 import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
-import { VerificationSpec, VerificationTransaction, VerifyNegotiation, VerifyNegotiationResult } from "./identity/verification/types";
+import { specIsComplete, VerificationTransaction, VerifyNegotiation, VerifyNegotiationResult } from "./identity/verification/types";
 import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./identity/verification/VerifyManager";
 import { Messenger } from "./messaging/Messenger";
 import { Msg } from "./messaging/types";
@@ -240,8 +240,4 @@ export class MyAgent {
         });
     }
 
-}
-
-function specIsComplete(spec?: Partial<VerificationSpec>): spec is VerificationSpec {
-    return !!spec && !!spec.authority && !!spec.legalEntity;
 }

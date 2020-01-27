@@ -3,7 +3,7 @@ import uuid from "uuid/v4";
 import { Hook } from "../../../util/Hook";
 import { Envelope, IHandleMessages, ISendMessages } from "../../messaging/types";
 import { BroadcastReference } from "../../references/types";
-import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, MsgRequestVerification, NegStatus, VerificationMessage, VerificationSpec, VerifyNegotiation } from "./types";
+import { MsgAcceptVerification, MsgOfferVerification, MsgRejectVerification, MsgRequestVerification, NegStatus, specIsComplete, VerificationMessage, VerificationSpec, VerifyNegotiation } from "./types";
 
 const log = debug("oa:verify-manager");
 
@@ -54,6 +54,7 @@ export class VerifyManager implements IHandleMessages<VerificationMessage> {
             const session = this.createSession(senderId, message.sessionId, iVerify, ref);
 
             log('forwarding message to new session', envelope);
+
             this.handleMessage(session, envelope);
             return true;
         }
@@ -118,7 +119,7 @@ export class VerifierNegotiationStrategy {
             subjectId,
             status: NegStatus.Pending,
             steps: [msg],
-            verifierAccepts: this.specIsComplete(spec),
+            verifierAccepts: specIsComplete(spec),
             subjectAccepts: false,
         };
 
@@ -137,7 +138,7 @@ export class VerifierNegotiationStrategy {
                 ...session,
                 steps: [...session.steps, message], // We add the offer
                 conceptSpec: offeredSpec, // We take the offer as the new status
-                verifierAccepts: this.specIsComplete(offeredSpec),
+                verifierAccepts: specIsComplete(offeredSpec),
                 status: NegStatus.Successful,
                 subjectAccepts: true,
             };
@@ -153,7 +154,7 @@ export class VerifierNegotiationStrategy {
 
     /** If the Subject accepts, register that. */
     public handleAccept(session: VerifyNegotiation, message: MsgAcceptVerification) {
-        if (this.specIsComplete(session.conceptSpec)) {
+        if (specIsComplete(session.conceptSpec)) {
             throw new Error("Protocol Error. Cannot accept an incomplete spec");
         }
 
@@ -179,10 +180,6 @@ export class VerifierNegotiationStrategy {
     protected offerIsAcceptable(offer: Partial<VerificationSpec>, start?: Partial<VerificationSpec>) {
         return true; // FIXME Compare offer
     }
-
-    protected specIsComplete(spec?: Partial<VerificationSpec>) {
-        return !!spec && !!spec.authority && !!spec.legalEntity;
-    }
 }
 
 /**
@@ -194,7 +191,7 @@ export class VerifieeNegotiationStrategy {
 
     public offer(session: VerifyNegotiation, spec: Partial<VerificationSpec>) {
 
-        if (!this.specIsComplete(spec)) {
+        if (!specIsComplete(spec)) {
             throw new Error("Protocol Error. We cannot offer an incomplete spec.");
         }
 
@@ -214,7 +211,7 @@ export class VerifieeNegotiationStrategy {
 
     public accept(session: VerifyNegotiation) {
 
-        if (!this.specIsComplete(session.conceptSpec)) {
+        if (!specIsComplete(session.conceptSpec)) {
             throw new Error("Protocol Error. We cannot accept an incomplete spec.");
         }
 
@@ -260,7 +257,7 @@ export class VerifieeNegotiationStrategy {
                 conceptSpec: offeredSpec, // We take the offer as the new status
             };
 
-            if (this.specIsComplete(offeredSpec)) {
+            if (specIsComplete(offeredSpec)) {
                 newSession.verifierAccepts = true;
             }
 
@@ -280,7 +277,4 @@ export class VerifieeNegotiationStrategy {
         return true; // FIXME Compare offer
     }
 
-    protected specIsComplete(spec?: Partial<VerificationSpec>): spec is VerificationSpec {
-        return !!spec && !!spec.authority && !!spec.legalEntity;
-    }
 }
