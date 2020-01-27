@@ -37,7 +37,7 @@ describe("IDVerifiee", () => {
             }).catch(done);
     })
 
-    it("rejects a verification when it differs from the allowed", (_done) => {
+    it.skip("rejects a verification when it differs from the allowed", (_done) => {
         const done = makeDone(_done, 1);
 
         const getById = (id: string) => id === "A" ? transactionB : undefined;
