@@ -91,18 +91,6 @@ export class MyAgent {
         const getTransactionById = (transactionId: string) =>
             selectTransactionById(transactionId)(stageMgr.state);
 
-
-        // const getTransactionById = (tId: string): VerificationTransaction | undefined => {
-        //     const neg = stageMgr.state.negotiations.find(n => n.sessionId === tId && n.status === NegStatus.Successful);
-
-        //     return !neg || !specIsComplete(neg.conceptSpec) ? undefined : {
-        //         sessionId: neg.sessionId,
-        //         spec: neg.conceptSpec,
-        //         subjectId: neg.subjectId,
-        //         verifierId: neg.verifierId,
-        //     };
-        // };
-
         const verifier = new IDVerifier(agent);
 
         const verifiee = new IDVerifiee(getTransactionById);

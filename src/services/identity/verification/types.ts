@@ -1,7 +1,7 @@
 import { IPv8VerifReq } from "../../../shared/Agent";
 import { Authority, LegalEntity } from "../../../types/State";
 
-/** A specification of what is to be Verified. */
+/** A specification of what is to be Verified. This content should be dynamic! */
 export interface VerificationSpec {
     legalEntity: LegalEntity;
     authority: Authority;
@@ -13,17 +13,6 @@ export interface VerificationSpec {
  */
 export interface VerificationTemplate {
     verifierId: string;
-    spec: Partial<VerificationSpec>;
-}
-
-/**
- * During a VerificationSession, Verified and Subject compose a
- * VerificationTransaction together.
- */
-export interface VerifyDraft {
-    draftId: string;
-    verifierId: string;
-    subjectId: string;
     spec: Partial<VerificationSpec>;
 }
 
