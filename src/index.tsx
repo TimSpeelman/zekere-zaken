@@ -2,36 +2,33 @@ import { ThemeProvider } from "@material-ui/core";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from "./App";
-import { dummyState } from "./dummy";
 import { CommandContextProvider } from "./hooks/useCommand";
-import { IdentityGatewayContextProvider } from "./hooks/useIdentityGateway";
 import { LocalStateContextProvider } from "./hooks/useLocalState";
-import { IdentityGatewayInterface } from "./services/identity/id-layer/IdentityGatewayInterface";
-import { SockAgent } from "./services/identity/id-layer/SockAgent";
-import { MyAgent } from "./services/MyAgent";
-import { SocketConnection } from "./services/socket";
-import { StateManager } from "./services/state/StateManager";
+import { ProfileContextProvider } from "./hooks/useProfile";
+import { LoadingScreen } from "./pages/LoadingScreen";
 import * as serviceWorker from './serviceWorker';
+import { gateway, stateManager, useDependenciesAfterSetup } from "./setup";
 import { theme } from "./theme";
 
-const stateManager = new StateManager();
-const socketAgent = new SockAgent(SocketConnection);
-const gateway: IdentityGatewayInterface = new MyAgent(socketAgent, stateManager);
+function WrappedApp() {
+    const deps = useDependenciesAfterSetup();
 
-// For demo purposes, we use a dummy state to prefill the app.
-gateway.connect().then((me) => stateManager.setState(dummyState(me.id)));
+    return !deps ? <LoadingScreen /> : (
+
+        <LocalStateContextProvider stateMgr={stateManager}>
+            <CommandContextProvider dispatch={(a) => gateway.dispatch(a)}>
+                <ProfileContextProvider myId={deps.myId} myProfile={stateManager.state.profile}>
+                    <App />
+                </ProfileContextProvider>
+            </CommandContextProvider>
+        </LocalStateContextProvider>
+    )
+}
 
 const root = (
-    <ThemeProvider theme={theme}>
-        <LocalStateContextProvider stateMgr={stateManager}>
-            <IdentityGatewayContextProvider gateway={gateway} >
-                <CommandContextProvider dispatch={(a) => gateway.dispatch(a)}>
-                    <App />
-                </CommandContextProvider>
-            </IdentityGatewayContextProvider>
-        </LocalStateContextProvider>
-    </ThemeProvider>
+    <ThemeProvider theme={theme}><WrappedApp /></ThemeProvider>
 );
+
 
 ReactDOM.render(root, document.getElementById('root'));
 

@@ -14,7 +14,7 @@ import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
-import { useIdentityGateway } from "../../hooks/useIdentityGateway";
+import { useProfile } from "../../hooks/useProfile";
 import { useSelector } from "../../hooks/useSelector";
 import { selectOutVerReqByTemplateId } from "../../selectors/selectOutVerReqs";
 import { selectProfileById } from "../../selectors/selectProfile";
@@ -25,7 +25,7 @@ export function OutgoingVerifReq() {
     const classes = useStyles({});
     const { reqId: id } = useParams();
     const { dispatch } = useCommand();
-    const { gateway: idGateway } = useIdentityGateway();
+    const { myId } = useProfile();
 
     const outReq = useSelector(id ? selectOutVerReqByTemplateId(id) : undefined);
     const req = outReq?.template;
@@ -33,7 +33,7 @@ export function OutgoingVerifReq() {
     const lastCompleted = last(completedTransactions);
     const lastVerifiee = useSelector(lastCompleted ? selectProfileById(lastCompleted.subjectId) : undefined);
 
-    const qrValue = !req ? "" : JSON.stringify({ reference: req.id, senderId: idGateway.me!.id });
+    const qrValue = !req ? "" : JSON.stringify({ reference: req.id, senderId: myId });
 
     const deleteItem = () => {
         if (req) {

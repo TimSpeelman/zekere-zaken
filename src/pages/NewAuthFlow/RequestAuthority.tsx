@@ -9,8 +9,8 @@ import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { FormActions } from "../../components/FormActions";
-import { useIdentityGateway } from "../../hooks/useIdentityGateway";
 import { useLocalState } from "../../hooks/useLocalState";
+import { useProfile } from "../../hooks/useProfile";
 import { useStyles } from "../../styles";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
 
@@ -23,7 +23,7 @@ export function RequestAuthority() {
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
     const [amount, setAmount] = useState(1);
 
-    const { gateway } = useIdentityGateway();
+    const { myId } = useProfile();
 
     const canSubmit = type && amount > 0;
 
@@ -36,7 +36,7 @@ export function RequestAuthority() {
                 datetime: new Date().toISOString(),
                 id: id,
                 legalEntity: entity ? entity : undefined,
-                subjectId: gateway.me!.id,
+                subjectId: myId,
             });
             window.location.assign(`#/authreqs/outbox/${id}`);
         }

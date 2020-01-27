@@ -1,14 +1,14 @@
 import { Container } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Route, RouteProps, Switch, useParams } from "react-router-dom";
 import uuid from "uuid/v4";
 import './assets/css/font-awesome.min.css';
 import { ResolveReference } from "./commands/Command";
 import TopBar from "./components/TopBar";
 import { useCommand } from "./hooks/useCommand";
-import { useIdentityGateway } from "./hooks/useIdentityGateway";
 import { useLocalState } from "./hooks/useLocalState";
+import { useProfile } from "./hooks/useProfile";
 import { AuthReqInbox } from "./pages/Authorizations/AuthReqInbox";
 import { AuthReqOutbox } from "./pages/Authorizations/AuthReqOutbox";
 import { IncomingAuthReq } from "./pages/Authorizations/IncomingAuthReq";
@@ -56,14 +56,9 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
 
 export const AppBody: React.FC = () => {
     const { manager } = useLocalState();
-    const { gateway: idGateway } = useIdentityGateway();
     const { dispatch } = useCommand();
-
-    const [isConnected, setConnected] = useState(false);
-
-    idGateway.connect().then((id) => {
-        setConnected(true);
-    })
+    const { myId } = useProfile();
+    const isConnected = !!myId;
 
     const onScanQR = (qr: string) => {
         try {

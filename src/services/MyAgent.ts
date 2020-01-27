@@ -2,10 +2,8 @@ import { AllowIDVerify, InvokeIDVerify, UserCommand } from "../commands/Command"
 import { DomainEvent, NegotiationUpdated } from "../commands/Event";
 import { Agent, Me } from "../shared/Agent";
 import { Dict } from "../types/Dict";
-import { Profile } from "../types/State";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
-import { IdentityGatewayInterface } from "./identity/id-layer/IdentityGatewayInterface";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
 import { IDVerifier } from "./identity/id-layer/IDVerifier";
 import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
@@ -18,7 +16,7 @@ import { ReferenceServer } from "./references/ReferenceServer";
 import { StateManager } from "./state/StateManager";
 
 /** MyAgent wraps all services together */
-export class MyAgent implements IdentityGatewayInterface {
+export class MyAgent {
 
     readonly eventHook: Hook<DomainEvent> = new Hook('events');
     readonly commandHook: Hook<UserCommand> = new Hook('commands');
@@ -26,7 +24,6 @@ export class MyAgent implements IdentityGatewayInterface {
     readonly messenger: Messenger<Msg>;
 
     me?: Me;
-    verifiedProfileHook: Hook<{ peerId: string; profile: Profile; }> = new Hook('my-agent:verified-profile');
 
     waitingForRefs: Dict<(env: Envelope<Msg>) => void> = {};
 
