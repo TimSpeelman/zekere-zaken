@@ -1,4 +1,4 @@
-import { VerificationResult } from "../services/identity/verification/types";
+import { VerifyNegotiationResult } from "../services/identity/verification/types";
 
 export interface Me {
     id: string;
@@ -23,7 +23,7 @@ export interface Agent {
     setIncomingMessageHandler(handler: (senderId: string, message: string) => void): void;
 
     /**  Verify a peer */
-    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerificationResult>;
+    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerifyNegotiationResult>;
 
     /** Handle a verification request */
     setVerificationRequestHandler(handler: InVerifyHandler): void;
@@ -31,7 +31,7 @@ export interface Agent {
 
 export interface IVerify {
     /**  Verify a peer */
-    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerificationResult>;
+    verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerifyNegotiationResult>;
 }
 
 export interface IBeVerified {

@@ -2,7 +2,7 @@ import debug from "debug";
 import uuid from "uuid/v4";
 import { Agent, InVerifyHandler, IPv8VerifReq, Me } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
-import { VerificationResult } from "../verification/types";
+import { VerifyNegotiationResult } from "../verification/types";
 
 const log = debug("oa:sock-agent");
 
@@ -12,7 +12,7 @@ export class SockAgent implements Agent {
     private inVerifHandler: InVerifyHandler = () => { throw new Error("Not implemented") };
     private me?: Me;
     private meHook: Hook<Me> = new Hook('sock-agent:me');
-    private verifAnsHook: Hook<{ id: string, result: VerificationResult }> = new Hook('sock-agent:verif-ans');
+    private verifAnsHook: Hook<{ id: string, result: VerifyNegotiationResult }> = new Hook('sock-agent:verif-ans');
 
     constructor(private socket: SocketIOClient.Socket) {
         this.subscribeToSocket();
@@ -35,7 +35,7 @@ export class SockAgent implements Agent {
         this.inMsgHandler = handler;
     }
 
-    verifyPeer(peerId: string, request: IPv8VerifReq): Promise<VerificationResult> {
+    verifyPeer(peerId: string, request: IPv8VerifReq): Promise<VerifyNegotiationResult> {
         const id = uuid();
         this.send(peerId, { request, type: "ipv8 verify request", id });
         return new Promise((resolve) => this.verifAnsHook.on(ans => ans.id === id && resolve(ans.result)));
@@ -64,7 +64,7 @@ export class SockAgent implements Agent {
                         this.send(senderId, { answer, type: "ipv8 verify answer", id: message.id });
                     });
                 case "ipv8 verify answer":
-                    return this.verifAnsHook.fire({ id: message.id, result: message.answer ? VerificationResult.Succeeded : VerificationResult.Cancelled })
+                    return this.verifAnsHook.fire({ id: message.id, result: message.answer ? VerifyNegotiationResult.Succeeded : VerifyNegotiationResult.Cancelled })
             }
         })
     }
