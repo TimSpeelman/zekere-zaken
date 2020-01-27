@@ -1,7 +1,6 @@
-import { AllowIDVerify, InvokeIDVerify, UserCommand } from "../commands/Command";
-import { DomainEvent, NegotiationUpdated } from "../commands/Event";
+import { InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
+import { DomainEvent, IDVerifyCompleted, NegotiationUpdated } from "../commands/Event";
 import { Agent, Me } from "../shared/Agent";
-import { Dict } from "../types/Dict";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
@@ -10,7 +9,7 @@ import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
 import { NegStatus, VerificationResult, VerificationSpec, VerificationTransaction, VerifyNegotiation } from "./identity/verification/types";
 import { VerifieeNegotiationStrategy, VerifierNegotiationStrategy, VerifyManager } from "./identity/verification/VerifyManager";
 import { Messenger } from "./messaging/Messenger";
-import { Envelope, Msg } from "./messaging/types";
+import { Msg } from "./messaging/types";
 import { ReferenceClient } from "./references/ReferenceClient";
 import { ReferenceServer } from "./references/ReferenceServer";
 import { StateManager } from "./state/StateManager";
@@ -18,14 +17,12 @@ import { StateManager } from "./state/StateManager";
 /** MyAgent wraps all services together */
 export class MyAgent {
 
-    readonly eventHook: Hook<DomainEvent> = new Hook('events');
-    readonly commandHook: Hook<UserCommand> = new Hook('commands');
+    public eventHook: Hook<DomainEvent> = new Hook('events');
+    private commandHook: Hook<UserCommand> = new Hook('commands');
 
-    readonly messenger: Messenger<Msg>;
+    private messenger: Messenger<Msg>;
 
     me?: Me;
-
-    waitingForRefs: Dict<(env: Envelope<Msg>) => void> = {};
 
     constructor(private agent: Agent, private stateMgr: StateManager) {
 
@@ -47,7 +44,7 @@ export class MyAgent {
         this.eventHook.on((e) => {
             switch (e.type) {
                 case "RefResolvedToVerify":
-                    return window.location.assign(`#/verifs/inbox/${e.negotiationId}`);
+                    return this.commandHook.fire(NavigateTo({ path: `#/verifs/inbox/${e.negotiationId}` }));
 
             }
         })
@@ -55,9 +52,17 @@ export class MyAgent {
         this.connect().then(me => {
             this.me = me;
         });
+
+        this.commandHook.on((cmd) => {
+            if (cmd.type === "NavigateTo") {
+                if (typeof window !== 'undefined') {
+                    window.location.assign(cmd.path);
+                }
+            }
+        });
     }
 
-    setupProfileExchange(messenger: Messenger<Msg>, stateMgr: StateManager) {
+    protected setupProfileExchange(messenger: Messenger<Msg>, stateMgr: StateManager) {
         // Take care of exchanging profiles between peers.
         const profileEx = new ProfileExchanger(messenger, () => stateMgr.state.profile!);
         messenger.addRecipient(profileEx);
@@ -69,7 +74,7 @@ export class MyAgent {
         profileEx.verifiedProfileHook.on(({ peerId, profile }) => stateMgr.addProfile(peerId, profile));
     }
 
-    setupReferenceSystem(messenger: Messenger<Msg>) {
+    protected setupReferenceSystem(messenger: Messenger<Msg>) {
 
         // Ensure that references we create can be resolved
         const referenceServer = new ReferenceServer();
@@ -86,7 +91,7 @@ export class MyAgent {
         return { referenceServer };
     }
 
-    setupIDVerify(agent: Agent, stageMgr: StateManager) {
+    protected setupIDVerify(agent: Agent, stageMgr: StateManager) {
 
 
         const getTransactionById = (tId: string): VerificationTransaction | undefined => {
@@ -105,6 +110,13 @@ export class MyAgent {
         const verifiee = new IDVerifiee(getTransactionById);
         agent.setVerificationRequestHandler((r) => verifiee.handleVerificationRequest(r));
 
+        verifiee.completedVerifyHook.on((result) => {
+            this.eventHook.fire(IDVerifyCompleted({
+                negotiationId: result.sessionId,
+                result: result.result,
+            }))
+        })
+
         verifier.completedVerifyHook.on((result) => {
             const neg = stageMgr.state.negotiations.find(n => n.sessionId === result.sessionId);
             if (neg && result.result === VerificationResult.Succeeded) {
@@ -114,6 +126,11 @@ export class MyAgent {
                     // @ts-ignore FIXME
                     spec: neg.conceptSpec,
                 })
+
+                this.eventHook.fire(IDVerifyCompleted({
+                    negotiationId: result.sessionId,
+                    result: result.result,
+                }))
             }
         })
 
@@ -121,7 +138,7 @@ export class MyAgent {
             verifier.verify(cmd.transaction));
     }
 
-    setupNegotiation(agent: Agent, messenger: Messenger<Msg>, stateMgr: StateManager) {
+    protected setupNegotiation(agent: Agent, messenger: Messenger<Msg>, stateMgr: StateManager) {
 
         const negHook = new Hook<VerifyNegotiation>('neg-hook');
         negHook.on((negotiation) => {
@@ -131,7 +148,6 @@ export class MyAgent {
         const stgVerifiee = new VerifieeNegotiationStrategy(messenger, negHook);
 
         const getSessionById = (sessionId: string) => {
-            console.log("Looking up session", sessionId, "in", stateMgr.state.negotiations);
             return stateMgr.state.negotiations.find(n => n.sessionId === sessionId);
         }
         const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById, this.eventHook);
@@ -165,13 +181,6 @@ export class MyAgent {
 
                     stgVerifiee.offer(session!, spec);
 
-                    // const session = verifyManager.getSessionById(peerId, sessionId);
-                    // session.offer({
-                    //     authority: session.spec?.authority,
-                    //     legalEntity: cmd.legalEntity
-                    // });
-
-                    // this.commandHook.fire(AllowIDVerify({ negotiationId: cmd.negotiationId, transaction: session.getTransaction()! }))
                     break;
                 } case "RejectNegotiation": {
                     const sessionId = cmd.negotiationId;
@@ -189,8 +198,6 @@ export class MyAgent {
                 case "NegotiationCompleted": {
                     if (ev.transaction.verifierId === messenger.me!.id) { // FIXME ugly
                         this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
-                    } else {
-                        this.commandHook.fire(AllowIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
                     }
                     break;
                 }

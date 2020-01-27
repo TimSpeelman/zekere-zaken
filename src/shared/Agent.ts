@@ -10,7 +10,7 @@ export interface IPv8VerifReq {
     credentials: { name: string, value: string }[];
 }
 
-export type InVerifyHandler = (req: any) => Promise<boolean>;
+export type InVerifyHandler = (req: IPv8VerifReq) => Promise<boolean>;
 
 export interface Agent {
     /** We connect to our agent, which returns our info */

@@ -8,12 +8,19 @@ export class Hook<T> {
     private listeners: Array<Listener<T>> = [];
     private log: (...args: any[]) => void;
 
-    constructor(name?: string) {
+    constructor(name?: string, private async = false) {
         this.log = !!name ? debug(`oa:hook:${name}`) : debug(`oa:hook:<unnamed>`)
     }
 
     public fire(arg: T): void {
-        this.log('fire', arg);
+        if (this.async) {
+            setTimeout(() => this._fire(arg), 1);
+        } else {
+            this._fire(arg);
+        }
+    }
+
+    protected _fire(arg: T): void {
         this.listeners.forEach((l) => l(arg));
     }
 

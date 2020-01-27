@@ -3,17 +3,26 @@ import { BroadcastReference } from "../services/references/types";
 import { LegalEntity, VerificationTemplate } from "../types/State";
 
 export type UserCommand =
+    CmdNavigateTo |
     CmdResolveReference |
     CmdCreateVReqTemplate |
     CmdRemoveVReqTemplate |
     CmdAcceptNegotiation |
     CmdRejectNegotiation |
-    CmdAllowIDVerify |
     CmdInvokeIDVerify |
     CmdAcceptNegWithLegalEntity
 
 // @ts-ignore
 export const factory = <T extends { type: string }>(type: T["type"]) => (req: Omit<T, "type">): T => ({ ...req, type })
+
+export interface CmdNavigateTo {
+    type: "NavigateTo",
+    path: string,
+}
+
+export const NavigateTo =
+    factory<CmdNavigateTo>("NavigateTo");
+
 
 export interface CmdResolveReference {
     type: "ResolveReference",
@@ -68,16 +77,6 @@ export interface CmdAcceptNegWithLegalEntity {
 
 export const AcceptNegWithLegalEntity =
     factory<CmdAcceptNegWithLegalEntity>("AcceptNegWithLegalEntity");
-
-
-export interface CmdAllowIDVerify {
-    type: "AllowIDVerify",
-    negotiationId: string,
-    transaction: VerificationTransaction,
-}
-
-export const AllowIDVerify =
-    factory<CmdAllowIDVerify>("AllowIDVerify");
 
 
 export interface CmdInvokeIDVerify {

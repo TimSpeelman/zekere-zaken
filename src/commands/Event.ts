@@ -1,11 +1,12 @@
-import { VerificationTransaction, VerifyNegotiation } from "../services/identity/verification/types";
+import { VerificationResult, VerificationTransaction, VerifyNegotiation } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
 
 export type DomainEvent =
     EventRefResolvedToVerify |
     EventRefResolvedToAuthorize |
     EventNegotiationCompleted |
-    EventNegotiationUpdated;
+    EventNegotiationUpdated |
+    EventIDVerifyCompleted;
 
 // @ts-ignore
 export const factory = <T extends { type: string }>(type: T["type"]) => (req: Omit<T, "type">): T => ({ ...req, type })
@@ -46,3 +47,13 @@ export interface EventNegotiationUpdated {
 
 export const NegotiationUpdated =
     factory<EventNegotiationUpdated>("NegotiationUpdated");
+
+
+export interface EventIDVerifyCompleted {
+    type: "IDVerifyCompleted",
+    negotiationId: string,
+    result: VerificationResult,
+}
+
+export const IDVerifyCompleted =
+    factory<EventIDVerifyCompleted>("IDVerifyCompleted");

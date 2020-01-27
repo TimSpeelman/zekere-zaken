@@ -1,17 +1,15 @@
 import { InAuthorizationRequest, InVerificationRequest, IState, OutAuthorizationRequest, Profile, VerificationTemplate, Verified } from "../../types/State";
+import { Cache } from "../../util/Cache";
 import { Hook } from "../../util/Hook";
 import { VerifyNegotiation } from "../identity/verification/types";
 
 export class StateManager {
     public hook: Hook<IState> = new Hook('state-manager');
 
-    constructor() {
-        const _profile = localStorage.getItem("profile");
-        if (_profile) {
-            const profile: Profile = JSON.parse(_profile);
-            if (profile) {
-                this.setState({ profile });
-            }
+    constructor(private cache: Cache<Profile>) {
+        const profile = cache.get("profile");
+        if (profile) {
+            this.setState({ profile });
         }
     }
 
@@ -34,11 +32,10 @@ export class StateManager {
     setState(state: Partial<IState>) {
         this._state = { ...this._state, ...state, };
         this.hook.fire(this._state);
-        console.log("NEW STATE", this._state);
     }
 
     setMyProfile(profile: Profile) {
-        localStorage.setItem("profile", JSON.stringify(profile));
+        this.cache.set("profile", profile);
         this.setState({ profile });
     }
 

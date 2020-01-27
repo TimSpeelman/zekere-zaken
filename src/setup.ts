@@ -4,12 +4,13 @@ import { SockAgent } from "./services/identity/id-layer/SockAgent";
 import { MyAgent } from "./services/MyAgent";
 import { SocketConnection } from "./services/socket";
 import { StateManager } from "./services/state/StateManager";
+import { LocalStorageJSONCache } from "./util/Cache";
 
 export interface Deps {
     myId: string;
 }
 
-export const stateManager = new StateManager();
+export const stateManager = new StateManager(new LocalStorageJSONCache());
 export const socketAgent = new SockAgent(SocketConnection);
 export const gateway = new MyAgent(socketAgent, stateManager);
 

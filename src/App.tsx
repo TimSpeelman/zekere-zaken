@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { HashRouter as Router, Route, RouteProps, Switch, useParams } from "react-router-dom";
 import uuid from "uuid/v4";
 import './assets/css/font-awesome.min.css';
-import { ResolveReference } from "./commands/Command";
+import { NavigateTo, ResolveReference } from "./commands/Command";
 import TopBar from "./components/TopBar";
 import { useCommand } from "./hooks/useCommand";
 import { useLocalState } from "./hooks/useLocalState";
@@ -68,7 +68,7 @@ export const AppBody: React.FC = () => {
             }
 
             dispatch(ResolveReference({ reference }))
-            window.location.assign(`#/resolve/${reference.senderId}/${reference.reference}`); // Or do upon command?
+            dispatch(NavigateTo({ path: `#/resolve/${reference.senderId}/${reference.reference}` })); // Or do upon command?
 
             return true;
         } catch (e) {
