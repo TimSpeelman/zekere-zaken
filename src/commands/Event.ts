@@ -1,5 +1,5 @@
-import { BroadcastReference } from "../services/identity/id-layer/IdentityGatewayInterface";
 import { VerificationTransaction, VerifyNegotiation } from "../services/identity/verification/types";
+import { BroadcastReference } from "../services/references/types";
 
 export type DomainEvent =
     EventRefResolvedToVerify |

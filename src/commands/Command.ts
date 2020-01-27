@@ -1,5 +1,5 @@
-import { BroadcastReference } from "../services/identity/id-layer/IdentityGatewayInterface";
 import { VerificationTransaction } from "../services/identity/verification/types";
+import { BroadcastReference } from "../services/references/types";
 import { LegalEntity, VerificationTemplate } from "../types/State";
 
 export type UserCommand =

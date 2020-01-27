@@ -1,8 +1,8 @@
 import debug from "debug";
 import { Dict } from "../../types/Dict";
 import { Timer } from "../../util/timer";
-import { BroadcastReference, ResolveOptions } from "../identity/id-layer/IdentityGatewayInterface";
 import { Envelope, IHandleMessages, ISendMessages, MsgResolveReference } from "../messaging/types";
+import { BroadcastReference, ResolveOptions } from "../references/types";
 
 const log = debug('oa:reference-client');
 
