@@ -84,6 +84,7 @@ export const dummyState = (myId: string): IState => {
         authority: Inkoop10k,
         issuerId: "jan",
         subjectId: myId,
+        sessionId: "x",
     };
 
     const AuthDeBroodfabriekInkoop5k: Authorization = {
@@ -93,11 +94,13 @@ export const dummyState = (myId: string): IState => {
         authority: Inkoop5k,
         issuerId: "sarah",
         subjectId: myId,
+        sessionId: "y",
     };
 
     return {
         verified: [],
-        negotiations: [],
+        authNegs: [],
+        verifyNegs: [],
         incomingAuthReqs: [
             InAuthDeBroodfabriekFinanciering100k,
             InAuthJanssenInkoop10k,
@@ -107,7 +110,7 @@ export const dummyState = (myId: string): IState => {
             InVerifJanssenInkoop5k,
         ],
 
-        outgoingAuthReqs: [
+        outgoingAuthTemplates: [
             OutAuthDeBroodfabriekFinanciering100k,
             OutAuthJanssenInkoop10k,
         ],

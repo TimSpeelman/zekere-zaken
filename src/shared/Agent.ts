@@ -1,3 +1,4 @@
+import { AuthorizeNegotiationResult } from "../services/identity/authorization/types";
 import { VerifyNegotiationResult } from "../services/identity/verification/types";
 
 export interface Me {
@@ -10,7 +11,15 @@ export interface IPv8VerifReq {
     credentials: { name: string, value: string }[];
 }
 
+export interface IPv8IssueReq {
+    issuerId: string;
+    meta: string;
+    credentials: { name: string, value: string }[];
+}
+
 export type InVerifyHandler = (req: IPv8VerifReq) => Promise<boolean>;
+
+export type InIssueHandler = (req: IPv8IssueReq) => Promise<boolean>;
 
 export interface Agent {
     /** We connect to our agent, which returns our info */
@@ -25,8 +34,14 @@ export interface Agent {
     /**  Verify a peer */
     verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerifyNegotiationResult>;
 
+    /**  Request an issuing */
+    requestIssue(peerId: string, req: IPv8IssueReq): Promise<AuthorizeNegotiationResult>;
+
     /** Handle a verification request */
     setVerificationRequestHandler(handler: InVerifyHandler): void;
+
+    /** Handle an issuing request */
+    setIssuingRequestHandler(handler: InIssueHandler): void;
 }
 
 export interface IVerify {
@@ -34,6 +49,15 @@ export interface IVerify {
     verifyPeer(peerId: string, req: IPv8VerifReq): Promise<VerifyNegotiationResult>;
 }
 
+export interface IIssue {
+    /**  Verify a peer */
+    requestIssue(peerId: string, req: IPv8IssueReq): Promise<AuthorizeNegotiationResult>;
+}
+
 export interface IBeVerified {
     handleVerificationRequest(req: any): Promise<boolean>;
+}
+
+export interface ICanIssue {
+    handleIssueRequest(req: IPv8IssueReq): Promise<boolean>;
 }

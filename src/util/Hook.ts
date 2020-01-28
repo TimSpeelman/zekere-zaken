@@ -13,6 +13,8 @@ export class Hook<T> {
     }
 
     public fire(arg: T): void {
+        this.log('fire', arg);
+
         if (this.async) {
             setTimeout(() => this._fire(arg), 0);
         } else {

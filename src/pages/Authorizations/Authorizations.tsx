@@ -3,8 +3,8 @@ import Tabs from '@material-ui/core/Tabs';
 import { default as React } from "react";
 import { BottomTools } from "../../components/BottomTools";
 import { useStyles } from "../../styles";
-import { AuthReqInbox } from "./AuthReqInbox";
-import { AuthReqOutbox } from "./AuthReqOutbox";
+import { AuthReqOutbox } from "../Authorizee/AuthReqOutbox";
+import { AuthReqInbox } from "../Authorizer/AuthReqInbox";
 
 interface Props {
     tab: "inbox" | "outbox"

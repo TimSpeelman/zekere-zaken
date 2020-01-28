@@ -1,7 +1,7 @@
 import { InVerificationRequest, IState } from "../types/State";
 
 export function selectOpenInVerReqs(state: IState): InVerificationRequest[] {
-    return state.negotiations.map((n) => ({
+    return state.verifyNegs.map((n) => ({
         authority: n.conceptSpec!.authority!,
         legalEntity: n.conceptSpec!.legalEntity,
         datetime: new Date().toISOString(), // FIXME

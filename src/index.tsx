@@ -2,6 +2,7 @@ import { ThemeProvider } from "@material-ui/core";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from "./App";
+import "./assets/css/index.css";
 import { CommandContextProvider } from "./hooks/useCommand";
 import { LocalStateContextProvider } from "./hooks/useLocalState";
 import { ProfileContextProvider } from "./hooks/useProfile";

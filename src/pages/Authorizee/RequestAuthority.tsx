@@ -2,28 +2,26 @@ import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
 import { default as React, useState } from "react";
 import uuid from "uuid/v4";
+import { CreateAReqTemplate } from "../../commands/Command";
 import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { FormActions } from "../../components/FormActions";
-import { useLocalState } from "../../hooks/useLocalState";
-import { useProfile } from "../../hooks/useProfile";
+import { OptionalField } from "../../components/OptionalField";
+import { useCommand } from "../../hooks/useCommand";
 import { useStyles } from "../../styles";
-import { Authority, KVKAuthorityType, LegalEntity } from "../../types/State";
+import { Authority, AuthorizationTemplate, KVKAuthorityType, LegalEntity } from "../../types/State";
 
 export function RequestAuthority() {
     const classes = useStyles({});
-    const [entity, setEntity] = useState<LegalEntity | null>(null);
-    const [chooseEntity, setChooseEntity] = useState(false);
 
-    const { manager } = useLocalState();
+    const { dispatch } = useCommand();
+
+    const [entity, setEntity] = useState<LegalEntity | null>(null);
     const [type, setType] = useState<KVKAuthorityType | null>(KVKAuthorityType.Inkoop);
     const [amount, setAmount] = useState(1);
-
-    const { myId } = useProfile();
 
     const canSubmit = type && amount > 0;
 
@@ -31,17 +29,16 @@ export function RequestAuthority() {
         if (type && amount > 0) {
             const authority: Authority = { type, amount };
             const id = uuid();
-            manager.addOutAuthReq({
+            const template: AuthorizationTemplate = {
+                id: id,
                 authority,
                 datetime: new Date().toISOString(),
-                id: id,
                 legalEntity: entity ? entity : undefined,
-                subjectId: myId,
-            });
+            };
+            dispatch(CreateAReqTemplate({ template }))
             window.location.assign(`#/authreqs/outbox/${id}`);
         }
     }
-
 
     return (
         <div>
@@ -61,12 +58,9 @@ export function RequestAuthority() {
                     <AmountInput value={amount} onChange={setAmount} helperText={"Welk bedrag wil u mogen besteden?"} />
                 </Box>
 
-                {chooseEntity ?
-                    (
-                        <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
-                    ) : (
-                        <Button startIcon={<AddIcon />} onClick={() => setChooseEntity(true)}>Organisatie Specificeren</Button>
-                    )}
+                <OptionalField label={"Organisatie Specificeren"}>
+                    <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
+                </OptionalField>
             </Paper>
 
             <FormActions>

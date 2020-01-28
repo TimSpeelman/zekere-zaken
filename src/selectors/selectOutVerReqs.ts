@@ -20,7 +20,7 @@ export function selectOutVerReqByTemplateId(templateId: string) {
 export function selectCompletedTransactionsByTemplateId(templateId: string) {
     return (state: IState) =>
         state.verified.filter(v => v.templateId === templateId).map(v =>
-            state.negotiations.filter(n => n.sessionId === v.sessionId).map((n): VerificationTransaction => ({
+            state.verifyNegs.filter(n => n.sessionId === v.sessionId).map((n): VerificationTransaction => ({
                 sessionId: n.sessionId,
                 // @ts-ignore FIXME
                 spec: n.conceptSpec! as VerificationSpec,

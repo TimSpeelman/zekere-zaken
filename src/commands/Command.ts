@@ -1,16 +1,22 @@
+import { AuthorizationTransaction } from "../services/identity/authorization/types";
 import { VerificationTransaction } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
-import { LegalEntity, VerificationTemplate } from "../types/State";
+import { AuthorizationTemplate, LegalEntity, VerificationTemplate } from "../types/State";
 
 export type UserCommand =
     CmdNavigateTo |
     CmdResolveReference |
     CmdCreateVReqTemplate |
     CmdRemoveVReqTemplate |
-    CmdAcceptNegotiation |
-    CmdRejectNegotiation |
+    CmdCreateAReqTemplate |
+    CmdRemoveAReqTemplate |
+    CmdAcceptVNegotiation |
+    CmdRejectVNegotiation |
+    CmdRejectANegotiation |
     CmdInvokeIDVerify |
-    CmdAcceptNegWithLegalEntity
+    CmdInvokeIDAuthorize |
+    CmdAcceptVNegWithLegalEntity |
+    CmdAcceptANegWithLegalEntity;
 
 // @ts-ignore
 export const factory = <T extends { type: string }>(type: T["type"]) => (req: Omit<T, "type">): T => ({ ...req, type })
@@ -51,33 +57,69 @@ export const RemoveVReqTemplate =
     factory<CmdRemoveVReqTemplate>("RemoveVReqTemplate");
 
 
-export interface CmdAcceptNegotiation {
-    type: "AcceptNegotiation",
+export interface CmdCreateAReqTemplate {
+    type: "CreateAReqTemplate",
+    template: AuthorizationTemplate,
+}
+
+export const CreateAReqTemplate =
+    factory<CmdCreateAReqTemplate>("CreateAReqTemplate");
+
+
+export interface CmdRemoveAReqTemplate {
+    type: "RemoveAReqTemplate",
+    templateId: string,
+}
+
+export const RemoveAReqTemplate =
+    factory<CmdRemoveAReqTemplate>("RemoveAReqTemplate");
+
+
+export interface CmdAcceptVNegotiation {
+    type: "AcceptVNegotiation",
     negotiationId: string,
 }
 
-export const AcceptNegotiation =
-    factory<CmdAcceptNegotiation>("AcceptNegotiation");
+export const AcceptVNegotiation =
+    factory<CmdAcceptVNegotiation>("AcceptVNegotiation");
 
 
-export interface CmdRejectNegotiation {
-    type: "RejectNegotiation",
+export interface CmdRejectVNegotiation {
+    type: "RejectVNegotiation",
     negotiationId: string,
 }
 
-export const RejectNegotiation =
-    factory<CmdRejectNegotiation>("RejectNegotiation");
+export const RejectVNegotiation =
+    factory<CmdRejectVNegotiation>("RejectVNegotiation");
 
 
-export interface CmdAcceptNegWithLegalEntity {
-    type: "AcceptNegWithLegalEntity",
+export interface CmdAcceptVNegWithLegalEntity {
+    type: "AcceptVNegWithLegalEntity",
     negotiationId: string,
     legalEntity: LegalEntity,
 }
 
-export const AcceptNegWithLegalEntity =
-    factory<CmdAcceptNegWithLegalEntity>("AcceptNegWithLegalEntity");
+export const AcceptVNegWithLegalEntity =
+    factory<CmdAcceptVNegWithLegalEntity>("AcceptVNegWithLegalEntity");
 
+
+export interface CmdAcceptANegWithLegalEntity {
+    type: "AcceptANegWithLegalEntity",
+    negotiationId: string,
+    legalEntity: LegalEntity,
+}
+
+export const AcceptANegWithLegalEntity =
+    factory<CmdAcceptANegWithLegalEntity>("AcceptANegWithLegalEntity");
+
+
+export interface CmdRejectANegotiation {
+    type: "RejectANegotiation",
+    negotiationId: string,
+}
+
+export const RejectANegotiation =
+    factory<CmdRejectANegotiation>("RejectANegotiation");
 
 export interface CmdInvokeIDVerify {
     type: "InvokeIDVerify",
@@ -87,4 +129,13 @@ export interface CmdInvokeIDVerify {
 
 export const InvokeIDVerify =
     factory<CmdInvokeIDVerify>("InvokeIDVerify");
+
+export interface CmdInvokeIDAuthorize {
+    type: "InvokeIDAuthorize",
+    negotiationId: string,
+    transaction: AuthorizationTransaction,
+}
+
+export const InvokeIDAuthorize =
+    factory<CmdInvokeIDAuthorize>("InvokeIDAuthorize");
 

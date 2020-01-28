@@ -52,3 +52,12 @@ interface Entry {
     msWait: number,
     action: () => void,
 }
+
+export const maxCalls = (max: number) => {
+    let calls = 0;
+    return () => {
+        if (calls++ >= max) {
+            throw new Error("Max calls reached");
+        }
+    }
+}

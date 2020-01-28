@@ -1,7 +1,8 @@
 import debug from "debug";
 import uuid from "uuid/v4";
-import { Agent, InVerifyHandler, IPv8VerifReq, Me } from "../../../shared/Agent";
+import { Agent, InIssueHandler, InVerifyHandler, IPv8IssueReq, IPv8VerifReq, Me } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
+import { AuthorizeNegotiationResult } from "../authorization/types";
 import { VerifyNegotiationResult } from "../verification/types";
 
 const log = debug("oa:sock-agent");
@@ -10,9 +11,11 @@ export class SockAgent implements Agent {
 
     private inMsgHandler: (senderId: string, message: string) => void = () => { throw new Error("Not implemented") };
     private inVerifHandler: InVerifyHandler = () => { throw new Error("Not implemented") };
+    private inIssueHandler: InIssueHandler = () => { throw new Error("Not implemented") };
     private me?: Me;
     private meHook: Hook<Me> = new Hook('sock-agent:me');
     private verifAnsHook: Hook<{ id: string, result: VerifyNegotiationResult }> = new Hook('sock-agent:verif-ans');
+    private issueAnsHook: Hook<{ id: string, result: AuthorizeNegotiationResult }> = new Hook('sock-agent:issue-ans');
 
     constructor(private socket: SocketIOClient.Socket) {
         this.subscribeToSocket();
@@ -35,6 +38,12 @@ export class SockAgent implements Agent {
         this.inMsgHandler = handler;
     }
 
+    requestIssue(peerId: string, request: IPv8IssueReq): Promise<AuthorizeNegotiationResult> {
+        const id = uuid();
+        this.send(peerId, { request, type: "ipv8 issue request", id });
+        return new Promise((resolve) => this.issueAnsHook.on(ans => ans.id === id && resolve(ans.result)));
+    }
+
     verifyPeer(peerId: string, request: IPv8VerifReq): Promise<VerifyNegotiationResult> {
         const id = uuid();
         this.send(peerId, { request, type: "ipv8 verify request", id });
@@ -43,6 +52,10 @@ export class SockAgent implements Agent {
 
     setVerificationRequestHandler(handler: InVerifyHandler): void {
         this.inVerifHandler = handler;
+    }
+
+    setIssuingRequestHandler(handler: InIssueHandler): void {
+        this.inIssueHandler = handler;
     }
 
     protected subscribeToSocket() {
@@ -65,6 +78,12 @@ export class SockAgent implements Agent {
                     });
                 case "ipv8 verify answer":
                     return this.verifAnsHook.fire({ id: message.id, result: message.answer ? VerifyNegotiationResult.Succeeded : VerifyNegotiationResult.Cancelled })
+                case "ipv8 issue request":
+                    return this.inIssueHandler(message.request).then((answer) => {
+                        this.send(senderId, { answer, type: "ipv8 issue answer", id: message.id });
+                    });
+                case "ipv8 issue answer":
+                    return this.issueAnsHook.fire({ id: message.id, result: message.answer ? AuthorizeNegotiationResult.Succeeded : AuthorizeNegotiationResult.Cancelled })
             }
         })
     }

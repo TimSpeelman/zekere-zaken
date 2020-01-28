@@ -1,4 +1,4 @@
-import { AcceptNegWithLegalEntity, CreateVReqTemplate, ResolveReference } from "../../src/commands/Command";
+import { AcceptVNegWithLegalEntity, CreateVReqTemplate, ResolveReference } from "../../src/commands/Command";
 import { VerifyNegotiationResult } from "../../src/services/identity/verification/types";
 import { describe, expect, it, makeDone, TestSequence } from "../setup";
 import { createMyAgent, mockAuthority, mockEntity, mockIDPair } from "./mocks";
@@ -55,7 +55,7 @@ describe("Verification Integration Test", () => {
         // The Subject then receives this request and accepts it
         subject.eventHook.on((e) => {
             if (e.type === "RefResolvedToVerify") {
-                subject.dispatch(AcceptNegWithLegalEntity({
+                subject.dispatch(AcceptVNegWithLegalEntity({
                     legalEntity,
                     negotiationId: e.negotiationId,
                 }))

@@ -1,15 +1,17 @@
+import { AuthorizeNegotiation } from "../services/identity/authorization/types";
 import { VerificationSpec, VerifyNegotiation } from "../services/identity/verification/types";
 import { Dict } from "./Dict";
 
 export interface IState {
-    negotiations: VerifyNegotiation[];
+    verifyNegs: VerifyNegotiation[];
+    authNegs: AuthorizeNegotiation[];
     verified: Verified[];
 
     incomingVerifReqs: InVerificationRequest[];
     outgoingVerifTemplates: VerificationTemplate[];
 
     incomingAuthReqs: InAuthorizationRequest[];
-    outgoingAuthReqs: OutAuthorizationRequest[];
+    outgoingAuthTemplates: AuthorizationTemplate[];
 
     authorizations: Authorization[];
 
@@ -57,6 +59,13 @@ export interface VerificationTemplate {
     datetime: string;
 }
 
+export interface AuthorizationTemplate {
+    id: string;
+    legalEntity?: LegalEntity;
+    authority: Authority;
+    datetime: string;
+}
+
 export interface OutAuthorizationRequest {
     id: string;
     legalEntity?: LegalEntity;
@@ -66,12 +75,14 @@ export interface OutAuthorizationRequest {
 }
 
 export interface Authorization {
+    fromTemplateId?: string;
     id: string;
     legalEntity: LegalEntity;
     authority: Authority;
     issuedAt: string;
     issuerId: string;
     subjectId: string;
+    sessionId: string;
 }
 
 export interface Actor {

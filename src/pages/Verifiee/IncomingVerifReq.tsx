@@ -4,8 +4,10 @@ import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import { isEqual, uniqWith } from "lodash";
 import { default as React, Fragment } from "react";
+import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
-import { AcceptNegWithLegalEntity as AcceptNegWithLegalEntity } from "../../commands/Command";
+import uuid from "uuid/v4";
+import { AcceptVNegWithLegalEntity as AcceptVNegWithLegalEntity, CreateAReqTemplate } from "../../commands/Command";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
@@ -16,7 +18,7 @@ import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuth
 import { selectOpenInVerReqById } from "../../selectors/selectOpenInVerReqs";
 import { selectProfileById } from "../../selectors/selectProfile";
 import { useStyles } from "../../styles";
-import { LegalEntity } from "../../types/State";
+import { AuthorizationTemplate, LegalEntity } from "../../types/State";
 
 export function IncomingVerifReq() {
     console.log("Render");
@@ -27,13 +29,26 @@ export function IncomingVerifReq() {
 
     const req = useSelector(id ? selectOpenInVerReqById(id) : undefined);
     const profile = useSelector(req ? selectProfileById(req.verifierId) : undefined);
-    const auths = useSelector(req ? selectMatchingAuthorizations(req) : undefined) || [];
+    const auths = useSelector(req ? selectMatchingAuthorizations({ legalEntity: req.legalEntity!, authority: req.authority }) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
-    const { getURL } = useWhatsappURL();
+    const { getURL, getWhatsappURL } = useWhatsappURL();
 
     function goVerify(legalEntity: LegalEntity) {
-        dispatch(AcceptNegWithLegalEntity({ negotiationId: req!.id, legalEntity }))
+        dispatch(AcceptVNegWithLegalEntity({ negotiationId: req!.id, legalEntity }))
+    }
+
+    const template: AuthorizationTemplate | undefined = req && {
+        id: uuid(),
+        datetime: new Date().toISOString(),
+        authority: req.authority,
+        legalEntity: req.legalEntity,
+    };
+
+    function fastAuthReq() {
+        if (template) {
+            dispatch(CreateAReqTemplate({ template }))
+        }
     }
 
     return !req ? <div>Dit verzoek bestaat niet.</div> :
@@ -76,7 +91,10 @@ export function IncomingVerifReq() {
                         </Box>
                         <FormActions>
                             <Button component="a" href="#/home">Annuleren</Button>
-                            <Button variant={"contained"} color={"primary"} component="a" href={getURL(req)}>Andere Organisatie</Button>
+                            <CopyToClipboard text={getURL(template)} >
+                                <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
+                                    component="a" href={getWhatsappURL(template)} target="_blank">Andere Organisatie</Button>
+                            </CopyToClipboard>
                         </FormActions>
                     </Fragment>
                 }

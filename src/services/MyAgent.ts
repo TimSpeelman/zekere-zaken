@@ -1,9 +1,14 @@
-import { InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
-import { DomainEvent, IDVerifyCompleted, NegotiationUpdated, RefResolvedToVerify } from "../commands/Event";
-import { selectTransactionById } from "../selectors/selectTransactionById";
+import uuid from "uuid";
+import { InvokeIDAuthorize, InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
+import { ANegotiationUpdated, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated } from "../commands/Event";
+import { selectATransactionById, selectVTransactionById } from "../selectors/selectTransactionById";
 import { Agent, Me } from "../shared/Agent";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
+import { AuthorizeeNegotiationStrategy, AuthorizeManager, AuthorizerNegotiationStrategy } from "./identity/authorization/AuthorizeManager";
+import { AuthorizationTransaction, AuthorizeNegotiation, AuthorizeNegotiationResult, NegStatus } from "./identity/authorization/types";
+import { IDIssuee } from "./identity/id-layer/IDIssuee";
+import { IDIssuer } from "./identity/id-layer/IDIssuer";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";
 import { IDVerifier } from "./identity/id-layer/IDVerifier";
 import { ProfileExchanger } from "./identity/profiles/ProfileExchanger";
@@ -18,7 +23,7 @@ import { StateManager } from "./state/StateManager";
 export class MyAgent {
 
     public eventHook: Hook<DomainEvent> = new Hook('events');
-    private commandHook: Hook<UserCommand> = new Hook('commands');
+    public commandHook: Hook<UserCommand> = new Hook('commands');
 
     private messenger: Messenger<Msg>;
 
@@ -36,7 +41,11 @@ export class MyAgent {
 
         this.setupIDVerify(agent, stateMgr, this.commandHook, this.eventHook);
 
+        this.setupIDAuthorize(agent, stateMgr, this.commandHook, this.eventHook);
+
         this.setupVerifyNegotiation(agent, messenger, stateMgr, this.commandHook, this.eventHook);
+
+        this.setupAuthorizeNegotiation(agent, messenger, stateMgr, this.commandHook, this.eventHook);
 
         this.setupStateTriggers(this.commandHook);
 
@@ -63,7 +72,8 @@ export class MyAgent {
             switch (e.type) {
                 case "RefResolvedToVerify":
                     return commandHook.fire(NavigateTo({ path: `#/verifs/inbox/${e.negotiationId}` }));
-
+                case "RefResolvedToAuthorize":
+                    return commandHook.fire(NavigateTo({ path: `#/authreqs/inbox/${e.negotiationId}` }));
             }
         })
 
@@ -103,7 +113,7 @@ export class MyAgent {
     protected setupIDVerify(agent: Agent, stageMgr: StateManager, commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
 
         const getTransactionById = (transactionId: string) =>
-            selectTransactionById(transactionId)(stageMgr.state);
+            selectVTransactionById(transactionId)(stageMgr.state);
 
         const verifier = new IDVerifier(agent);
 
@@ -118,7 +128,7 @@ export class MyAgent {
         })
 
         verifier.completedVerifyHook.on((result) => {
-            const neg = stageMgr.state.negotiations.find(n => n.sessionId === result.sessionId);
+            const neg = stageMgr.state.verifyNegs.find(n => n.sessionId === result.sessionId);
             if (neg && result.result === VerifyNegotiationResult.Succeeded) {
                 stageMgr.addVerified({
                     templateId: neg.fromTemplateId!,
@@ -138,13 +148,73 @@ export class MyAgent {
             verifier.verify(cmd.transaction));
     }
 
+    protected setupIDAuthorize(agent: Agent, stageMgr: StateManager, commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
+
+        const getTransactionById = (transactionId: string) =>
+            selectATransactionById(transactionId)(stageMgr.state);
+
+        const authorizer = new IDIssuer(getTransactionById);
+
+        const authorizee = new IDIssuee(agent);
+        agent.setIssuingRequestHandler((r) => authorizer.handleIssueRequest(r));
+
+        authorizee.completedIssueHook.on((result) => {
+            eventHook.fire(IDIssuingCompleted({
+                negotiationId: result.sessionId,
+                result: result.result,
+            }))
+
+            const neg = stageMgr.state.authNegs.find(n => n.sessionId === result.sessionId);
+            if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
+                stageMgr.addAuthorization({
+                    fromTemplateId: neg.fromTemplateId!,
+                    sessionId: neg.sessionId,
+                    // @ts-ignore FIXME
+                    spec: neg.conceptSpec,
+                    legalEntity: neg.conceptSpec!.legalEntity!,
+                    authority: neg.conceptSpec!.authority!,
+                    issuedAt: new Date().toISOString(), // FIXME
+                    issuerId: neg.authorizerId,
+                    subjectId: neg.subjectId,
+                    id: uuid(),
+                })
+            }
+        })
+
+        authorizer.completedIssueHook.on((result) => {
+            const neg = stageMgr.state.authNegs.find(n => n.sessionId === result.sessionId);
+            if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
+                stageMgr.addAuthorization({
+                    fromTemplateId: neg.fromTemplateId!,
+                    sessionId: neg.sessionId,
+                    // @ts-ignore FIXME
+                    spec: neg.conceptSpec,
+                    legalEntity: neg.conceptSpec!.legalEntity!,
+                    authority: neg.conceptSpec!.authority!,
+                    issuedAt: new Date().toISOString(), // FIXME
+                    issuerId: neg.authorizerId,
+                    subjectId: neg.subjectId,
+                    id: uuid(),
+                })
+
+                eventHook.fire(IDIssuingCompleted({
+                    negotiationId: result.sessionId,
+                    result: result.result,
+                }))
+            }
+        })
+
+        commandHook.on((cmd) => cmd.type === "InvokeIDAuthorize" &&
+            authorizee.requestIssuing(cmd.transaction));
+    }
+
     protected setupVerifyNegotiation(agent: Agent, messenger: Messenger<Msg>, stateMgr: StateManager, commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
 
         const negHook = new Hook<VerifyNegotiation>('neg-hook');
         negHook.on((negotiation) => {
-            const isNew = !stateMgr.state.negotiations.find(n => n.sessionId === negotiation.sessionId);
+            const isNew = !stateMgr.state.verifyNegs.find(n => n.sessionId === negotiation.sessionId);
 
-            eventHook.fire(NegotiationUpdated({ negotiation }))
+            eventHook.fire(VNegotiationUpdated({ negotiation }))
 
             if (isNew && negotiation.fromReference) {
                 eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
@@ -154,7 +224,7 @@ export class MyAgent {
         const stgVerifiee = new VerifieeNegotiationStrategy(messenger, negHook);
 
         const getSessionById = (sessionId: string) => {
-            return stateMgr.state.negotiations.find(n => n.sessionId === sessionId);
+            return stateMgr.state.verifyNegs.find(n => n.sessionId === sessionId);
         }
         const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById);
 
@@ -164,7 +234,7 @@ export class MyAgent {
 
         commandHook.on(cmd => {
             switch (cmd.type) {
-                case "AcceptNegWithLegalEntity": {
+                case "AcceptVNegWithLegalEntity": {
                     const sessionId = cmd.negotiationId;
 
                     const session = failIfFalsy(getSessionById(sessionId), "SessionID unknown");
@@ -176,7 +246,7 @@ export class MyAgent {
                     stgVerifiee.offer(session!, spec);
 
                     break;
-                } case "RejectNegotiation": {
+                } case "RejectVNegotiation": {
                     const sessionId = cmd.negotiationId;
                     const session = failIfFalsy(getSessionById(sessionId), "SessionID unknown");
 
@@ -189,15 +259,15 @@ export class MyAgent {
 
         eventHook.on((ev) => {
             switch (ev.type) {
-                case "NegotiationCompleted": {
+                case "VNegotiationCompleted": {
                     if (ev.transaction.verifierId === messenger.me!.id) { // FIXME ugly
                         commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
                     }
                     break;
                 }
-                case "NegotiationUpdated": {
+                case "VNegotiationUpdated": {
                     const n = ev.negotiation;
-                    this.stateMgr.updateNeg(n);
+                    this.stateMgr.updateVerifyNeg(n);
                     if (n.verifierId === messenger.me!.id && specIsComplete(n.conceptSpec)) {
                         const transaction: VerificationTransaction = {
                             spec: n.conceptSpec,
@@ -216,6 +286,85 @@ export class MyAgent {
         return { verifyManager, stgVerifier };
     }
 
+    protected setupAuthorizeNegotiation(agent: Agent, messenger: Messenger<Msg>, stateMgr: StateManager, commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
+
+        const negHook = new Hook<AuthorizeNegotiation>('neg-hook');
+        negHook.on((negotiation) => {
+            const isNew = !stateMgr.state.authNegs.find(n => n.sessionId === negotiation.sessionId);
+
+            eventHook.fire(ANegotiationUpdated({ negotiation }))
+
+            if (isNew && negotiation.fromReference) {
+                eventHook.fire(RefResolvedToAuthorize({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
+            }
+        })
+        const stgAuthorizer = new AuthorizerNegotiationStrategy(messenger, negHook);
+        const stgAuthorizee = new AuthorizeeNegotiationStrategy(messenger, negHook);
+
+        const getSessionById = (sessionId: string) => {
+            return stateMgr.state.authNegs.find(n => n.sessionId === sessionId);
+        }
+        const authorizeManager = new AuthorizeManager(stgAuthorizer, stgAuthorizee, getSessionById);
+
+        messenger.addRecipient(authorizeManager);
+
+        agent.connect().then((me) => { authorizeManager.myId = me.id; })
+
+        commandHook.on(cmd => {
+            switch (cmd.type) {
+                case "AcceptANegWithLegalEntity": {
+                    const sessionId = cmd.negotiationId;
+
+                    const session = failIfFalsy(getSessionById(sessionId), "SessionID unknown");
+                    const spec = {
+                        ...session!.conceptSpec,
+                        legalEntity: cmd.legalEntity,
+                    }
+
+                    stgAuthorizer.offer(session!, spec);
+
+                    break;
+                } case "RejectANegotiation": {
+                    const sessionId = cmd.negotiationId;
+                    const session = failIfFalsy(getSessionById(sessionId), "SessionID unknown");
+
+                    stgAuthorizee.reject(session!); // FIXME, always verifiee?
+                    break;
+                }
+            }
+
+        })
+
+        eventHook.on((ev) => {
+            switch (ev.type) {
+                // case "ANegotiationCompleted": {
+                //     if (ev.transaction.verifierId === messenger.me!.id) { // FIXME ugly
+                //         commandHook.fire(InvokeIDAuthorize({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
+                //     }
+                //     break;
+                // }
+                case "ANegotiationUpdated": {
+                    const n = ev.negotiation;
+                    this.stateMgr.updateAuthNeg(n);
+                    // If I am subject, I invoke the authorize
+                    if (n.subjectId === messenger.me!.id && specIsComplete(n.conceptSpec)
+                        && n.status === NegStatus.Successful) {
+                        const transaction: AuthorizationTransaction = {
+                            spec: n.conceptSpec,
+                            subjectId: n.subjectId,
+                            authorizerId: n.authorizerId,
+                            sessionId: n.sessionId,
+                        }
+                        commandHook.fire(InvokeIDAuthorize({ negotiationId: ev.negotiation.sessionId, transaction }));
+                    }
+                }
+            }
+        })
+
+        this.setupTriggerAuthorizeOnResolve(messenger, stgAuthorizee);
+
+    }
+
     protected setupStateTriggers(commandHook: Hook<UserCommand>) {
         commandHook.on((command) => {
             switch (command.type) {
@@ -223,6 +372,16 @@ export class MyAgent {
                     return this.stateMgr.addOutVerifTemplate(command.template);
                 case "RemoveVReqTemplate":
                     return this.stateMgr.removeOutVerifTemplate(command.templateId);
+                case "CreateAReqTemplate":
+                    return this.stateMgr.addOutAuthTemplate(command.template);
+                case "RemoveAReqTemplate":
+                    return this.stateMgr.removeOutAuthTemplate(command.templateId);
+            }
+        })
+        this.eventHook.on((event) => {
+            switch (event.type) {
+                case "IDIssuingCompleted":
+
             }
         })
     }
@@ -237,6 +396,24 @@ export class MyAgent {
                     const { legalEntity, authority } = template
 
                     stgVerifier.startVerify(this.me!.id, senderId, { legalEntity, authority }, reference, template.id);
+
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    protected setupTriggerAuthorizeOnResolve(messenger: Messenger<Msg>, stgAuthorizee: AuthorizeeNegotiationStrategy) {
+
+        messenger.addHandler(({ senderId, message }) => {
+            if (message.type === "ResolveReference") {
+                const reference = message.ref;
+                const template = this.stateMgr.state.outgoingAuthTemplates.find(t => t.id === reference);
+                if (template) {
+                    const { legalEntity, authority } = template
+
+                    stgAuthorizee.requestToAuthorize(this.me!.id, senderId, { legalEntity, authority }, reference, template.id);
 
                     return true;
                 }

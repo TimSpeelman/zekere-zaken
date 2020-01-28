@@ -1,12 +1,13 @@
-import { Authority, Authorization, InVerificationRequest, IState } from "../types/State";
+import { VerificationSpec } from "../services/identity/verification/types";
+import { Authority, Authorization, IState } from "../types/State";
 
-export function selectMatchingAuthorizations(req: InVerificationRequest) {
-    return (state: IState) => state.authorizations.filter((a) => match(req, a));
+export function selectMatchingAuthorizations(spec: VerificationSpec) {
+    return (state: IState) => state.authorizations.filter((a) => match(spec, a));
 }
 
-function match(req: InVerificationRequest, auth: Authorization): boolean {
-    const correctLegalEntity = !req.legalEntity || req.legalEntity === auth.legalEntity;
-    return correctLegalEntity && matchAuthority(req.authority, auth.authority);
+function match(spec: VerificationSpec, auth: Authorization): boolean {
+    const correctLegalEntity = !spec.legalEntity || spec.legalEntity === auth.legalEntity;
+    return correctLegalEntity && matchAuthority(spec.authority, auth.authority);
 }
 
 function matchAuthority(reqAuth: Authority, presentAuth: Authority) {

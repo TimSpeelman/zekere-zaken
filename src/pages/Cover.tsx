@@ -13,7 +13,7 @@ export function Cover() {
     const url = state.profile ? "#/home" : "#/onboard";
     return (
         <Box className={classes.cover}>
-            <img src={logo} alt="Zekere Zaken App" style={{ width: "100vw", display: "block" }} />
+            <img src={logo} alt="Zekere Zaken App" style={{ width: "100%", display: "block" }} />
 
             <Button component="a" variant="contained" href={url} onClick={fullScreen}>Starten</Button>
         </Box>

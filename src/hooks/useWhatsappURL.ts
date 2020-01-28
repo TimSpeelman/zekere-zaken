@@ -1,19 +1,28 @@
-import { InAuthorizationRequest } from "../types/State";
+import { AuthorizationTemplate } from "../types/State";
 import { eur } from "../util/eur";
 import { useProfile } from "./useProfile";
+
+const url = window.location;
+const baseUrl = `${url.protocol}//${url.host}`;
 
 export function useWhatsappURL() {
     const { myId } = useProfile();
 
-    function getURL(req: Omit<InAuthorizationRequest, "subjectId">) {
-        let textMsg = "";
-        if (req) {
-            const inAuthReq: InAuthorizationRequest = { ...req, subjectId: myId! };
-            const uriReq = encodeURIComponent(JSON.stringify(inAuthReq))
-            textMsg = `Wil je mij machtigen voor '${req?.authority.type}' tot '${eur(req!.authority.amount)}'? https://zekerezaken.nl/#/in/${uriReq}`;
-        }
-        return `https://wa.me/?text=${encodeURIComponent(textMsg)}`
+    function getURL(template?: AuthorizationTemplate) {
+        if (!template) return "";
+        return `${baseUrl}/#/in/${myId}/${template.id}`;
     }
 
-    return { getURL };
+    function getWhatsappURL(template?: AuthorizationTemplate) {
+        if (!template) {
+            return "";
+        } else {
+            const textMsg = `Wil je mij machtigen voor '${template?.authority.type}'`
+                + ` tot ${eur(template!.authority.amount)}?`
+                + ` Ga naar ${getURL(template)}`;
+            return `https://wa.me/?text=${encodeURIComponent(textMsg)}`
+        }
+    }
+
+    return { getURL, getWhatsappURL };
 }

@@ -11,7 +11,7 @@ import { authText, reqText } from "../../util/intl";
 
 export function AuthReqOutbox() {
     const { state } = useLocalState();
-    const reqs = state.outgoingAuthReqs;
+    const reqs = state.outgoingAuthTemplates;
     const auths = state.authorizations;
     return (
         <div>
@@ -21,9 +21,6 @@ export function AuthReqOutbox() {
                 {auths.length === 0 ?
                     <div>
                         <ListItem disabled>U heeft nog geen bevoegdheden.</ListItem>
-                        <Box style={{ textAlign: "center" }} mt={2} mb={2} >
-                            <Button variant="outlined" component="a" href="#/authreqs/new">Bevoegdheid Aanvragen</Button>
-                        </Box>
                     </div>
                     :
                     auths.map(auth => (
@@ -39,6 +36,10 @@ export function AuthReqOutbox() {
                         </ListItem>
                     ))
                 }
+
+                <Box style={{ textAlign: "center" }} mt={2} mb={2} >
+                    <Button variant="outlined" component="a" href="#/authreqs/new">Bevoegdheid Aanvragen</Button>
+                </Box>
 
                 <ListSubheader>Openstaande Verzoeken</ListSubheader>
                 {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}

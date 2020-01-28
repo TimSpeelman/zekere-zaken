@@ -2,20 +2,19 @@ import { Container } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Route, RouteProps, Switch, useParams } from "react-router-dom";
-import uuid from "uuid/v4";
 import './assets/css/font-awesome.min.css';
 import { NavigateTo, ResolveReference } from "./commands/Command";
 import TopBar from "./components/TopBar";
 import { useCommand } from "./hooks/useCommand";
 import { useLocalState } from "./hooks/useLocalState";
 import { useProfile } from "./hooks/useProfile";
-import { AuthReqInbox } from "./pages/Authorizations/AuthReqInbox";
-import { AuthReqOutbox } from "./pages/Authorizations/AuthReqOutbox";
-import { IncomingAuthReq } from "./pages/Authorizations/IncomingAuthReq";
-import { OutgoingAuthReq } from "./pages/Authorizations/OutgoingAuthReq";
+import { AuthReqOutbox } from "./pages/Authorizee/AuthReqOutbox";
+import { OutgoingAuthReq } from "./pages/Authorizee/OutgoingAuthReq";
+import { RequestAuthority } from "./pages/Authorizee/RequestAuthority";
+import { AuthReqInbox } from "./pages/Authorizer/AuthReqInbox";
+import { IncomingAuthReq } from "./pages/Authorizer/IncomingAuthReq";
 import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
-import { RequestAuthority } from "./pages/NewAuthFlow/RequestAuthority";
 import { Onboard } from "./pages/Onboard";
 import { ScanQR } from "./pages/ScanQR";
 import { IncomingVerifReq } from "./pages/Verifiee/IncomingVerifReq";
@@ -24,7 +23,6 @@ import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
 import { isBroadcastReference } from "./services/references/types";
 import { useStyles } from "./styles";
-import { InAuthorizationRequest } from "./types/State";
 
 export const App: React.FC = () => <Router><AppBody /></Router>
 
@@ -80,7 +78,7 @@ export const AppBody: React.FC = () => {
         <Switch>
             <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference"><div>Resolving reference..</div></MyRoute>
             <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
-            <MyRoute title="Inkomend Verzoek" path="/in/:req"><ReqHandler /></MyRoute>
+            <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference"><ReqHandler /></MyRoute>
 
             {/* Verifiers */}
             <MyRoute title="Verifiëren" path="/verifs/new"><NewVerification /></MyRoute>
@@ -107,20 +105,18 @@ export const AppBody: React.FC = () => {
 }
 
 function ReqHandler() {
-    const { req } = useParams();
+    const { senderId, reference } = useParams();
     const { manager } = useLocalState();
+    const { dispatch } = useCommand();
+
     useEffect(() => {
+        if (senderId && reference) {
 
-        setTimeout(() => {
-            // @ts-ignore TODO Validation
-            const inAuthReq: InAuthorizationRequest = JSON.parse(decodeURIComponent(req!));
-            inAuthReq.id = uuid();
-            manager.addInAuthReq(inAuthReq);
-            console.log(inAuthReq);
+            const ref = { senderId, reference };
+            dispatch(ResolveReference({ reference: ref }))
+            dispatch(NavigateTo({ path: `#/resolve/${senderId}/${reference}` }));
+        }
 
-            window.location.assign(`#/authreqs/inbox/${inAuthReq.id}`);
-        }, 1000);
-
-    }, [req, manager])
+    }, [senderId, reference, manager]);
     return <div>Momentje..</div>
 }

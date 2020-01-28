@@ -5,6 +5,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
         display: "flex",
+        height: "100%",
     },
     toolbarIcon: {
         display: "flex",
@@ -62,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         flexDirection: "column",
         width: "100%",
-        height: "100vh",
+        height: "100%",
         overflow: "auto",
         display: "flex",
     },
