@@ -8,7 +8,7 @@ export class Hook<T> {
     private listeners: Array<Listener<T>> = [];
     private log: (...args: any[]) => void;
 
-    constructor(name?: string, private async = false) {
+    constructor(private name?: string, private async = false) {
         this.log = !!name ? debug(`oa:hook:${name}`) : debug(`oa:hook:<unnamed>`)
     }
 
@@ -28,6 +28,12 @@ export class Hook<T> {
         this.log('register', listener);
         this.listeners.push(listener);
         return () => this.unsubscribe(listener);
+    }
+
+    public filter<R extends T>(filter: (item: T) => item is R) {
+        const hook = new Hook<R>(this.name + ":filtered");
+        this.on((item) => filter(item) ? hook.fire(item) : undefined);
+        return hook;
     }
 
     /** Pipe the data to another hook */

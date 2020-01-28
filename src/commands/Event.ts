@@ -9,7 +9,8 @@ export type DomainEvent =
     EventIDVerifyCompleted;
 
 // @ts-ignore
-export const factory = <T extends { type: string }>(type: T["type"]) => (req: Omit<T, "type">): T => ({ ...req, type })
+export const factory = <T extends { type: string }>(type: T["type"]) => (event: Omit<T, "type">): T => ({ ...event, type })
+export const isA = <T extends DomainEvent>(type: T["type"]) => (event: DomainEvent): event is T => event.type === type;
 
 export interface EventRefResolvedToVerify {
     type: "RefResolvedToVerify",
@@ -57,3 +58,5 @@ export interface EventIDVerifyCompleted {
 
 export const IDVerifyCompleted =
     factory<EventIDVerifyCompleted>("IDVerifyCompleted");
+export const IsIDVerifyCompleted =
+    isA<EventIDVerifyCompleted>("IDVerifyCompleted");
