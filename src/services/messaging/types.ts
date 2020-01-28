@@ -32,11 +32,6 @@ export interface IHandleMessages<MessageType> {
     receive(envelope: Envelope<MessageType>): boolean;
 }
 
-export interface ISpyOnMessages<MessageType> {
-    /** Always returns false, to let the message pass. */
-    receive(envelope: Envelope<MessageType>): false;
-}
-
 export interface ISendMessages<MessageType> {
     /** Sends messages over some channel to a peer. */
     send<M extends MessageType>(peerId: string, message: M, reference?: string): Promise<void>;
