@@ -2,8 +2,8 @@ import debug from "debug";
 import uuid from "uuid/v4";
 import { Hook } from "../../../util/Hook";
 import { AuthorizeNegotiationResult } from "../authorization/types";
-import { Agent, InIssueHandler, InVerifyHandler, IPv8IssueReq, IPv8VerifReq, Me } from "../id-layer/Agent";
 import { VerifyNegotiationResult } from "../verification/types";
+import { Agent, InIssueHandler, InVerifyHandler, IPv8IssueReq, IPv8VerifReq, Me } from "./Agent";
 
 const log = debug("oa:sock-agent");
 

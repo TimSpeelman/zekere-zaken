@@ -1,7 +1,7 @@
 import debug from "debug";
 import { Hook } from "../../../util/Hook";
-import { IBeVerified as IHandleIDVerifyRequests, IPv8VerifReq } from "../id-layer/Agent";
 import { IDVerifyResult, VerificationTransaction, VerifyNegotiationResult } from "../verification/types";
+import { IBeVerified as IHandleIDVerifyRequests, IPv8VerifReq } from "./Agent";
 
 const log = debug('oa:verifiee');
 
