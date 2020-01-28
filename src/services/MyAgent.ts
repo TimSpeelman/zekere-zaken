@@ -27,33 +27,47 @@ export class MyAgent {
     constructor(private agent: Agent, private stateMgr: StateManager) {
 
         // Handle sending of messages between Peers.
-        this.messenger = new Messenger<Msg>(agent);
+        const messenger = new Messenger<Msg>(agent);
+        this.messenger = messenger;
 
-        this.setupProfileExchange(this.messenger, this.stateMgr);
+        this.setupProfileExchange(messenger, stateMgr);
 
-        this.setupReferenceSystem(this.messenger);
+        this.setupReferenceSystem(messenger, this.commandHook);
 
-        this.setupIDVerify(this.agent, this.stateMgr);
+        this.setupIDVerify(agent, stateMgr, this.commandHook, this.eventHook);
 
-        const { verifyManager, stgVerifier } = this.setupNegotiation(this.agent, this.messenger, this.stateMgr);
+        this.setupVerifyNegotiation(agent, messenger, stateMgr, this.commandHook, this.eventHook);
 
-        this.setupSaveTemplatesToState();
+        this.setupStateTriggers(this.commandHook);
 
-        this.setupTriggerVerifyOnResolve(this.messenger, stgVerifier);
-
-        this.eventHook.on((e) => {
-            switch (e.type) {
-                case "RefResolvedToVerify":
-                    return this.commandHook.fire(NavigateTo({ path: `#/verifs/inbox/${e.negotiationId}` }));
-
-            }
-        })
+        this.setupUITriggers(this.commandHook, this.eventHook);
 
         this.connect().then(me => {
             this.me = me;
         });
+    }
 
-        this.commandHook.on((cmd) => {
+    dispatch(command: UserCommand) {
+
+        this.commandHook.fire(command);
+
+    }
+
+    connect(): Promise<Me> {
+        this.messenger.connect();
+        return this.agent.connect();
+    }
+
+    protected setupUITriggers(commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
+        eventHook.on((e) => {
+            switch (e.type) {
+                case "RefResolvedToVerify":
+                    return commandHook.fire(NavigateTo({ path: `#/verifs/inbox/${e.negotiationId}` }));
+
+            }
+        })
+
+        commandHook.on((cmd) => {
             if (cmd.type === "NavigateTo") {
                 if (typeof window !== 'undefined') {
                     window.location.assign(cmd.path);
@@ -74,19 +88,19 @@ export class MyAgent {
         profileEx.verifiedProfileHook.on(({ peerId, profile }) => stateMgr.addProfile(peerId, profile));
     }
 
-    protected setupReferenceSystem(messenger: Messenger<Msg>) {
+    protected setupReferenceSystem(messenger: Messenger<Msg>, commandHook: Hook<UserCommand>) {
 
         // Resolves references created by other peers
         const referenceClient = new ReferenceClient<Msg>(messenger);
         messenger.addRecipient(referenceClient);
 
         // On ResolveReference command, resolve a reference
-        this.commandHook.on((a) => a.type === "ResolveReference" &&
+        commandHook.on((a) => a.type === "ResolveReference" &&
             referenceClient.requestToResolveBroadcast(a.reference));
 
     }
 
-    protected setupIDVerify(agent: Agent, stageMgr: StateManager) {
+    protected setupIDVerify(agent: Agent, stageMgr: StateManager, commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
 
         const getTransactionById = (transactionId: string) =>
             selectTransactionById(transactionId)(stageMgr.state);
@@ -97,7 +111,7 @@ export class MyAgent {
         agent.setVerificationRequestHandler((r) => verifiee.handleVerificationRequest(r));
 
         verifiee.completedVerifyHook.on((result) => {
-            this.eventHook.fire(IDVerifyCompleted({
+            eventHook.fire(IDVerifyCompleted({
                 negotiationId: result.sessionId,
                 result: result.result,
             }))
@@ -113,27 +127,27 @@ export class MyAgent {
                     spec: neg.conceptSpec,
                 })
 
-                this.eventHook.fire(IDVerifyCompleted({
+                eventHook.fire(IDVerifyCompleted({
                     negotiationId: result.sessionId,
                     result: result.result,
                 }))
             }
         })
 
-        this.commandHook.on((cmd) => cmd.type === "InvokeIDVerify" &&
+        commandHook.on((cmd) => cmd.type === "InvokeIDVerify" &&
             verifier.verify(cmd.transaction));
     }
 
-    protected setupNegotiation(agent: Agent, messenger: Messenger<Msg>, stateMgr: StateManager) {
+    protected setupVerifyNegotiation(agent: Agent, messenger: Messenger<Msg>, stateMgr: StateManager, commandHook: Hook<UserCommand>, eventHook: Hook<DomainEvent>) {
 
         const negHook = new Hook<VerifyNegotiation>('neg-hook');
         negHook.on((negotiation) => {
             const isNew = !stateMgr.state.negotiations.find(n => n.sessionId === negotiation.sessionId);
 
-            this.eventHook.fire(NegotiationUpdated({ negotiation }))
+            eventHook.fire(NegotiationUpdated({ negotiation }))
 
             if (isNew && negotiation.fromReference) {
-                this.eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
+                eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
             }
         })
         const stgVerifier = new VerifierNegotiationStrategy(messenger, negHook);
@@ -148,7 +162,7 @@ export class MyAgent {
 
         agent.connect().then((me) => { verifyManager.myId = me.id; })
 
-        this.commandHook.on(cmd => {
+        commandHook.on(cmd => {
             switch (cmd.type) {
                 case "AcceptNegWithLegalEntity": {
                     const sessionId = cmd.negotiationId;
@@ -173,11 +187,11 @@ export class MyAgent {
 
         })
 
-        this.eventHook.on((ev) => {
+        eventHook.on((ev) => {
             switch (ev.type) {
                 case "NegotiationCompleted": {
                     if (ev.transaction.verifierId === messenger.me!.id) { // FIXME ugly
-                        this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
+                        commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
                     }
                     break;
                 }
@@ -191,28 +205,19 @@ export class MyAgent {
                             verifierId: n.verifierId,
                             sessionId: n.sessionId,
                         }
-                        this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.negotiation.sessionId, transaction }));
+                        commandHook.fire(InvokeIDVerify({ negotiationId: ev.negotiation.sessionId, transaction }));
                     }
                 }
             }
         })
 
+        this.setupTriggerVerifyOnResolve(messenger, stgVerifier);
+
         return { verifyManager, stgVerifier };
     }
 
-    dispatch(command: UserCommand) {
-
-        this.commandHook.fire(command);
-
-    }
-
-    connect(): Promise<Me> {
-        this.messenger.connect();
-        return this.agent.connect();
-    }
-
-    protected setupSaveTemplatesToState() {
-        this.commandHook.on((command) => {
+    protected setupStateTriggers(commandHook: Hook<UserCommand>) {
+        commandHook.on((command) => {
             switch (command.type) {
                 case "CreateVReqTemplate":
                     return this.stateMgr.addOutVerifTemplate(command.template);
