@@ -13,8 +13,6 @@ export class VerifyManager implements IHandleMessages<VerificationMessage> {
 
     public myId = ""; // FIXME
 
-    public negHook: Hook<VerifyNegotiation> = new Hook('verify-manager:neg');
-
     constructor(
         private verifierStrategy: VerifierNegotiationStrategy,
         private verifieeStrategy: VerifieeNegotiationStrategy,
