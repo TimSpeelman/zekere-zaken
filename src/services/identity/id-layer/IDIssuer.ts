@@ -1,7 +1,7 @@
 import debug from "debug";
-import { IPv8IssueReq } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
 import { AuthorizationTransaction, AuthorizeNegotiationResult, IDAuthorizeResult } from "../authorization/types";
+import { IPv8IssueReq } from "../id-layer/Agent";
 
 const log = debug('oa:Issuee');
 

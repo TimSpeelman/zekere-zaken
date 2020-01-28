@@ -1,9 +1,9 @@
 import uuid from "uuid/v4";
 import { AuthorizeNegotiationResult } from "../../src/services/identity/authorization/types";
+import { Agent, InIssueHandler, InVerifyHandler, IPv8IssueReq, IPv8VerifReq } from "../../src/services/identity/id-layer/Agent";
 import { VerifyNegotiationResult } from "../../src/services/identity/verification/types";
 import { MyAgent } from "../../src/services/MyAgent";
 import { StateManager } from "../../src/services/state/StateManager";
-import { Agent, InIssueHandler, InVerifyHandler, IPv8IssueReq, IPv8VerifReq } from "../../src/shared/Agent";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../src/types/State";
 import { InMemoryCache } from "../../src/util/Cache";
 import { Hook } from "../../src/util/Hook";

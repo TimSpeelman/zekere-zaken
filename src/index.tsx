@@ -1,15 +1,15 @@
 import { ThemeProvider } from "@material-ui/core";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { App } from "./App";
-import "./assets/css/index.css";
-import { CommandContextProvider } from "./hooks/useCommand";
-import { LocalStateContextProvider } from "./hooks/useLocalState";
-import { ProfileContextProvider } from "./hooks/useProfile";
-import { LoadingScreen } from "./pages/LoadingScreen";
 import * as serviceWorker from './serviceWorker';
 import { gateway, stateManager, useDependenciesAfterSetup } from "./setup";
 import { theme } from "./theme";
+import { App } from "./ui/App";
+import "./ui/assets/css/index.css";
+import { CommandContextProvider } from "./ui/hooks/useCommand";
+import { LocalStateContextProvider } from "./ui/hooks/useLocalState";
+import { ProfileContextProvider } from "./ui/hooks/useProfile";
+import { LoadingScreen } from "./ui/pages/LoadingScreen";
 
 function WrappedApp() {
     const deps = useDependenciesAfterSetup();

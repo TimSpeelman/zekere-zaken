@@ -1,8 +1,8 @@
 import debug from "debug";
 import uuid from "uuid/v4";
-import { Agent, Me } from "../../shared/Agent";
 import { arr } from "../../util/arr";
 import { CommandChain } from "../../util/CommandChain";
+import { Agent, Me } from "../identity/id-layer/Agent";
 import { Envelope, IHandleMessages, ISendMessages } from "./types";
 
 const log = debug('oa:messaging');

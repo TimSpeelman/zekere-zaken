@@ -1,12 +1,12 @@
 import uuid from "uuid";
 import { InvokeIDAuthorize, InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
 import { ANegotiationUpdated, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated } from "../commands/Event";
-import { selectATransactionById, selectVTransactionById } from "../selectors/selectTransactionById";
-import { Agent, Me } from "../shared/Agent";
+import { selectATransactionById, selectVTransactionById } from "../ui/selectors/selectTransactionById";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
 import { AuthorizeeNegotiationStrategy, AuthorizeManager, AuthorizerNegotiationStrategy } from "./identity/authorization/AuthorizeManager";
 import { AuthorizationTransaction, AuthorizeNegotiation, AuthorizeNegotiationResult, NegStatus } from "./identity/authorization/types";
+import { Agent, Me } from "./identity/id-layer/Agent";
 import { IDIssuee } from "./identity/id-layer/IDIssuee";
 import { IDIssuer } from "./identity/id-layer/IDIssuer";
 import { IDVerifiee } from "./identity/id-layer/IDVerifiee";

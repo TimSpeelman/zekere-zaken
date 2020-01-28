@@ -1,6 +1,6 @@
 import debug from "debug";
-import { IVerify } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
+import { IVerify } from "../id-layer/Agent";
 import { IDVerifyResult, VerificationTransaction } from "../verification/types";
 
 const log = debug('oa:verifiee');

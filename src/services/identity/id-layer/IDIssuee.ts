@@ -1,7 +1,7 @@
 import debug from "debug";
-import { IIssue } from "../../../shared/Agent";
 import { Hook } from "../../../util/Hook";
 import { AuthorizationTransaction, IDAuthorizeResult } from "../authorization/types";
+import { IIssue } from "../id-layer/Agent";
 
 const log = debug('oa:verifiee');
 
