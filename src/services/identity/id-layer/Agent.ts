@@ -1,26 +1,6 @@
 import { AuthorizeNegotiationResult } from "../authorization/types";
 import { VerifyNegotiationResult } from "../verification/types";
 
-export interface Me {
-    id: string;
-}
-
-export interface IPv8VerifReq {
-    verifierId: string;
-    meta: string;
-    credentials: { name: string, value: string }[];
-}
-
-export interface IPv8IssueReq {
-    issuerId: string;
-    meta: string;
-    credentials: { name: string, value: string }[];
-}
-
-export type InVerifyHandler = (req: IPv8VerifReq) => Promise<boolean>;
-
-export type InIssueHandler = (req: IPv8IssueReq) => Promise<boolean>;
-
 export interface Agent {
     /** We connect to our agent, which returns our info */
     connect(): Promise<Me>;
@@ -42,6 +22,26 @@ export interface Agent {
 
     /** Handle an issuing request */
     setIssuingRequestHandler(handler: InIssueHandler): void;
+}
+
+export interface Me {
+    id: string;
+}
+
+export type InVerifyHandler = (req: IPv8VerifReq) => Promise<boolean>;
+
+export interface IPv8VerifReq {
+    verifierId: string;
+    meta: string;
+    credentials: { name: string, value: string }[];
+}
+
+export type InIssueHandler = (req: IPv8IssueReq) => Promise<boolean>;
+
+export interface IPv8IssueReq {
+    issuerId: string;
+    meta: string;
+    credentials: { name: string, value: string }[];
 }
 
 export interface IVerify {
