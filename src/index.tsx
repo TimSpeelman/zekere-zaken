@@ -37,3 +37,14 @@ ReactDOM.render(root, document.getElementById('root'));
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+// Workaround to ensure that custom styles are placed last (to override other styles);
+function tryAlter() {
+    const customStyles = document.querySelector('style[data-meta=makeStyles]');
+    if (customStyles) {
+        document.getElementsByTagName('head')[0].insertAdjacentElement('beforeend', customStyles)
+    } else {
+        setTimeout(tryAlter, 200);
+    }
+}
+tryAlter();
