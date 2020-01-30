@@ -84,7 +84,7 @@ export interface OutAuthorizationRequest {
 
 /** For Subject and Authorizer. Successful results of IDAuthorize procedure.  */
 export interface SucceededIDAuthorize {
-    templateId: string;
+    templateId?: string;
     sessionId: string;
     spec: AuthorizationSpec;
 }
