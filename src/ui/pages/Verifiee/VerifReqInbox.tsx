@@ -6,7 +6,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { format } from "date-fns";
 import { default as React } from "react";
 import { useStyles } from "../../../styles";
-import { VerificationRequest } from "../../../types/State";
+import { InVerificationRequest } from "../../../types/State";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { selectOpenInVerReqs } from "../../selectors/selectOpenInVerReqs";
@@ -15,7 +15,7 @@ export function VerifReqInbox() {
     const { state } = useLocalState();
     const reqs = useSelector(selectOpenInVerReqs) || [];
     const classes = useStyles({});
-    const getProfile = (req: VerificationRequest) => state.profiles[req.verifierId];
+    const getProfile = (req: InVerificationRequest) => state.profiles[req.verifierId];
 
     return (
         <div>

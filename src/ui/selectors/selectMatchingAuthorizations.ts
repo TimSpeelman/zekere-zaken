@@ -1,8 +1,9 @@
 import { VerificationSpec } from "../../services/identity/verification/types";
 import { Authority, Authorization, IState } from "../../types/State";
+import { selectMyAuthorizations } from "./selectMyAuthorizations";
 
 export function selectMatchingAuthorizations(spec: VerificationSpec) {
-    return (state: IState) => state.myAuthorizations.filter((a) => match(spec, a));
+    return (state: IState) => selectMyAuthorizations(state).filter((a) => match(spec, a));
 }
 
 function match(spec: VerificationSpec, auth: Authorization): boolean {

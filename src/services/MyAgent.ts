@@ -53,6 +53,7 @@ export class MyAgent {
 
         this.connect().then(me => {
             this.me = me;
+            stateMgr.setMyId(me.id);
         });
     }
 
@@ -128,7 +129,7 @@ export class MyAgent {
         })
 
         verifier.completedVerifyHook.on((result) => {
-            const neg = stageMgr.state.verifyNegs.find(n => n.sessionId === result.sessionId);
+            const neg = stageMgr.state.verifyNegotiations.find(n => n.sessionId === result.sessionId);
             if (neg && result.result === VerifyNegotiationResult.Succeeded) {
                 stageMgr.addVerified({
                     templateId: neg.fromTemplateId!,
@@ -164,7 +165,7 @@ export class MyAgent {
                 result: result.result,
             }))
 
-            const neg = stageMgr.state.authNegs.find(n => n.id === result.sessionId);
+            const neg = stageMgr.state.authorizeNegotiations.find(n => n.id === result.sessionId);
             if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
                 stageMgr.addAuthorization({
                     fromTemplateId: neg.fromTemplateId!,
@@ -182,7 +183,7 @@ export class MyAgent {
         })
 
         authorizer.completedIssueHook.on((result) => {
-            const neg = stageMgr.state.authNegs.find(n => n.id === result.sessionId);
+            const neg = stageMgr.state.authorizeNegotiations.find(n => n.id === result.sessionId);
             if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
                 stageMgr.addAuthorization({
                     fromTemplateId: neg.fromTemplateId!,
@@ -212,7 +213,7 @@ export class MyAgent {
 
         const negHook = new Hook<VerifyNegotiation>('neg-hook');
         negHook.on((negotiation) => {
-            const isNew = !stateMgr.state.verifyNegs.find(n => n.sessionId === negotiation.sessionId);
+            const isNew = !stateMgr.state.verifyNegotiations.find(n => n.sessionId === negotiation.sessionId);
 
             eventHook.fire(VNegotiationUpdated({ negotiation }))
 
@@ -224,7 +225,7 @@ export class MyAgent {
         const stgVerifiee = new VerifieeNegotiationStrategy(messenger, negHook);
 
         const getSessionById = (sessionId: string) => {
-            return stateMgr.state.verifyNegs.find(n => n.sessionId === sessionId);
+            return stateMgr.state.verifyNegotiations.find(n => n.sessionId === sessionId);
         }
         const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById);
 
@@ -290,7 +291,7 @@ export class MyAgent {
 
         const negHook = new Hook<AuthorizeNegotiation>('neg-hook');
         negHook.on((negotiation) => {
-            const isNew = !stateMgr.state.authNegs.find(n => n.id === negotiation.id);
+            const isNew = !stateMgr.state.authorizeNegotiations.find(n => n.id === negotiation.id);
 
             eventHook.fire(ANegotiationUpdated({ negotiation }))
 
@@ -302,7 +303,7 @@ export class MyAgent {
         const stgAuthorizee = new AuthorizeeNegotiationStrategy(messenger, negHook);
 
         const getSessionById = (sessionId: string) => {
-            return stateMgr.state.authNegs.find(n => n.id === sessionId);
+            return stateMgr.state.authorizeNegotiations.find(n => n.id === sessionId);
         }
         const authorizeManager = new AuthorizeManager(stgAuthorizer, stgAuthorizee, getSessionById);
 

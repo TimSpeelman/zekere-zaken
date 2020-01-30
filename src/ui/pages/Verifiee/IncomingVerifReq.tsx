@@ -27,31 +27,31 @@ export function IncomingVerifReq() {
     const { reqId: id } = useParams();
     const classes = useStyles({});
 
-    const req = useSelector(id ? selectOpenInVerReqById(id) : undefined);
-    const profile = useSelector(req ? selectProfileById(req.verifierId) : undefined);
-    const auths = useSelector(req ? selectMatchingAuthorizations({ legalEntity: req.legalEntity!, authority: req.authority }) : undefined) || [];
+    const inVReq = useSelector(id ? selectOpenInVerReqById(id) : undefined);
+    const profile = useSelector(inVReq ? selectProfileById(inVReq.verifierId) : undefined);
+    const auths = useSelector(inVReq ? selectMatchingAuthorizations({ legalEntity: inVReq.legalEntity!, authority: inVReq.authority }) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
     const { getURL, getWhatsappURL } = useWhatsappURL();
 
     function goVerify(legalEntity: LegalEntity) {
-        dispatch(AcceptVNegWithLegalEntity({ negotiationId: req!.id, legalEntity }))
+        dispatch(AcceptVNegWithLegalEntity({ negotiationId: inVReq!.id, legalEntity }))
     }
 
-    const template: AuthorizationTemplate | undefined = req && {
+    const authTemplate: AuthorizationTemplate | undefined = inVReq && {
         id: uuid(),
         datetime: new Date().toISOString(),
-        authority: req.authority,
-        legalEntity: req.legalEntity,
+        authority: inVReq.authority,
+        legalEntity: inVReq.legalEntity,
     };
 
     function fastAuthReq() {
-        if (template) {
-            dispatch(CreateAReqTemplate({ template }))
+        if (authTemplate) {
+            dispatch(CreateAReqTemplate({ template: authTemplate }))
         }
     }
 
-    return !req ? <div>Dit verzoek bestaat niet.</div> :
+    return !inVReq ? <div>Dit verzoek bestaat niet.</div> :
         !profile ? <div>Wacht op profiel van Verifier..</div> : (
             <div>
                 <Box p={1}></Box>
@@ -62,7 +62,7 @@ export function IncomingVerifReq() {
                     <p><strong>{profile!.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
                 </Box>
 
-                <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
+                <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} />
 
                 {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                     <Fragment>
@@ -71,7 +71,8 @@ export function IncomingVerifReq() {
                         </Box>
                         <FormActions>
                             <Button component="a" href="#/home">Annuleren</Button>
-                            <Button variant={"contained"} color={"primary"} component="a" href={getURL(req)}>Aanvragen</Button>
+                            <Button variant={"contained"} color={"primary"} component="a"
+                                onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
                         </FormActions>
                     </Fragment>
                 }
@@ -91,9 +92,9 @@ export function IncomingVerifReq() {
                         </Box>
                         <FormActions>
                             <Button component="a" href="#/home">Annuleren</Button>
-                            <CopyToClipboard text={getURL(template)} >
+                            <CopyToClipboard text={getURL(authTemplate)} >
                                 <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
-                                    component="a" href={getWhatsappURL(template)} target="_blank">Andere Organisatie</Button>
+                                    component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
                             </CopyToClipboard>
                         </FormActions>
                     </Fragment>

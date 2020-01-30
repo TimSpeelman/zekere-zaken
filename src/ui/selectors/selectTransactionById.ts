@@ -4,7 +4,7 @@ import { IState } from "../../types/State";
 
 export function selectVTransactionById(tId: string) {
     return (state: IState): VerificationTransaction | undefined => {
-        const neg = state.verifyNegs.find(n => n.sessionId === tId && n.status === NegStatus.Successful);
+        const neg = state.verifyNegotiations.find(n => n.sessionId === tId && n.status === NegStatus.Successful);
 
         return !neg || !specIsComplete(neg.conceptSpec) ? undefined : {
             sessionId: neg.sessionId,
@@ -18,7 +18,7 @@ export function selectVTransactionById(tId: string) {
 
 export function selectATransactionById(tId: string) {
     return (state: IState): AuthorizationTransaction | undefined => {
-        const neg = state.authNegs.find(n => n.id === tId && n.status === NegStatus.Successful);
+        const neg = state.authorizeNegotiations.find(n => n.id === tId && n.status === NegStatus.Successful);
 
         return !neg || !specIsComplete(neg.conceptSpec) ? undefined : {
             sessionId: neg.id,

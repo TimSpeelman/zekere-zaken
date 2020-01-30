@@ -8,11 +8,13 @@ import { format } from "date-fns";
 import { default as React } from "react";
 import { authText, reqText } from "../../../util/intl";
 import { useLocalState } from "../../hooks/useLocalState";
+import { useSelector } from "../../hooks/useSelector";
+import { selectMyAuthorizations } from "../../selectors/selectMyAuthorizations";
 
 export function AuthReqOutbox() {
     const { state } = useLocalState();
-    const reqs = state.outgoingAuthTemplates;
-    const auths = state.myAuthorizations;
+    const templates = state.outgoingAuthTemplates;
+    const auths = useSelector(selectMyAuthorizations) || [];
     return (
         <div>
 
@@ -42,8 +44,8 @@ export function AuthReqOutbox() {
                 </Box>
 
                 <ListSubheader>Openstaande Verzoeken</ListSubheader>
-                {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
-                {reqs.map(req => (
+                {templates.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
+                {templates.map(req => (
                     <ListItem button key={req.id} component="a" href={`#/authreqs/outbox/${req.id}`}>
                         <ListItemAvatar>
                             <Avatar>

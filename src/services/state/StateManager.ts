@@ -1,4 +1,4 @@
-import { Authorization, AuthorizationTemplate, IState, OutAuthorizationRequest, Profile, VerificationTemplate, Verified } from "../../types/State";
+import { AuthorizationTemplate, IState, OutAuthorizationRequest, Profile, SucceededIDAuthorize, SucceededIDVerify, VerificationTemplate } from "../../types/State";
 import { Cache } from "../../util/Cache";
 import { Hook } from "../../util/Hook";
 import { AuthorizeNegotiation } from "../identity/authorization/types";
@@ -19,21 +19,24 @@ export class StateManager {
         return this._state;
     }
 
-    private _state: IState =
-        {
-            verified: [],
-            verifyNegs: [],
-            authNegs: [],
-            outgoingAuthTemplates: [],
-            outgoingVerifTemplates: [],
-            profiles: {},
-            myAuthorizations: [],
-            givenAuthorizations: [],
-        }
+    private _state: IState = {
+        myId: "",
+        authorizeNegotiations: [],
+        outgoingAuthTemplates: [],
+        outgoingVerifTemplates: [],
+        profiles: {},
+        succeededIDAuthorize: [],
+        succeededIDVerify: [],
+        verifyNegotiations: [],
+    }
 
     setState(state: Partial<IState>) {
         this._state = { ...this._state, ...state, };
         this.hook.fire(this._state);
+    }
+
+    setMyId(myId: string) {
+        this.setState({ myId });
     }
 
     setMyProfile(profile: Profile) {
@@ -45,20 +48,20 @@ export class StateManager {
         this.setState({ profiles: { [peerId]: profile } });
     }
 
-    addVerified(verified: Verified) {
-        this.setState({ verified: [...this.state.verified, verified] })
+    addVerified(verified: SucceededIDVerify) {
+        this.setState({ succeededIDVerify: [...this.state.succeededIDVerify, verified] })
     }
 
-    addAuthorization(authorization: Authorization) {
-        this.setState({ myAuthorizations: [...this.state.myAuthorizations, authorization] })
+    addAuthorization(authorization: SucceededIDAuthorize) {
+        this.setState({ succeededIDAuthorize: [...this.state.succeededIDAuthorize, authorization] })
     }
 
     updateVerifyNeg(neg: VerifyNegotiation) {
-        this.setState({ verifyNegs: [...this.state.verifyNegs.filter(n => n.sessionId !== neg.sessionId), neg] })
+        this.setState({ verifyNegotiations: [...this.state.verifyNegotiations.filter(n => n.sessionId !== neg.sessionId), neg] })
     }
 
     updateAuthNeg(neg: AuthorizeNegotiation) {
-        this.setState({ authNegs: [...this.state.authNegs.filter(n => n.id !== neg.id), neg] })
+        this.setState({ authorizeNegotiations: [...this.state.authorizeNegotiations.filter(n => n.id !== neg.id), neg] })
     }
 
     addOutAuthReq(req: OutAuthorizationRequest) {
