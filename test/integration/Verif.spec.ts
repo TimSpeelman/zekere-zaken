@@ -1,12 +1,12 @@
 import { AcceptVNegWithLegalEntity, CreateVReqTemplate, ResolveReference } from "../../src/commands/Command";
 import { VerifyNegotiationResult } from "../../src/services/identity/verification/types";
-import { describe, expect, it, makeDone, TestSequence } from "../setup";
+import { describe, expect, it, multiDone, TestSequence, timeoutDone } from "../setup";
 import { createMyAgent, mockAuthority, mockEntity, mockIDPair } from "./mocks";
 
 describe("Verification Integration Test", () => {
 
     it("my agent connects", (_done) => {
-        const done = makeDone(_done, 1);
+        const done = timeoutDone(_done);
         const [vAgent, sAgent] = mockIDPair("VERIF", "SUBJ");
         const [verifier] = createMyAgent(vAgent);
         const [subject] = createMyAgent(sAgent);
@@ -18,7 +18,7 @@ describe("Verification Integration Test", () => {
     })
 
     it("successfully do a verification, if consented", (_done) => {
-        const done = makeDone(_done, 2);
+        const [err, doneVerif, doneSub] = multiDone(_done, ["verif", "sub"], 3000);
         const [vAgent, sAgent] = mockIDPair("VERIF", "SUBJ");
         const [verifier, verifierState] = createMyAgent(vAgent);
         const [subject, subjectState] = createMyAgent(sAgent);
@@ -66,14 +66,14 @@ describe("Verification Integration Test", () => {
         subject.eventHook.on((e) => {
             if (e.type === "IDVerifyCompleted") {
                 expect(e.result).to.eq(VerifyNegotiationResult.Succeeded);
-                done();
+                doneSub();
             }
         });
 
         verifier.eventHook.on((e) => {
             if (e.type === "IDVerifyCompleted") {
                 expect(e.result).to.eq(VerifyNegotiationResult.Succeeded);
-                done();
+                doneVerif();
             }
         });
 

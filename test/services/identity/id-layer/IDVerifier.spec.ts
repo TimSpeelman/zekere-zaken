@@ -2,14 +2,14 @@ import { IVerify } from "../../../../src/services/identity/id-layer/Agent";
 import { IDVerifier } from "../../../../src/services/identity/id-layer/IDVerifier";
 import { VerificationTransaction, VerifyNegotiationResult } from "../../../../src/services/identity/verification/types";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../../src/types/State";
-import { describe, expect, it, makeDone } from "../../../setup";
+import { describe, expect, it, timeoutDone } from "../../../setup";
 
 describe("IDVerifier", () => {
 
     const transactionA = mockVerifTransaction("A");
 
     it("triggers a proper verify", (_done) => {
-        const done = makeDone(_done, 1);
+        const done = timeoutDone(_done);
 
         // Test how the Verifier calls the underlying ID layer.
         const mockVerifier: IVerify = {
@@ -18,7 +18,7 @@ describe("IDVerifier", () => {
                 expect(req.credentials).to.deep.equal([]);
                 expect(req.meta).to.equal(transactionA.sessionId);
                 expect(req.verifierId).to.equal(transactionA.verifierId);
-                done();
+                done(0);
                 return Promise.resolve(VerifyNegotiationResult.Succeeded);
             }
         }

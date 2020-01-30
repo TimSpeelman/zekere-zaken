@@ -2,7 +2,7 @@ import { IPv8VerifReq } from "../../../../src/services/identity/id-layer/Agent";
 import { IDVerifiee } from "../../../../src/services/identity/id-layer/IDVerifiee";
 import { VerificationTransaction } from "../../../../src/services/identity/verification/types";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../../../src/types/State";
-import { describe, expect, it, makeDone } from "../../../setup";
+import { describe, expect, it, timeoutDone } from "../../../setup";
 
 describe("IDVerifiee", () => {
 
@@ -11,7 +11,7 @@ describe("IDVerifiee", () => {
     const incomingRequestA = mockIncomingRequest("A");
 
     it("accepts a verification that is allowed", (_done) => {
-        const done = makeDone(_done, 1);
+        const done = timeoutDone(_done);
 
         const getById = (id: string) => id === "A" ? transactionA : undefined;
 
@@ -20,12 +20,12 @@ describe("IDVerifiee", () => {
         verifiee.handleVerificationRequest(incomingRequestA)
             .then((answer) => {
                 expect(answer).to.equal(true);
-                done();
+                done(0);
             }).catch(done);
     });
 
     it("rejects a verification that is not allowed (by session)", (_done) => {
-        const done = makeDone(_done, 1);
+        const done = timeoutDone(_done);
 
         const getById = (id: string) => id === "B" ? transactionB : undefined;
         const verifiee = new IDVerifiee(getById);
@@ -38,7 +38,7 @@ describe("IDVerifiee", () => {
     })
 
     it.skip("rejects a verification when it differs from the allowed", (_done) => {
-        const done = makeDone(_done, 1);
+        const done = timeoutDone(_done);
 
         const getById = (id: string) => id === "A" ? transactionB : undefined;
         const verifiee = new IDVerifiee(getById);

@@ -1,13 +1,13 @@
 import { AcceptANegWithLegalEntity, CreateAReqTemplate, ResolveReference } from "../../src/commands/Command";
 import { AuthorizeNegotiationResult } from "../../src/services/identity/authorization/types";
-import { describe, expect, it, makeDone, TestSequence } from "../setup";
+import { describe, expect, it, multiDone, TestSequence } from "../setup";
 import { createMyAgent, mockAuthority, mockEntity, mockIDPair } from "./mocks";
 
 describe("Authorization Integration Test", () => {
 
     it("successfully do an authorization, if consented", (_done) => {
         // const done = makeDone(_done, 2, 20000);
-        const done = makeDone(_done, 2, 3000);
+        const [done, subDone, authDone] = multiDone(_done, ["sub", "auth"], 3000);
         const [aAgent, sAgent] = mockIDPair("AUTH", "SUBJ");
         const [authorizer, authorizerState] = createMyAgent(aAgent);
         const [subject, subjectState] = createMyAgent(sAgent);
@@ -62,7 +62,7 @@ describe("Authorization Integration Test", () => {
         subject.eventHook.on((e) => {
             if (e.type === "IDIssuingCompleted") {
                 expect(e.result).to.eq(AuthorizeNegotiationResult.Succeeded);
-                done();
+                subDone();
             }
         });
 
@@ -70,7 +70,7 @@ describe("Authorization Integration Test", () => {
 
             if (e.type === "IDIssuingCompleted") {
                 expect(e.result).to.eq(AuthorizeNegotiationResult.Succeeded);
-                done();
+                authDone();
             }
         });
 
