@@ -3,21 +3,31 @@ import { VerificationSpec, VerifyNegotiation } from "../services/identity/verifi
 import { Dict } from "./Dict";
 
 export interface IState {
-    verifyNegs: VerifyNegotiation[];
-    authNegs: AuthorizeNegotiation[];
-    verified: Verified[];
-
-    incomingVerifReqs: InVerificationRequest[];
+    /** For Verifier. Templates to verify one or more subjects. */
     outgoingVerifTemplates: VerificationTemplate[];
 
-    incomingAuthReqs: InAuthorizationRequest[];
+    /** For Verifier and Subject. Ongoing and past negotiations to Verify. */
+    verifyNegs: VerifyNegotiation[];
+
+    /** For Verifier and Subject. Results of IDVerify procedure. */
+    verified: Verified[];
+
+    /** For Subject. Templates to request authorization from an authorizer. */
     outgoingAuthTemplates: AuthorizationTemplate[];
 
-    authorizations: Authorization[];
+    /** For Subject and Authorizer. Ongoing and past negotiations to Authorize. */
+    authNegs: AuthorizeNegotiation[];
 
+    /** For Subject. Authorizations issued to the current user. */
+    myAuthorizations: Authorization[];
+    
+    /** For Authorizer. Authorizations issued by the current user to other subjects. */
+    givenAuthorizations: Authorization[];
+
+    /** Profile of current user */
     profile?: Profile;
 
-    /** A profile per peerID */
+    /** Profiles of other users (indexed by PeerID) */
     profiles: Dict<Profile>;
 }
 
@@ -36,6 +46,7 @@ export interface VerificationRequest {
     verifierId: string;
 }
 
+/** Derived from VNeg */
 export interface InVerificationRequest {
     id: string;
     authority: Authority;
@@ -44,6 +55,7 @@ export interface InVerificationRequest {
     legalEntity?: LegalEntity;
 }
 
+/** Derived from ANeg */
 export interface InAuthorizationRequest {
     id: string;
     subjectId: string;

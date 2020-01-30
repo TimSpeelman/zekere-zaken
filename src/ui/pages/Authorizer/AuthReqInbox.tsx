@@ -8,11 +8,13 @@ import { format } from "date-fns";
 import { default as React } from "react";
 import { InAuthorizationRequest } from "../../../types/State";
 import { useLocalState } from "../../hooks/useLocalState";
+import { useSelector } from "../../hooks/useSelector";
+import { selectOpenInAuthReqs } from "../../selectors/selectOpenInAuthReqs";
 
 export function AuthReqInbox() {
 
     const { state } = useLocalState();
-    const reqs = state.incomingAuthReqs;
+    const reqs = useSelector(selectOpenInAuthReqs) || [];
     const getProfile = (req: InAuthorizationRequest) => state.profiles[req.subjectId];
 
     return (

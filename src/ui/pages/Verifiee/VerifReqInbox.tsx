@@ -8,10 +8,12 @@ import { default as React } from "react";
 import { useStyles } from "../../../styles";
 import { VerificationRequest } from "../../../types/State";
 import { useLocalState } from "../../hooks/useLocalState";
+import { useSelector } from "../../hooks/useSelector";
+import { selectOpenInVerReqs } from "../../selectors/selectOpenInVerReqs";
 
 export function VerifReqInbox() {
     const { state } = useLocalState();
-    const reqs = state.incomingVerifReqs;
+    const reqs = useSelector(selectOpenInVerReqs) || [];
     const classes = useStyles({});
     const getProfile = (req: VerificationRequest) => state.profiles[req.verifierId];
 

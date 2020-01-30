@@ -12,7 +12,7 @@ import { useLocalState } from "../../hooks/useLocalState";
 export function AuthReqOutbox() {
     const { state } = useLocalState();
     const reqs = state.outgoingAuthTemplates;
-    const auths = state.authorizations;
+    const auths = state.myAuthorizations;
     return (
         <div>
 

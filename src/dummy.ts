@@ -101,15 +101,7 @@ export const dummyState = (myId: string): IState => {
         verified: [],
         authNegs: [],
         verifyNegs: [],
-        incomingAuthReqs: [
-            InAuthDeBroodfabriekFinanciering100k,
-            InAuthJanssenInkoop10k,
-        ],
-        incomingVerifReqs: [
-            InVerifDeBroodfabriekFinanciering70k,
-            InVerifJanssenInkoop5k,
-        ],
-
+        givenAuthorizations: [],
         outgoingAuthTemplates: [
             OutAuthDeBroodfabriekFinanciering100k,
             OutAuthJanssenInkoop10k,
@@ -127,7 +119,7 @@ export const dummyState = (myId: string): IState => {
             joep: Joep,
         },
 
-        authorizations: [
+        myAuthorizations: [
             AuthJanssenInkoop10k,
             AuthDeBroodfabriekInkoop5k,
         ],
