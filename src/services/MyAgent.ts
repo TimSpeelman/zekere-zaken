@@ -164,11 +164,11 @@ export class MyAgent {
                 result: result.result,
             }))
 
-            const neg = stageMgr.state.authNegs.find(n => n.sessionId === result.sessionId);
+            const neg = stageMgr.state.authNegs.find(n => n.id === result.sessionId);
             if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
                 stageMgr.addAuthorization({
                     fromTemplateId: neg.fromTemplateId!,
-                    sessionId: neg.sessionId,
+                    sessionId: neg.id,
                     // @ts-ignore FIXME
                     spec: neg.conceptSpec,
                     legalEntity: neg.conceptSpec!.legalEntity!,
@@ -182,11 +182,11 @@ export class MyAgent {
         })
 
         authorizer.completedIssueHook.on((result) => {
-            const neg = stageMgr.state.authNegs.find(n => n.sessionId === result.sessionId);
+            const neg = stageMgr.state.authNegs.find(n => n.id === result.sessionId);
             if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
                 stageMgr.addAuthorization({
                     fromTemplateId: neg.fromTemplateId!,
-                    sessionId: neg.sessionId,
+                    sessionId: neg.id,
                     // @ts-ignore FIXME
                     spec: neg.conceptSpec,
                     legalEntity: neg.conceptSpec!.legalEntity!,
@@ -290,19 +290,19 @@ export class MyAgent {
 
         const negHook = new Hook<AuthorizeNegotiation>('neg-hook');
         negHook.on((negotiation) => {
-            const isNew = !stateMgr.state.authNegs.find(n => n.sessionId === negotiation.sessionId);
+            const isNew = !stateMgr.state.authNegs.find(n => n.id === negotiation.id);
 
             eventHook.fire(ANegotiationUpdated({ negotiation }))
 
             if (isNew && negotiation.fromReference) {
-                eventHook.fire(RefResolvedToAuthorize({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
+                eventHook.fire(RefResolvedToAuthorize({ negotiationId: negotiation.id, reference: negotiation.fromReference }));
             }
         })
         const stgAuthorizer = new AuthorizerNegotiationStrategy(messenger, negHook);
         const stgAuthorizee = new AuthorizeeNegotiationStrategy(messenger, negHook);
 
         const getSessionById = (sessionId: string) => {
-            return stateMgr.state.authNegs.find(n => n.sessionId === sessionId);
+            return stateMgr.state.authNegs.find(n => n.id === sessionId);
         }
         const authorizeManager = new AuthorizeManager(stgAuthorizer, stgAuthorizee, getSessionById);
 
@@ -353,9 +353,9 @@ export class MyAgent {
                             spec: n.conceptSpec,
                             subjectId: n.subjectId,
                             authorizerId: n.authorizerId,
-                            sessionId: n.sessionId,
+                            sessionId: n.id,
                         }
-                        commandHook.fire(InvokeIDAuthorize({ negotiationId: ev.negotiation.sessionId, transaction }));
+                        commandHook.fire(InvokeIDAuthorize({ negotiationId: ev.negotiation.id, transaction }));
                     }
                 }
             }

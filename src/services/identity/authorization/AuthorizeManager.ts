@@ -3,7 +3,8 @@ import uuid from "uuid/v4";
 import { Hook } from "../../../util/Hook";
 import { Envelope, IHandleMessages, ISendMessages } from "../../messaging/types";
 import { BroadcastReference } from "../../references/types";
-import { AuthorizationMessage, AuthorizationSpec, AuthorizeNegotiation, MsgAcceptAuthorization, MsgOfferAuthorization, MsgRejectAuthorization, MsgRequestAuthorization, NegStatus, specIsComplete } from "./types";
+import { ANeg } from "./AuthorizeNegotiation";
+import { AuthorizationMessage, AuthorizationSpec, AuthorizeNegotiation, MsgAcceptAuthorization, MsgOfferAuthorization, MsgRejectAuthorization, MsgRequestAuthorization, specIsComplete } from "./types";
 
 const log = debug("oa:authorize-manager");
 
@@ -72,16 +73,12 @@ export class AuthorizeManager implements IHandleMessages<AuthorizationMessage> {
     }
 
     public createSession(peerId: string, sessionId: string, iAuthorize: boolean, reference?: BroadcastReference): AuthorizeNegotiation {
-        return {
-            fromReference: reference,
-            sessionId,
-            authorizerId: iAuthorize ? this.myId : peerId,
-            subjectId: iAuthorize ? peerId : this.myId,
-            status: NegStatus.Pending,
-            steps: [],
-            authorizerAccepts: false,
-            subjectAccepts: false,
-        }
+        const authorizerId = iAuthorize ? this.myId : peerId;
+        const subjectId = iAuthorize ? peerId : this.myId;
+
+        const neg = ANeg.start(subjectId, authorizerId, sessionId, reference).state;
+
+        return neg;
     }
 
     protected canAcceptMessage(envelope: Envelope<AuthorizationMessage>) {
@@ -99,20 +96,13 @@ export class AuthorizerNegotiationStrategy {
     constructor(private sender: ISendMessages<AuthorizationMessage>, private negHook: Hook<AuthorizeNegotiation>) { }
 
     public offer(session: AuthorizeNegotiation, spec: Partial<AuthorizationSpec>) {
-
         if (!specIsComplete(spec)) {
             throw new Error("Protocol Error. We cannot offer an incomplete spec.");
         }
 
-        const message: MsgOfferAuthorization = { sessionId: session.sessionId, type: "OfferAuthorization", spec };
+        const message: MsgOfferAuthorization = { sessionId: session.id, type: "OfferAuthorization", spec };
 
-        const newSession: AuthorizeNegotiation = {
-            ...session,
-            conceptSpec: spec,
-            steps: [...session.steps, message], // We add the offer
-            authorizerAccepts: true,
-            status: NegStatus.Successful,
-        };
+        const newSession = new ANeg(session).withOffer(session.authorizerId, spec).state;
 
         this.sender.send(session.subjectId, message);
         this.negHook.fire(newSession);
@@ -121,21 +111,6 @@ export class AuthorizerNegotiationStrategy {
     /** When a Subject responds with an offer, we expect it to be complete to start IDAuthorize */
     public handleOffer(session: AuthorizeNegotiation, message: MsgOfferAuthorization) {
         throw new Error("Protocol Error. We should be authorizer");
-
-        // const offeredSpec = message.spec;
-
-        // if (this.offerIsAcceptable(offeredSpec, session.conceptSpec)) {
-        //     const newSession: AuthorizeNegotiation = {
-        //         ...session,
-        //         steps: [...session.steps, message], // We add the offer
-        //         conceptSpec: offeredSpec, // We take the offer as the new status
-        //         authorizerAccepts: specIsComplete(offeredSpec),
-        //         status: NegStatus.Successful,
-        //         subjectAccepts: true,
-        //     };
-
-        //     this.negHook.fire(newSession);
-        // }
     }
 
     /** We are requested to authorize. */
@@ -144,14 +119,8 @@ export class AuthorizerNegotiationStrategy {
         const offeredSpec = message.spec;
 
         if (this.offerIsAcceptable(offeredSpec, session.conceptSpec)) {
-            const newSession: AuthorizeNegotiation = {
-                ...session,
-                steps: [...session.steps, message], // We add the offer
-                conceptSpec: offeredSpec, // We take the offer as the new status
-                subjectAccepts: specIsComplete(offeredSpec),
-                status: session.authorizerAccepts ? NegStatus.Successful : session.status,
-            };
 
+            const newSession = new ANeg(session).withRequest(session.subjectId, offeredSpec).state;
             this.negHook.fire(newSession);
         }
     }
@@ -162,23 +131,14 @@ export class AuthorizerNegotiationStrategy {
             throw new Error("Protocol Error. Cannot accept an incomplete spec");
         }
 
-        const newSession: AuthorizeNegotiation = {
-            ...session,
-            steps: [...session.steps, message], // We add the Accept
-            status: session.authorizerAccepts ? NegStatus.Successful : session.status,
-            subjectAccepts: true,
-        };
-
+        const newSession = new ANeg(session).withAccept(session.subjectId).state;
         this.negHook.fire(newSession);
     }
 
     /** If the Subject accepts, register that */
     public handleReject(session: AuthorizeNegotiation, message: MsgRejectAuthorization) {
-        this.negHook.fire({
-            ...session,
-            steps: [...session.steps, message], // We add the Reject
-            status: NegStatus.Terminated,
-        });
+        const newSession = new ANeg(session).withReject(session.subjectId).state;
+        this.negHook.fire(newSession);
     }
 
     protected offerIsAcceptable(offer: Partial<AuthorizationSpec>, start?: Partial<AuthorizationSpec>) {
@@ -199,26 +159,13 @@ export class AuthorizeeNegotiationStrategy {
         const sessionId = uuid();
 
         // Send authreq to peer
-        const msg: MsgRequestAuthorization = {
-            type: "RequestAuthorization",
-            sessionId: sessionId,
-            spec,
-        };
+        const msg: MsgRequestAuthorization = { type: "RequestAuthorization", sessionId: sessionId, spec, };
 
-        const neg: AuthorizeNegotiation = {
-            fromTemplateId: templateId,
-            sessionId,
-            authorizerId,
-            subjectId: myId,
-            status: NegStatus.Pending,
-            steps: [msg],
-            authorizerAccepts: false,
-            subjectAccepts: specIsComplete(spec),
-        };
+        const newSession = ANeg.start(myId, authorizerId, sessionId, undefined, templateId).state;
 
         this.sender.send(authorizerId, msg, reference);
 
-        this.negHook.fire(neg);
+        this.negHook.fire(newSession);
     }
 
     public accept(session: AuthorizeNegotiation) {
@@ -227,28 +174,18 @@ export class AuthorizeeNegotiationStrategy {
             throw new Error("Protocol Error. We cannot accept an incomplete spec.");
         }
 
-        const message: MsgAcceptAuthorization = { sessionId: session.sessionId, type: "AcceptAuthorization" };
+        const message: MsgAcceptAuthorization = { sessionId: session.id, type: "AcceptAuthorization" };
 
-        const newSession: AuthorizeNegotiation = {
-            ...session,
-            steps: [...session.steps, message], // We add the offer
-            subjectAccepts: true,
-            authorizerAccepts: true,
-            status: NegStatus.Successful, // We accept their offer, so we both agree
-        };
+        const newSession = new ANeg(session).withAccept(session.subjectId).state;
 
         this.sender.send(session.authorizerId, message);
         this.negHook.fire(newSession);
     }
 
     public reject(session: AuthorizeNegotiation) {
-        const message: MsgRejectAuthorization = { sessionId: session.sessionId, type: "RejectAuthorization" };
+        const message: MsgRejectAuthorization = { sessionId: session.id, type: "RejectAuthorization" };
 
-        const newSession: AuthorizeNegotiation = {
-            ...session,
-            steps: [...session.steps, message], // We add the offer
-            status: NegStatus.Terminated,
-        };
+        const newSession = new ANeg(session).withReject(session.subjectId).state;
 
         this.sender.send(session.authorizerId, message);
         this.negHook.fire(newSession);
@@ -263,14 +200,12 @@ export class AuthorizeeNegotiationStrategy {
         }
 
         if (this.offerIsAcceptable(offeredSpec, session.conceptSpec)) {
-            const newSession: AuthorizeNegotiation = {
-                ...session,
-                steps: [...session.steps, message], // We add the offer
-                conceptSpec: offeredSpec, // We take the offer as the new status
-                subjectAccepts: specIsComplete(offeredSpec),
-                authorizerAccepts: true,
-                status: specIsComplete(offeredSpec) ? NegStatus.Successful : session.status,
-            };
+
+            const newSession_ = new ANeg(session).withOffer(session.authorizerId, offeredSpec);
+
+            // Automatically accept when the spec is complete?
+            const newSession = specIsComplete(offeredSpec) ?
+                newSession_.withAccept(session.subjectId).state : newSession_.state;
 
             this.negHook.fire(newSession);
         }
@@ -287,25 +222,13 @@ export class AuthorizeeNegotiationStrategy {
             throw new Error("Protocol Error. We cannot accept an incomplete spec.");
         }
 
-        const newSession: AuthorizeNegotiation = {
-            ...session,
-            steps: [...session.steps, message], // We add the offer
-            authorizerAccepts: true,
-            status: session.subjectAccepts ? NegStatus.Successful : session.status,
-        };
-
+        const newSession = new ANeg(session).withAccept(session.authorizerId).state;
         this.negHook.fire(newSession);
     }
 
     public handleReject(session: AuthorizeNegotiation, message: MsgRejectAuthorization) {
 
-        const newSession: AuthorizeNegotiation = {
-            ...session,
-            steps: [...session.steps, message], // We add the offer
-            authorizerAccepts: false,
-            status: NegStatus.Terminated,
-        };
-
+        const newSession = new ANeg(session).withReject(session.authorizerId).state;
         this.negHook.fire(newSession);
     }
 

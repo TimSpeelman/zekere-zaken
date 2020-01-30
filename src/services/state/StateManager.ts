@@ -58,7 +58,7 @@ export class StateManager {
     }
 
     updateAuthNeg(neg: AuthorizeNegotiation) {
-        this.setState({ authNegs: [...this.state.authNegs.filter(n => n.sessionId !== neg.sessionId), neg] })
+        this.setState({ authNegs: [...this.state.authNegs.filter(n => n.id !== neg.id), neg] })
     }
 
     addInAuthReq(req: InAuthorizationRequest) {

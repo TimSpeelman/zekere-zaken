@@ -84,15 +84,33 @@ export interface IDAuthorizeResult {
 export interface AuthorizeNegotiation {
     fromReference?: BroadcastReference;
     fromTemplateId?: string;
-    sessionId: string;
+    id: string;
     status: NegStatus;
     subjectId: string;
     authorizerId: string;
-    steps: NegStep[];
+    steps: Step[];
     conceptSpec?: Partial<AuthorizationSpec>;
     authorizerAccepts: boolean;
     subjectAccepts: boolean;
 }
+
+export interface Step {
+    peerId: string;
+    step: NegotiationStep;
+}
+
+export enum NegotiationAction {
+    Offer,
+    Request,
+    Accept,
+    Reject
+}
+
+export type NegotiationStep = Offer | Request | Accept | Reject
+export interface Offer { type: NegotiationAction.Offer, spec: Partial<AuthorizationSpec> }
+export interface Request { type: NegotiationAction.Request, spec: Partial<AuthorizationSpec> }
+export interface Accept { type: NegotiationAction.Accept, }
+export interface Reject { type: NegotiationAction.Reject, }
 
 export type NegStep =
     MsgOfferAuthorization | MsgRequestAuthorization | MsgAcceptAuthorization | MsgRejectAuthorization;

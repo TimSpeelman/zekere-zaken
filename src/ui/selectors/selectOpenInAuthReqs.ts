@@ -5,7 +5,7 @@ export function selectOpenInAuthReqs(state: IState): InAuthorizationRequest[] {
         authority: n.conceptSpec!.authority!,
         legalEntity: n.conceptSpec!.legalEntity,
         datetime: new Date().toISOString(), // FIXME
-        id: n.sessionId,
+        id: n.id,
         subjectId: n.subjectId,
     }));
 }

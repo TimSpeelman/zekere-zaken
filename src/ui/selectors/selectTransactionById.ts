@@ -18,10 +18,10 @@ export function selectVTransactionById(tId: string) {
 
 export function selectATransactionById(tId: string) {
     return (state: IState): AuthorizationTransaction | undefined => {
-        const neg = state.authNegs.find(n => n.sessionId === tId && n.status === NegStatus.Successful);
+        const neg = state.authNegs.find(n => n.id === tId && n.status === NegStatus.Successful);
 
         return !neg || !specIsComplete(neg.conceptSpec) ? undefined : {
-            sessionId: neg.sessionId,
+            sessionId: neg.id,
             spec: neg.conceptSpec,
             subjectId: neg.subjectId,
             authorizerId: neg.authorizerId,
