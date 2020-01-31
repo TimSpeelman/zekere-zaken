@@ -24,6 +24,7 @@ export class VerifyNegotiationMiddleware {
     setup() {
 
         const negHook = new Hook<VerifyNegotiation>('neg-hook');
+
         negHook.on((negotiation) => {
             const isNew = !this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === negotiation.sessionId);
 
@@ -35,11 +36,7 @@ export class VerifyNegotiationMiddleware {
         })
         const stgVerifier = new VerifierNegotiationStrategy(this.messenger, negHook);
         const stgVerifiee = new VerifieeNegotiationStrategy(this.messenger, negHook);
-
-        const getSessionById = (sessionId: string) => {
-            return this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === sessionId);
-        }
-        const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, getSessionById);
+        const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, this.getSessionById);
 
         this.messenger.addRecipient(verifyManager);
 
@@ -50,7 +47,7 @@ export class VerifyNegotiationMiddleware {
                 case "AcceptVNegWithLegalEntity": {
                     const sessionId = cmd.negotiationId;
 
-                    const session = failIfFalsy(getSessionById(sessionId), "SessionID unknown");
+                    const session = failIfFalsy(this.getSessionById(sessionId), "SessionID unknown");
                     const spec = {
                         ...session!.conceptSpec,
                         legalEntity: cmd.legalEntity,
@@ -61,7 +58,7 @@ export class VerifyNegotiationMiddleware {
                     break;
                 } case "RejectVNegotiation": {
                     const sessionId = cmd.negotiationId;
-                    const session = failIfFalsy(getSessionById(sessionId), "SessionID unknown");
+                    const session = failIfFalsy(this.getSessionById(sessionId), "SessionID unknown");
 
                     stgVerifiee.reject(session!); // FIXME, always verifiee?
                     break;
@@ -74,12 +71,9 @@ export class VerifyNegotiationMiddleware {
             switch (ev.type) {
                 case "IDVerifyCompleted": {
                     const neg = this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === ev.negotiationId);
-                    if (!!neg) {
 
-                        if (neg.fromTemplateId) {
-                            this.eventHook.fire(VTemplateAnswered({ templateId: neg.fromTemplateId, negotiationId: ev.negotiationId }))
-                        }
-
+                    if (!!neg && neg.fromTemplateId) {
+                        this.eventHook.fire(VTemplateAnswered({ templateId: neg.fromTemplateId, negotiationId: ev.negotiationId }))
                     }
                     break;
                 } case "VNegotiationCompleted": {
@@ -125,5 +119,8 @@ export class VerifyNegotiationMiddleware {
         });
     }
 
+    protected getSessionById = (sessionId: string) => {
+        return this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === sessionId);
+    }
 
 }
