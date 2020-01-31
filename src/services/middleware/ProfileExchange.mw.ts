@@ -1,3 +1,5 @@
+import { AddProfile, UserCommand } from "../../commands/Command";
+import { Hook } from "../../util/Hook";
 import { ProfileExchanger } from "../identity/profiles/ProfileExchanger";
 import { Messenger } from "../messaging/Messenger";
 import { Msg } from "../messaging/types";
@@ -6,6 +8,7 @@ import { StateManager } from "../state/StateManager";
 export class ProfileExchangeMiddleware {
 
     constructor(
+        private commandHook: Hook<UserCommand>,
         private stateMgr: StateManager,
         private messenger: Messenger<Msg>,
     ) { }
@@ -19,7 +22,8 @@ export class ProfileExchangeMiddleware {
         this.messenger.addHandler((env) => { profileEx.sendProfileToPeer(env.senderId); return false });
 
         // Save profiles after they have been verified
-        profileEx.verifiedProfileHook.on(({ peerId, profile }) => this.stateMgr.addProfile(peerId, profile));
+        profileEx.verifiedProfileHook.on(({ peerId, profile }) =>
+            this.commandHook.fire(AddProfile({ peerId, profile })));
     }
 
 }

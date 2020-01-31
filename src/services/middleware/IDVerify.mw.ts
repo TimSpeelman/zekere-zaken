@@ -5,7 +5,6 @@ import { Hook } from "../../util/Hook";
 import { Agent } from "../identity/id-layer/Agent";
 import { IDVerifiee } from "../identity/id-layer/IDVerifiee";
 import { IDVerifier } from "../identity/id-layer/IDVerifier";
-import { VerifyNegotiationResult } from "../identity/verification/types";
 import { StateManager } from "../state/StateManager";
 
 export class IDVerifyMiddleware {
@@ -31,20 +30,10 @@ export class IDVerifyMiddleware {
 
         // Outputs
         verifier.completedVerifyHook.on((result) => {
-            const neg = this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === result.sessionId);
-            if (neg && result.result === VerifyNegotiationResult.Succeeded) {
-                this.stateMgr.addSucceededIDVerify({
-                    templateId: neg.fromTemplateId!,
-                    sessionId: neg.sessionId,
-                    // @ts-ignore FIXME
-                    spec: neg.conceptSpec,
-                })
-
-                this.eventHook.fire(IDVerifyCompleted({
-                    negotiationId: result.sessionId,
-                    result: result.result,
-                }))
-            }
+            this.eventHook.fire(IDVerifyCompleted({
+                negotiationId: result.sessionId,
+                result: result.result,
+            }))
         })
 
     }

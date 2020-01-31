@@ -1,11 +1,12 @@
 import { AuthorizationTransaction } from "../services/identity/authorization/types";
 import { VerificationTransaction } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
-import { AuthorizationTemplate, LegalEntity, VerificationTemplate } from "../types/State";
+import { AuthorizationTemplate, LegalEntity, Profile, VerificationTemplate } from "../types/State";
 
 export type UserCommand =
     CmdNavigateTo |
     CmdResolveReference |
+    CmdAddProfile |
     CmdCreateVReqTemplate |
     CmdRemoveVReqTemplate |
     CmdCreateAReqTemplate |
@@ -37,6 +38,16 @@ export interface CmdResolveReference {
 
 export const ResolveReference =
     factory<CmdResolveReference>("ResolveReference");
+
+
+export interface CmdAddProfile {
+    type: "AddProfile",
+    peerId: string,
+    profile: Profile,
+}
+
+export const AddProfile =
+    factory<CmdAddProfile>("AddProfile");
 
 
 export interface CmdCreateVReqTemplate {

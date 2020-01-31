@@ -1,5 +1,5 @@
 import { InvokeIDVerify, UserCommand } from "../../commands/Command";
-import { DomainEvent, RefResolvedToVerify, VNegotiationUpdated } from "../../commands/Event";
+import { DomainEvent, RefResolvedToVerify, VNegotiationUpdated, VTemplateAnswered } from "../../commands/Event";
 import { failIfFalsy } from "../../util/failIfFalsy";
 import { Hook } from "../../util/Hook";
 import { specIsComplete } from "../identity/authorization/types";
@@ -72,7 +72,17 @@ export class VerifyNegotiationMiddleware {
 
         this.eventHook.on((ev) => {
             switch (ev.type) {
-                case "VNegotiationCompleted": {
+                case "IDVerifyCompleted": {
+                    const neg = this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === ev.negotiationId);
+                    if (!!neg) {
+
+                        if (neg.fromTemplateId) {
+                            this.eventHook.fire(VTemplateAnswered({ templateId: neg.fromTemplateId, negotiationId: ev.negotiationId }))
+                        }
+
+                    }
+                    break;
+                } case "VNegotiationCompleted": {
                     if (ev.transaction.verifierId === this.messenger.me!.id) { // FIXME ugly
                         this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
                     }
@@ -80,7 +90,6 @@ export class VerifyNegotiationMiddleware {
                 }
                 case "VNegotiationUpdated": {
                     const n = ev.negotiation;
-                    this.stateMgr.updateVerifyNeg(n);
                     if (n.verifierId === this.messenger.me!.id && specIsComplete(n.conceptSpec)) {
                         const transaction: VerificationTransaction = {
                             spec: n.conceptSpec,

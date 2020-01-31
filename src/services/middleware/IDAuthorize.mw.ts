@@ -1,9 +1,7 @@
-import uuid from "uuid/v4";
 import { UserCommand } from "../../commands/Command";
 import { DomainEvent, IDIssuingCompleted } from "../../commands/Event";
 import { selectATransactionById } from "../../ui/selectors/selectTransactionById";
 import { Hook } from "../../util/Hook";
-import { AuthorizeNegotiationResult } from "../identity/authorization/types";
 import { Agent } from "../identity/id-layer/Agent";
 import { IDIssuee } from "../identity/id-layer/IDIssuee";
 import { IDIssuer } from "../identity/id-layer/IDIssuer";
@@ -29,28 +27,10 @@ export class IDAuthorizeMiddleware {
         this.agent.setIssuingRequestHandler((r) => authorizer.handleIssueRequest(r));
 
         authorizer.completedIssueHook.on((result) => {
-
             this.eventHook.fire(IDIssuingCompleted({
                 negotiationId: result.sessionId,
                 result: result.result,
             }))
-
-            const neg = this.stateMgr.state.authorizeNegotiations.find(n => n.id === result.sessionId);
-            if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
-                this.stateMgr.addSucceededIDAuthorize({
-                    fromTemplateId: neg.fromTemplateId!,
-                    sessionId: neg.id,
-                    // @ts-ignore FIXME
-                    spec: neg.conceptSpec,
-                    legalEntity: neg.conceptSpec!.legalEntity!,
-                    authority: neg.conceptSpec!.authority!,
-                    issuedAt: new Date().toISOString(), // FIXME
-                    issuerId: neg.authorizerId,
-                    subjectId: neg.subjectId,
-                    id: uuid(),
-                })
-
-            }
         })
 
     }
@@ -62,28 +42,10 @@ export class IDAuthorizeMiddleware {
             authorizee.requestIssuing(cmd.transaction));
 
         authorizee.completedIssueHook.on((result) => {
-
             this.eventHook.fire(IDIssuingCompleted({
                 negotiationId: result.sessionId,
                 result: result.result,
             }))
-
-            const neg = this.stateMgr.state.authorizeNegotiations.find(n => n.id === result.sessionId);
-            if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
-                this.stateMgr.addSucceededIDAuthorize({
-                    fromTemplateId: neg.fromTemplateId!,
-                    sessionId: neg.id,
-                    // @ts-ignore FIXME
-                    spec: neg.conceptSpec,
-                    legalEntity: neg.conceptSpec!.legalEntity!,
-                    authority: neg.conceptSpec!.authority!,
-                    issuedAt: new Date().toISOString(), // FIXME
-                    issuerId: neg.authorizerId,
-                    subjectId: neg.subjectId,
-                    id: uuid(),
-                })
-
-            }
         })
     }
 

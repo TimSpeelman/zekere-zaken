@@ -1,5 +1,5 @@
 import { InvokeIDAuthorize, UserCommand } from "../../commands/Command";
-import { ANegotiationUpdated, DomainEvent, RefResolvedToAuthorize, VTemplateAnswered } from "../../commands/Event";
+import { ANegotiationUpdated, DomainEvent, RefResolvedToAuthorize } from "../../commands/Event";
 import { failIfFalsy } from "../../util/failIfFalsy";
 import { Hook } from "../../util/Hook";
 import { AuthorizeeNegotiationStrategy, AuthorizeManager, AuthorizerNegotiationStrategy } from "../identity/authorization/AuthorizeManager";
@@ -71,19 +71,9 @@ export class AuthorizeNegotiationMiddleware {
 
         this.eventHook.on((ev) => {
             switch (ev.type) {
-                case "IDVerifyCompleted": {
-                    const neg = this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === ev.negotiationId);
-                    if (!!neg) {
-
-                        if (neg.fromTemplateId) {
-                            this.eventHook.fire(VTemplateAnswered({ templateId: neg.fromTemplateId, negotiationId: ev.negotiationId }))
-                        }
-
-                    }
-                    break;
-                } case "ANegotiationUpdated": {
+                case "ANegotiationUpdated": {
                     const n = ev.negotiation;
-                    this.stateMgr.updateAuthNeg(n);
+
                     // If I am subject, I invoke the authorize
                     if (n.subjectId === this.messenger.me!.id && specIsComplete(n.conceptSpec)
                         && n.status === NegStatus.Successful) {
