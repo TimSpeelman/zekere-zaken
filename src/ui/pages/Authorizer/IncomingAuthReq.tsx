@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import { isEqual, uniqWith } from "lodash";
-import { default as React, Fragment } from "react";
+import { default as React, Fragment, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AcceptANegWithLegalEntity } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
@@ -26,6 +26,12 @@ export function IncomingAuthReq() {
     const profile = useSelector(req ? selectProfileById(req.subjectId) : undefined);
     const auths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
+
+    useEffect(() => {
+        if (req?.resultedInAuthId) {
+            window.location.assign(`#/given-authorizations/${req!.resultedInAuthId}`);
+        }
+    }, [req])
 
     const acceptRequest = (legalEntity: LegalEntity) => {
         if (req) {

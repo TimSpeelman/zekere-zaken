@@ -25,10 +25,9 @@ export function AuthReqInbox() {
                 <ListSubheader>Uitgegeven Machtigingen</ListSubheader>
                 {given.length === 0 && <ListItem disabled>U heeft geen uitgegeven machtigingen.</ListItem>}
                 {given.map(auth => (
-                    <ListItem button key={auth.id} component="a" href={`#/authreq/inbox/${auth.id}`}>
+                    <ListItem button key={auth.id} component="a" href={`#/given-authorizations/${auth.id}`}>
                         <ListItemAvatar>
-                            <Avatar src={getProfile(auth.subjectId)?.photo}
-                                style={{ width: 60, height: 60 }} />
+                            <Avatar src={getProfile(auth.subjectId)?.photo} />
                         </ListItemAvatar>
                         <ListItemText primary={getProfile(auth.subjectId)?.name} secondary={format(new Date(auth.issuedAt), 'dd-MM-yyyy HH:mm')} />
                     </ListItem>

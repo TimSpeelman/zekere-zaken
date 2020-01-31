@@ -76,6 +76,7 @@ export interface InAuthorizationRequest {
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    resultedInAuthId?: string;
 }
 
 export interface OutAuthorizationRequest {

@@ -92,6 +92,7 @@ export interface AuthorizeNegotiation {
     conceptSpec?: Partial<AuthorizationSpec>;
     authorizerAccepts: boolean;
     subjectAccepts: boolean;
+    resultedInAuthId?: string;
 }
 
 export interface Step {

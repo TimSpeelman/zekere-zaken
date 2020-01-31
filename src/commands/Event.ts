@@ -6,6 +6,7 @@ export type DomainEvent =
     EventRefResolvedToVerify |
     EventRefResolvedToAuthorize |
     EventATemplateAnswered |
+    EventAInReqAnswered |
     EventVNegotiationCompleted |
     EventVNegotiationUpdated |
     EventANegotiationCompleted |
@@ -107,4 +108,14 @@ export interface EventATemplateAnswered {
 
 export const ATemplateAnswered =
     factory<EventATemplateAnswered>("ATemplateAnswered");
+
+
+export interface EventAInReqAnswered {
+    type: "AInReqAnswered",
+    negotiationId: string,
+    authorizationId: string,
+}
+
+export const AInReqAnswered =
+    factory<EventAInReqAnswered>("AInReqAnswered");
 

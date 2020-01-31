@@ -15,6 +15,7 @@ import { MyAuthorization } from "./pages/Authorizee/MyAuthorization";
 import { OutgoingAuthReq } from "./pages/Authorizee/OutgoingAuthReq";
 import { RequestAuthority } from "./pages/Authorizee/RequestAuthority";
 import { AuthReqInbox } from "./pages/Authorizer/AuthReqInbox";
+import { GivenAuthorization } from "./pages/Authorizer/GivenAuthorization";
 import { IncomingAuthReq } from "./pages/Authorizer/IncomingAuthReq";
 import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
@@ -97,6 +98,7 @@ export const AppBody: React.FC = () => {
 
 
             {/* Authorizers */}
+            <MyRoute title="Uitgegeven Machtiging" path="/given-authorizations/:id"><GivenAuthorization /></MyRoute>
             <MyRoute title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId"><IncomingAuthReq /></MyRoute>
             <MyRoute title="Machtigingen" path="/authreqs/inbox"><AuthReqInbox /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/home"><Home /></MyRoute>
