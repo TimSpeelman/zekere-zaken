@@ -32,7 +32,7 @@ export function OutgoingAuthReq() {
                 <p>Deel de volgende link om uw bevoegdheid aan te vragen.</p>
             </Box>
 
-            <AuthorityCard legalEntity={template.legalEntity} authority={template.authority} />
+            <AuthorityCard title={"Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} />
 
             <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>

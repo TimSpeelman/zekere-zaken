@@ -76,6 +76,12 @@ const useStyles = makeStyles((theme) => ({
         overflow: "auto",
         flexDirection: "column",
     },
+    paperTitle: {
+        padding: theme.spacing(2),
+        margin: -theme.spacing(2),
+        marginBottom: 0,
+        borderBottom: "1px solid #eee",
+    },
     fixedHeight: {
         height: 240,
     },
