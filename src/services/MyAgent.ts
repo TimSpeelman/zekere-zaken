@@ -1,6 +1,6 @@
 import uuid from "uuid";
 import { InvokeIDAuthorize, InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
-import { AInReqAnswered, ANegotiationUpdated, ATemplateAnswered, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated } from "../commands/Event";
+import { AInReqAnswered, ANegotiationUpdated, ATemplateAnswered, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated, VTemplateAnswered } from "../commands/Event";
 import { AuthorizationFromNeg } from "../types/State";
 import { selectATransactionById, selectVTransactionById } from "../ui/selectors/selectTransactionById";
 import { failIfFalsy } from "../util/failIfFalsy";
@@ -343,13 +343,17 @@ export class MyAgent {
 
         eventHook.on((ev) => {
             switch (ev.type) {
-                // case "ANegotiationCompleted": {
-                //     if (ev.transaction.verifierId === messenger.me!.id) { // FIXME ugly
-                //         commandHook.fire(InvokeIDAuthorize({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
-                //     }
-                //     break;
-                // }
-                case "ANegotiationUpdated": {
+                case "IDVerifyCompleted": {
+                    const neg = this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === ev.negotiationId);
+                    if (!!neg) {
+
+                        if (neg.fromTemplateId) {
+                            this.eventHook.fire(VTemplateAnswered({ templateId: neg.fromTemplateId, negotiationId: ev.negotiationId }))
+                        }
+
+                    }
+                    break;
+                } case "ANegotiationUpdated": {
                     const n = ev.negotiation;
                     this.stateMgr.updateAuthNeg(n);
                     // If I am subject, I invoke the authorize

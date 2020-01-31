@@ -5,6 +5,7 @@ import { BroadcastReference } from "../services/references/types";
 export type DomainEvent =
     EventRefResolvedToVerify |
     EventRefResolvedToAuthorize |
+    EventVTemplateAnswered |
     EventATemplateAnswered |
     EventAInReqAnswered |
     EventVNegotiationCompleted |
@@ -108,6 +109,16 @@ export interface EventATemplateAnswered {
 
 export const ATemplateAnswered =
     factory<EventATemplateAnswered>("ATemplateAnswered");
+
+
+export interface EventVTemplateAnswered {
+    type: "VTemplateAnswered",
+    templateId: string,
+    negotiationId: string,
+}
+
+export const VTemplateAnswered =
+    factory<EventVTemplateAnswered>("VTemplateAnswered");
 
 
 export interface EventAInReqAnswered {
