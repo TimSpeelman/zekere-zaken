@@ -34,6 +34,7 @@ export class VerifyNegotiationMiddleware {
                 this.eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
             }
         })
+
         const stgVerifier = new VerifierNegotiationStrategy(this.messenger, negHook);
         const stgVerifiee = new VerifieeNegotiationStrategy(this.messenger, negHook);
         const verifyManager = new VerifyManager(stgVerifier, stgVerifiee, this.getSessionById);
@@ -76,27 +77,11 @@ export class VerifyNegotiationMiddleware {
                         this.eventHook.fire(VTemplateAnswered({ templateId: neg.fromTemplateId, negotiationId: ev.negotiationId }))
                     }
                     break;
-                } case "VNegotiationCompleted": {
-                    if (ev.transaction.verifierId === this.messenger.me!.id) { // FIXME ugly
-                        this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
-                    }
-                    break;
-                }
-                case "VNegotiationUpdated": {
-                    const n = ev.negotiation;
-                    if (n.verifierId === this.messenger.me!.id && specIsComplete(n.conceptSpec)) {
-                        const transaction: VerificationTransaction = {
-                            spec: n.conceptSpec,
-                            subjectId: n.subjectId,
-                            verifierId: n.verifierId,
-                            sessionId: n.sessionId,
-                        }
-                        this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.negotiation.sessionId, transaction }));
-                    }
                 }
             }
         })
 
+        this.setupIDVerifyTriggers();
         this.setupTriggerVerifyOnResolve(stgVerifier);
     }
 
@@ -116,6 +101,33 @@ export class VerifyNegotiationMiddleware {
                 }
             }
             return false;
+        });
+    }
+
+    protected setupIDVerifyTriggers() {
+
+        this.eventHook.on((ev) => {
+            switch (ev.type) {
+
+                case "VNegotiationCompleted": {
+                    if (ev.transaction.verifierId === this.messenger.me!.id) { // FIXME ugly
+                        this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.transaction.sessionId, transaction: ev.transaction }))
+                    }
+                    break;
+                }
+                case "VNegotiationUpdated": {
+                    const n = ev.negotiation;
+                    if (n.verifierId === this.messenger.me!.id && specIsComplete(n.conceptSpec)) {
+                        const transaction: VerificationTransaction = {
+                            spec: n.conceptSpec,
+                            subjectId: n.subjectId,
+                            verifierId: n.verifierId,
+                            sessionId: n.sessionId,
+                        }
+                        this.commandHook.fire(InvokeIDVerify({ negotiationId: ev.negotiation.sessionId, transaction }));
+                    }
+                }
+            }
         });
     }
 
