@@ -26,7 +26,7 @@ export function AuthReqOutbox() {
                     </div>
                     :
                     auths.map(auth => (
-                        <ListItem button key={auth.id} component="a" href={`#/auths/${auth.id}`}>
+                        <ListItem button key={auth.id} component="a" href={`#/my-authorizations/${auth.id}`}>
                             <ListItemAvatar>
                                 <Avatar>
                                     <i className="material-icons">check</i>

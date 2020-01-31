@@ -11,6 +11,7 @@ import { useCommand } from "./hooks/useCommand";
 import { useLocalState } from "./hooks/useLocalState";
 import { useProfile } from "./hooks/useProfile";
 import { AuthReqOutbox } from "./pages/Authorizee/AuthReqOutbox";
+import { MyAuthorization } from "./pages/Authorizee/MyAuthorization";
 import { OutgoingAuthReq } from "./pages/Authorizee/OutgoingAuthReq";
 import { RequestAuthority } from "./pages/Authorizee/RequestAuthority";
 import { AuthReqInbox } from "./pages/Authorizer/AuthReqInbox";
@@ -92,6 +93,7 @@ export const AppBody: React.FC = () => {
             <MyRoute title="Nieuw Machtigingsverzoek" path="/authreqs/new"><RequestAuthority /></MyRoute>
             <MyRoute title="Uitgaand Machtigingsverzoek" path="/authreqs/outbox/:reqId"><OutgoingAuthReq /></MyRoute>
             <MyRoute title="Mijn Bevoegdheden" path="/authreqs/outbox"><AuthReqOutbox /></MyRoute>
+            <MyRoute title="Mijn Bevoegdheid" path="/my-authorizations/:id"><MyAuthorization /></MyRoute>
 
 
             {/* Authorizers */}
