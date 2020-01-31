@@ -1,4 +1,4 @@
-import { AuthorizationTemplate, IState, OutAuthorizationRequest, Profile, SucceededIDAuthorize, SucceededIDVerify, VerificationTemplate } from "../../types/State";
+import { Authorization, AuthorizationTemplate, IState, OutAuthorizationRequest, Profile, SucceededIDAuthorize, SucceededIDVerify, VerificationTemplate } from "../../types/State";
 import { Cache } from "../../util/Cache";
 import { Hook } from "../../util/Hook";
 import { AuthorizeNegotiation } from "../identity/authorization/types";
@@ -27,6 +27,8 @@ export class StateManager {
         profiles: {},
         succeededIDAuthorize: [],
         succeededIDVerify: [],
+        myAuthorizations: [],
+        givenAuthorizations: [],
         verifyNegotiations: [],
     }
 
@@ -45,15 +47,23 @@ export class StateManager {
     }
 
     addProfile(peerId: string, profile: Profile) {
-        this.setState({ profiles: { [peerId]: profile } });
+        this.setState({ profiles: { ...this.state.profiles, [peerId]: profile } });
     }
 
-    addVerified(verified: SucceededIDVerify) {
+    addSucceededIDVerify(verified: SucceededIDVerify) {
         this.setState({ succeededIDVerify: [...this.state.succeededIDVerify, verified] })
     }
 
-    addAuthorization(authorization: SucceededIDAuthorize) {
+    addSucceededIDAuthorize(authorization: SucceededIDAuthorize) {
         this.setState({ succeededIDAuthorize: [...this.state.succeededIDAuthorize, authorization] })
+    }
+
+    addOutVerifTemplate(template: VerificationTemplate) {
+        this.setState({ outgoingVerifTemplates: [...this.state.outgoingVerifTemplates, template] })
+    }
+
+    removeOutVerifTemplate(id: string) {
+        this.setState({ outgoingVerifTemplates: this.state.outgoingVerifTemplates.filter(template => template.id !== id) })
     }
 
     updateVerifyNeg(neg: VerifyNegotiation) {
@@ -68,23 +78,28 @@ export class StateManager {
         this.setState({ outgoingAuthTemplates: [...this.state.outgoingAuthTemplates, req] })
     }
 
-    addOutVerifTemplate(template: VerificationTemplate) {
-        this.setState({ outgoingVerifTemplates: [...this.state.outgoingVerifTemplates, template] })
-    }
-
     addOutAuthTemplate(template: AuthorizationTemplate) {
         this.setState({ outgoingAuthTemplates: [...this.state.outgoingAuthTemplates, template] })
-    }
-
-    removeOutAuthReq(id: string) {
-        this.setState({ outgoingAuthTemplates: this.state.outgoingAuthTemplates.filter(req => req.id !== id) })
-    }
-
-    removeOutVerifTemplate(id: string) {
-        this.setState({ outgoingVerifTemplates: this.state.outgoingVerifTemplates.filter(template => template.id !== id) })
     }
 
     removeOutAuthTemplate(id: string) {
         this.setState({ outgoingAuthTemplates: this.state.outgoingAuthTemplates.filter(template => template.id !== id) })
     }
+
+    addMyAuthorization(authorization: Authorization) {
+        this.setState({ myAuthorizations: [...this.state.myAuthorizations, authorization] })
+    }
+
+    removeMyAuthorization(id: string) {
+        this.setState({ myAuthorizations: this.state.myAuthorizations.filter(item => item.id !== id) })
+    }
+
+    addGivenAuthorization(authorization: Authorization) {
+        this.setState({ givenAuthorizations: [...this.state.givenAuthorizations, authorization] })
+    }
+
+    removeGivenAuthorization(id: string) {
+        this.setState({ givenAuthorizations: this.state.givenAuthorizations.filter(item => item.id !== id) })
+    }
+
 }

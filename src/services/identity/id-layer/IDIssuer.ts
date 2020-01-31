@@ -3,7 +3,7 @@ import { Hook } from "../../../util/Hook";
 import { AuthorizationTransaction, AuthorizeNegotiationResult, IDAuthorizeResult } from "../authorization/types";
 import { IPv8IssueReq } from "./Agent";
 
-const log = debug('oa:Issuee');
+const log = debug('oa:issuer');
 
 /**
  * The Issuer accepts or rejects incoming IDIssueRequests. Each request comes in with

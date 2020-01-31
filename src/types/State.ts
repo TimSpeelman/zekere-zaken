@@ -1,4 +1,4 @@
-import { AuthorizationSpec, AuthorizeNegotiation, NegStatus } from "../services/identity/authorization/types";
+import { AuthorizationSpec, AuthorizeNegotiation } from "../services/identity/authorization/types";
 import { VerificationSpec, VerifyNegotiation } from "../services/identity/verification/types";
 import { Dict } from "./Dict";
 
@@ -23,8 +23,11 @@ export interface IState {
     /** For Subject and Authorizer. Successful results of IDAuthorize procedure.  */
     succeededIDAuthorize: SucceededIDAuthorize[];
 
+    /** For Authorizer. Authorizations issued to the current user. */
+    myAuthorizations: Authorization[];
+
     /** For Authorizer. Authorizations issued by the current user to other subjects. */
-    // givenAuthorizations: Authorization[];
+    givenAuthorizations: Authorization[];
 
     /** Profile of current user */
     profile?: Profile;
@@ -102,7 +105,7 @@ export interface Authorization {
 }
 
 export function AuthorizationFromNeg(neg: AuthorizeNegotiation): Authorization | undefined {
-    return neg.status !== NegStatus.Successful ? undefined : {
+    return {
         authority: neg.conceptSpec!.authority!,
         id: neg.id,
         issuedAt: new Date().toISOString(), // FIXME

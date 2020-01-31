@@ -1,6 +1,5 @@
 import add from "date-fns/add";
-import { AuthorizeNegotiation, NegotiationAction, NegStatus } from "./services/identity/authorization/types";
-import { Actor, Authority, Authorization, InAuthorizationRequest, InVerificationRequest, IState, KVKAuthorityType, LegalEntity, OutAuthorizationRequest, SucceededIDAuthorize, VerificationTemplate } from "./types/State";
+import { Actor, Authority, Authorization, InAuthorizationRequest, InVerificationRequest, IState, KVKAuthorityType, LegalEntity, OutAuthorizationRequest, VerificationTemplate } from "./types/State";
 
 export const Kees: Actor = { name: "Kees Schoon", photo: "" };
 export const Jan: Actor = { name: "Jan Janssen", photo: "" };
@@ -78,54 +77,56 @@ export const dummyState = (myId: string): IState => {
     const InAuthDeBroodfabriekFinanciering100k: InAuthorizationRequest =
         { ...OutAuthDeBroodfabriekFinanciering100k, subjectId: "joep" }
 
-    // const AuthJanssenInkoop10k: Authorization = {
-    //     id: "5",
-    //     issuedAt: add(new Date(), { minutes: -3 }).toISOString(),
-    //     legalEntity: JanssenBV,
-    //     authority: Inkoop10k,
-    //     issuerId: "jan",
-    //     subjectId: myId,
-    //     sessionId: "x",
-    // };
-
-    const AuthJanssenInkoop10k: AuthorizeNegotiation = {
+    const AuthJanssenInkoop10k: Authorization = {
         id: "5",
-        conceptSpec: {
-            legalEntity: JanssenBV,
-            authority: Inkoop10k,
-        },
-        steps: [
-            {
-                peerId: "jan",
-                step: {
-                    type: NegotiationAction.Offer,
-                    spec: {
-                        legalEntity: JanssenBV,
-                        authority: Inkoop10k,
-                    }
-                }
-            },
-            {
-                peerId: myId,
-                step: {
-                    type: NegotiationAction.Accept,
-                },
-            },
-        ],
-        authorizerId: "jan",
+        issuedAt: add(new Date(), { minutes: -3 }).toISOString(),
+        legalEntity: JanssenBV,
+        authority: Inkoop10k,
+        issuerId: "jan",
         subjectId: myId,
-        subjectAccepts: true,
-        authorizerAccepts: true,
-        status: NegStatus.Successful,
+        sessionId: "x",
     };
 
-    const AuthJanssenInkoop10kIDAuthorize: SucceededIDAuthorize = {
-        sessionId: "5",
-        spec: {
-            legalEntity: JanssenBV,
-            authority: Inkoop10k,
-        },
-    }
+    const AuthJanssenInkoop5k: Authorization = {
+        id: "5",
+        issuedAt: add(new Date(), { minutes: -3 }).toISOString(),
+        legalEntity: JanssenBV,
+        authority: Inkoop10k,
+        subjectId: "piet",
+        issuerId: myId,
+        sessionId: "x",
+    };
+
+    // const AuthJanssenInkoop10k: AuthorizeNegotiation = {
+    //     id: "5",
+    //     conceptSpec: {
+    //         legalEntity: JanssenBV,
+    //         authority: Inkoop10k,
+    //     },
+    //     steps: [
+    //         {
+    //             peerId: "jan",
+    //             step: {
+    //                 type: NegotiationAction.Offer,
+    //                 spec: {
+    //                     legalEntity: JanssenBV,
+    //                     authority: Inkoop10k,
+    //                 }
+    //             }
+    //         },
+    //         {
+    //             peerId: myId,
+    //             step: {
+    //                 type: NegotiationAction.Accept,
+    //             },
+    //         },
+    //     ],
+    //     authorizerId: "jan",
+    //     subjectId: myId,
+    //     subjectAccepts: true,
+    //     authorizerAccepts: true,
+    //     status: NegStatus.Successful,
+    // };
 
     const AuthDeBroodfabriekInkoop5k: Authorization = {
         id: "6",
@@ -140,8 +141,12 @@ export const dummyState = (myId: string): IState => {
     return {
         myId,
         succeededIDVerify: [],
-        authorizeNegotiations: [
+        authorizeNegotiations: [],
+        myAuthorizations: [
             AuthJanssenInkoop10k
+        ],
+        givenAuthorizations: [
+            AuthJanssenInkoop5k
         ],
         verifyNegotiations: [],
         outgoingAuthTemplates: [
@@ -161,9 +166,7 @@ export const dummyState = (myId: string): IState => {
             joep: Joep,
         },
 
-        succeededIDAuthorize: [
-            AuthJanssenInkoop10kIDAuthorize
-        ],
+        succeededIDAuthorize: [],
 
     };
 }

@@ -3,7 +3,7 @@ import { Hook } from "../../../util/Hook";
 import { IDVerifyResult, VerificationTransaction } from "../verification/types";
 import { IVerify } from "./Agent";
 
-const log = debug('oa:verifiee');
+const log = debug('oa:verifier');
 
 /** 
  * The IDVerifier translates domain-level semantics to the underlying IDCredentials

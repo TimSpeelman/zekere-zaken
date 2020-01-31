@@ -7,7 +7,7 @@ describe("Authorization Integration Test", () => {
 
     it("successfully do an authorization, if consented", (_done) => {
         // const done = makeDone(_done, 2, 20000);
-        const [done, subDone, authDone] = multiDone(_done, ["sub", "auth"], 3000);
+        const [done, subInvoke, subComplete, authDone] = multiDone(_done, ["subInvoke", "subComplete", "auth"], 3000);
         const [aAgent, sAgent] = mockIDPair("AUTH", "SUBJ");
         const [authorizer, authorizerState] = createMyAgent(aAgent);
         const [subject, subjectState] = createMyAgent(sAgent);
@@ -54,25 +54,25 @@ describe("Authorization Integration Test", () => {
         })
 
         // We now expect both to receive a completed issuing
-        // subject.commandHook.on((e) => {
-        //     if (e.type === "InvokeIDAuthorize") {
-        //         done();
-        //     }
-        // });
+        subject.commandHook.on((e) => {
+            if (e.type === "InvokeIDAuthorize") {
+                subInvoke();
+            }
+        }, true);
+
         subject.eventHook.on((e) => {
             if (e.type === "IDIssuingCompleted") {
                 expect(e.result).to.eq(AuthorizeNegotiationResult.Succeeded);
-                subDone();
+                subComplete();
             }
-        });
+        }, true);
 
         authorizer.eventHook.on((e) => {
-
             if (e.type === "IDIssuingCompleted") {
                 expect(e.result).to.eq(AuthorizeNegotiationResult.Succeeded);
                 authDone();
             }
-        });
+        }, true);
 
         seq.go();
 

@@ -5,7 +5,7 @@ import { CommandChain } from "../../util/CommandChain";
 import { Agent, Me } from "../identity/id-layer/Agent";
 import { Envelope, IHandleMessages, ISendMessages } from "./types";
 
-const log = debug('oa:messaging');
+const log = debug('oa:messenger');
 
 /**
  * Ensure that domain messages are sent to and received from peers.

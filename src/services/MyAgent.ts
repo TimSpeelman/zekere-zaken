@@ -1,6 +1,7 @@
 import uuid from "uuid";
 import { InvokeIDAuthorize, InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
 import { ANegotiationUpdated, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated } from "../commands/Event";
+import { AuthorizationFromNeg } from "../types/State";
 import { selectATransactionById, selectVTransactionById } from "../ui/selectors/selectTransactionById";
 import { failIfFalsy } from "../util/failIfFalsy";
 import { Hook } from "../util/Hook";
@@ -131,7 +132,7 @@ export class MyAgent {
         verifier.completedVerifyHook.on((result) => {
             const neg = stageMgr.state.verifyNegotiations.find(n => n.sessionId === result.sessionId);
             if (neg && result.result === VerifyNegotiationResult.Succeeded) {
-                stageMgr.addVerified({
+                stageMgr.addSucceededIDVerify({
                     templateId: neg.fromTemplateId!,
                     sessionId: neg.sessionId,
                     // @ts-ignore FIXME
@@ -160,6 +161,7 @@ export class MyAgent {
         agent.setIssuingRequestHandler((r) => authorizer.handleIssueRequest(r));
 
         authorizee.completedIssueHook.on((result) => {
+
             eventHook.fire(IDIssuingCompleted({
                 negotiationId: result.sessionId,
                 result: result.result,
@@ -167,7 +169,7 @@ export class MyAgent {
 
             const neg = stageMgr.state.authorizeNegotiations.find(n => n.id === result.sessionId);
             if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
-                stageMgr.addAuthorization({
+                stageMgr.addSucceededIDAuthorize({
                     fromTemplateId: neg.fromTemplateId!,
                     sessionId: neg.id,
                     // @ts-ignore FIXME
@@ -179,13 +181,20 @@ export class MyAgent {
                     subjectId: neg.subjectId,
                     id: uuid(),
                 })
+
             }
         })
 
         authorizer.completedIssueHook.on((result) => {
+
+            eventHook.fire(IDIssuingCompleted({
+                negotiationId: result.sessionId,
+                result: result.result,
+            }))
+
             const neg = stageMgr.state.authorizeNegotiations.find(n => n.id === result.sessionId);
             if (neg && result.result === AuthorizeNegotiationResult.Succeeded) {
-                stageMgr.addAuthorization({
+                stageMgr.addSucceededIDAuthorize({
                     fromTemplateId: neg.fromTemplateId!,
                     sessionId: neg.id,
                     // @ts-ignore FIXME
@@ -198,10 +207,6 @@ export class MyAgent {
                     id: uuid(),
                 })
 
-                eventHook.fire(IDIssuingCompleted({
-                    negotiationId: result.sessionId,
-                    result: result.result,
-                }))
             }
         })
 
@@ -382,7 +387,18 @@ export class MyAgent {
         this.eventHook.on((event) => {
             switch (event.type) {
                 case "IDIssuingCompleted":
+                    const neg = this.stateMgr.state.authorizeNegotiations.find(n => n.id === event.negotiationId);
+                    if (!!neg) {
+                        this.stateMgr.updateAuthNeg({ ...neg, status: NegStatus.Successful })
 
+                        if (neg.subjectId === this.stateMgr.state.myId) {
+                            return this.stateMgr.addMyAuthorization(AuthorizationFromNeg(neg)!);
+                        } else {
+                            return this.stateMgr.addGivenAuthorization(AuthorizationFromNeg(neg)!);
+                        }
+                    } else {
+                        throw new Error('Completed negotiation could not be found')
+                    }
             }
         })
     }

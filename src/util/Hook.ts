@@ -26,9 +26,13 @@ export class Hook<T> {
         this.listeners.forEach((l) => l(arg));
     }
 
-    public on(listener: Listener<T>): Unsubscribe {
+    public on(listener: Listener<T>, atStart = false): Unsubscribe {
         this.log('register', listener);
-        this.listeners.push(listener);
+        if (atStart) {
+            this.listeners.unshift(listener);
+        } else {
+            this.listeners.push(listener);
+        }
         return () => this.unsubscribe(listener);
     }
 

@@ -3,7 +3,7 @@ import { Hook } from "../../../util/Hook";
 import { AuthorizationTransaction, IDAuthorizeResult } from "../authorization/types";
 import { IIssue } from "./Agent";
 
-const log = debug('oa:verifiee');
+const log = debug('oa:issuee');
 
 /** 
  * The IDIssuee translates domain-level semantics to the underlying IDCredentials
@@ -23,7 +23,7 @@ export class IDIssuee {
 
         log("authorizing session", sessionId);
 
-        const result = await this.agent.requestIssue(subjectId, {
+        const result = await this.agent.requestIssue(authorizerId, {
             credentials: this.translateToIDCredentials(transaction),
             meta: sessionId,
             issuerId: authorizerId,
