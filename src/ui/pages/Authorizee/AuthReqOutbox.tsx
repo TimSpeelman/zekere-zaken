@@ -10,10 +10,11 @@ import { authText, reqText } from "../../../util/intl";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { selectMyAuthorizations } from "../../selectors/selectMyAuthorizations";
+import { selectOpenAuthTemplates } from "../../selectors/selectOpenAuthTemplates";
 
 export function AuthReqOutbox() {
     const { state } = useLocalState();
-    const templates = state.outgoingAuthTemplates;
+    const templates = useSelector(selectOpenAuthTemplates) || [];
     const auths = useSelector(selectMyAuthorizations) || [];
     return (
         <div>

@@ -1,6 +1,6 @@
 import uuid from "uuid";
 import { InvokeIDAuthorize, InvokeIDVerify, NavigateTo, UserCommand } from "../commands/Command";
-import { ANegotiationUpdated, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated } from "../commands/Event";
+import { ANegotiationUpdated, ATemplateAnswered, DomainEvent, IDIssuingCompleted, IDVerifyCompleted, RefResolvedToAuthorize, RefResolvedToVerify, VNegotiationUpdated } from "../commands/Event";
 import { AuthorizationFromNeg } from "../types/State";
 import { selectATransactionById, selectVTransactionById } from "../ui/selectors/selectTransactionById";
 import { failIfFalsy } from "../util/failIfFalsy";
@@ -386,13 +386,29 @@ export class MyAgent {
         })
         this.eventHook.on((event) => {
             switch (event.type) {
+                case "ATemplateAnswered":
+                    const { state } = this.stateMgr;
+                    this.stateMgr.setState({
+                        outgoingAuthTemplates: state.outgoingAuthTemplates
+                            .map(template => template.id !== event.templateId ? template :
+                                { ...template, answeredWithAuthorizationId: event.authorizationId })
+                    })
+                    break;
                 case "IDIssuingCompleted":
                     const neg = this.stateMgr.state.authorizeNegotiations.find(n => n.id === event.negotiationId);
                     if (!!neg) {
-                        this.stateMgr.updateAuthNeg({ ...neg, status: NegStatus.Successful })
 
                         if (neg.subjectId === this.stateMgr.state.myId) {
-                            return this.stateMgr.addMyAuthorization(AuthorizationFromNeg(neg)!);
+
+                            this.stateMgr.addMyAuthorization(AuthorizationFromNeg(neg)!);
+
+                            if (neg.fromTemplateId) {
+                                this.eventHook.fire(ATemplateAnswered({
+                                    templateId: neg.fromTemplateId,
+                                    authorizationId: neg.id
+                                }))
+                            }
+
                         } else {
                             return this.stateMgr.addGivenAuthorization(AuthorizationFromNeg(neg)!);
                         }

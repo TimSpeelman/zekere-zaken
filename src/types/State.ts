@@ -66,6 +66,7 @@ export interface AuthorizationTemplate {
     legalEntity?: LegalEntity;
     authority: Authority;
     datetime: string;
+    answeredWithAuthorizationId?: string;
 }
 
 /** Derived from ANeg */

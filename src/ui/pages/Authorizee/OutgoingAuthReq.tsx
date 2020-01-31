@@ -1,8 +1,8 @@
-import { IconButton } from "@material-ui/core";
+import { IconButton, List, ListItem } from "@material-ui/core";
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import DeleteIcon from '@material-ui/icons/Delete';
-import { default as React } from "react";
+import { default as React, useEffect } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { AuthorityCard } from "../../components/AuthorityCard";
@@ -18,6 +18,12 @@ export function OutgoingAuthReq() {
 
     const { getURL, getWhatsappURL } = useWhatsappURL();
 
+    useEffect(() => {
+        if (template?.answeredWithAuthorizationId) {
+            window.location.assign(`#/my-authorizations/${template!.answeredWithAuthorizationId}`);
+        }
+    }, [template])
+
     const deleteItem = () => {
         if (template) {
             manager.removeOutAuthTemplate(template.id);
@@ -26,13 +32,12 @@ export function OutgoingAuthReq() {
     }
 
     return !template ? <div>Dit verzoek bestaat niet</div> : (
-        <div>
-            {/* <Box p={1}></Box> */}
-            <Box pt={1} pb={1}>
-                <p>Deel de volgende link om uw bevoegdheid aan te vragen.</p>
-            </Box>
-
+        <Box pt={3}>
             <AuthorityCard title={"Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} />
+
+            <List >
+                <ListItem disabled>Dit verzoek is nog niet beantwoord.</ListItem>
+            </List>
 
             <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>
@@ -41,6 +46,6 @@ export function OutgoingAuthReq() {
                     <Button variant={"contained"} color={"primary"} component="a" href={getWhatsappURL(template)} target='_blank' >Delen via Whatsapp</Button>
                 </CopyToClipboard>
             </FormActions>
-        </div>
+        </Box>
     );
 }
