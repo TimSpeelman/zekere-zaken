@@ -82,8 +82,8 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
         return <LoadingScreen />
     }
 
-    if (!state.profile && props.location.pathname !== "/onboard") {
-        return <Redirect to={"/onboard"} />
+    if (!state.profile && !props.location.pathname.startsWith("/onboard")) {
+        return <Redirect to={"/onboard/" + encodeURIComponent(props.location.pathname)} />
     }
 
     return (
@@ -113,6 +113,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
             <MyRoute title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId"><IncomingAuthReq /></MyRoute>
             <MyRoute title="Machtigingen" path="/authreqs/inbox"><AuthReqInbox /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/home"><Home /></MyRoute>
+            <MyRoute title="Zekere Zaken App" path="/onboard/:redirectTo"><Onboard /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
             <MyRoute title="" path="/"><Cover /></MyRoute>
         </Switch>

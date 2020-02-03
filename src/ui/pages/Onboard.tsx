@@ -1,6 +1,7 @@
 import { Box, Button, FormControl, InputLabel, Paper, TextField } from "@material-ui/core";
 import imageCompression from "browser-image-compression";
 import { default as React, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useStyles } from "../../styles";
 import { AspectRatio } from "../components/AspectRatio";
 import { FormActions } from "../components/FormActions";
@@ -11,6 +12,7 @@ const reader2 = new FileReader();
 
 export function Onboard() {
 
+    const { redirectTo } = useParams();
     const [name, setName] = useState("");
     const [photo, setPhoto] = useState(localStorage.getItem("photo"));
     const { manager } = useLocalState();
@@ -43,7 +45,7 @@ export function Onboard() {
     const handleSubmit = () => {
         if (canSubmit && photo && name) {
             manager.setMyProfile({ photo, name })
-            window.location.assign(`#/home`);
+            window.location.assign(redirectTo ? `#${decodeURIComponent(redirectTo)}` : `#/home`);
         }
     };
 
