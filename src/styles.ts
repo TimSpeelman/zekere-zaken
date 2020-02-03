@@ -112,6 +112,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "column",
+        color: "white",
     },
     warning: {
         color: "red",

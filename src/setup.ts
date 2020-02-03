@@ -8,6 +8,7 @@ import { LocalStorageJSONCache } from "./util/Cache";
 
 export interface Deps {
     myId: string;
+    kicked: boolean;
 }
 
 const localS = new LocalStorageJSONCache();
@@ -19,8 +20,10 @@ export const gateway = new MyAgent(socketAgent, stateManager);
 export function useDependenciesAfterSetup(): Deps | undefined {
 
     const [myId, setMyId] = useState("");
+    const [kicked, setKicked] = useState(false);
 
     useEffect(() => {
+        SocketConnection.on("kick", () => setKicked(true));
         gateway.connect().then((me) => {
             setMyId(me.id);
 
@@ -33,6 +36,6 @@ export function useDependenciesAfterSetup(): Deps | undefined {
     }, []);
 
     return !!myId ? {
-        myId
+        myId, kicked
     } : undefined;
 }

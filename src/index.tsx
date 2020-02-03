@@ -8,12 +8,15 @@ import { App } from "./ui/App";
 import "./ui/assets/css/index.css";
 import { CommandContextProvider } from "./ui/hooks/useCommand";
 import { LocalStateContextProvider } from "./ui/hooks/useLocalState";
+import { Kicked } from "./ui/pages/Kicked";
 import { LoadingScreen } from "./ui/pages/LoadingScreen";
 
 function WrappedApp() {
     const deps = useDependenciesAfterSetup();
 
-    return !deps ? <LoadingScreen /> : (
+    if (!deps) return <LoadingScreen />;
+    if (deps.kicked) return <Kicked />;
+    return (
 
         <LocalStateContextProvider stateMgr={stateManager}>
             <CommandContextProvider dispatch={(a) => gateway.dispatch(a)}>

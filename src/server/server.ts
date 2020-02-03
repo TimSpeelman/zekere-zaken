@@ -25,12 +25,24 @@ if (USE_HTTPS) {
 const peers: Dict<socket.Socket> = {};
 
 server.on("connection", function (peer) {
+
+    // If a peer tries to reconnect it should pass a token
     const token = peer.handshake.query.token;
     const id = tokenIsValid(token) ? token : uuid();
+    const isNew = !(id in peers);
+
+    // We first try to disconnect the previous session
+    if (!isNew) {
+        try {
+            peers[id].emit("kick");
+        } catch (e) {
+            console.log("Failed to kick", id);
+        }
+    }
 
     peers[id] = peer;
 
-    console.log(`Connected new peer with ID:`, id);
+    console.log(`${new Date().toISOString()}: ${isNew ? "Connected" : "Reconnected"}. IP=${peer.handshake.address} | ID=${id}`);
 
     peer.emit("id", id);
 
