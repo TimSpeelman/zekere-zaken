@@ -3,7 +3,7 @@ import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import React, { useEffect, useState } from 'react';
 import QrReader from "react-qr-reader";
-import { FormActions } from "../components/FormActions";
+import { FormActions } from "../../components/FormActions";
 
 interface Props {
     onScanQR: (qr: string) => boolean;

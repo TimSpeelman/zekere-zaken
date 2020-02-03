@@ -1,8 +1,8 @@
 import { Box, Button, Divider } from "@material-ui/core";
 import { default as React } from "react";
-import { ClearCache, ToggleConsole } from "../../commands/Command";
-import { useCommand } from "../hooks/useCommand";
-import { useLocalState } from "../hooks/useLocalState";
+import { ClearCache, ToggleConsole } from "../../../commands/Command";
+import { useCommand } from "../../hooks/useCommand";
+import { useLocalState } from "../../hooks/useLocalState";
 
 export function Settings() {
     const { dispatch } = useCommand();

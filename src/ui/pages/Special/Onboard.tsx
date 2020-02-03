@@ -2,10 +2,10 @@ import { Box, Button, FormControl, InputLabel, Paper, TextField } from "@materia
 import imageCompression from "browser-image-compression";
 import { default as React, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useStyles } from "../../styles";
-import { AspectRatio } from "../components/AspectRatio";
-import { FormActions } from "../components/FormActions";
-import { useLocalState } from "../hooks/useLocalState";
+import { useStyles } from "../../../styles";
+import { AspectRatio } from "../../components/AspectRatio";
+import { FormActions } from "../../components/FormActions";
+import { useLocalState } from "../../hooks/useLocalState";
 
 const reader = new FileReader();
 const reader2 = new FileReader();

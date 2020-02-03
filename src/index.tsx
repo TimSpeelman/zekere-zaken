@@ -8,8 +8,8 @@ import { App } from "./ui/App";
 import "./ui/assets/css/index.css";
 import { CommandContextProvider } from "./ui/hooks/useCommand";
 import { LocalStateContextProvider } from "./ui/hooks/useLocalState";
-import { Kicked } from "./ui/pages/Kicked";
-import { LoadingScreen } from "./ui/pages/LoadingScreen";
+import { Kicked } from "./ui/pages/Special/Kicked";
+import { LoadingScreen } from "./ui/pages/Special/LoadingScreen";
 
 function WrappedApp() {
     const deps = useDependenciesAfterSetup();

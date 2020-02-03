@@ -1,8 +1,8 @@
 import { Button, Typography } from "@material-ui/core";
 import Box from '@material-ui/core/Box';
 import { default as React } from "react";
-import { useStyles } from "../../styles";
-import { useLocalState } from "../hooks/useLocalState";
+import { useStyles } from "../../../styles";
+import { useLocalState } from "../../hooks/useLocalState";
 
 export function Kicked() {
     const classes = useStyles({});
