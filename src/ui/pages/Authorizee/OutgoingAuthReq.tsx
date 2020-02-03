@@ -33,10 +33,10 @@ export function OutgoingAuthReq() {
 
     return !template ? <div>Dit verzoek bestaat niet</div> : (
         <Box pt={3}>
-            <AuthorityCard title={"Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} />
+            <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} />
 
             <List >
-                <ListItem disabled>Dit verzoek is nog niet beantwoord.</ListItem>
+                <ListItem disabled>Dit verzoek is nog niet beantwoord. Deel dit verzoek via Whatsapp met een bevoegd persoon, om u te laten machtigen.</ListItem>
             </List>
 
             <FormActions>

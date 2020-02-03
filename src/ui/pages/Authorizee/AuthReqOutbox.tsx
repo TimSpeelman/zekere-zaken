@@ -20,7 +20,7 @@ export function AuthReqOutbox() {
         <div>
 
             <List component="nav" >
-                <ListSubheader>Actuele Bevoegdheden</ListSubheader>
+                <ListSubheader>Mijn Actuele Bevoegdheden</ListSubheader>
                 {auths.length === 0 ?
                     <div>
                         <ListItem disabled>U heeft nog geen bevoegdheden.</ListItem>
@@ -44,7 +44,7 @@ export function AuthReqOutbox() {
                     <Button variant="outlined" component="a" href="#/authreqs/new">Bevoegdheid Aanvragen</Button>
                 </Box>
 
-                <ListSubheader>Openstaande Verzoeken</ListSubheader>
+                <ListSubheader>Mijn Onbeantwoorde Aanvragen</ListSubheader>
                 {templates.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
                 {templates.map(req => (
                     <ListItem button key={req.id} component="a" href={`#/authreqs/outbox/${req.id}`}>
