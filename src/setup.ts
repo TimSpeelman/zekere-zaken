@@ -10,7 +10,9 @@ export interface Deps {
     myId: string;
 }
 
-export const stateManager = new StateManager(new LocalStorageJSONCache());
+const localS = new LocalStorageJSONCache();
+export const stateManager = new StateManager(localS, localS);
+
 export const socketAgent = new SockAgent(SocketConnection);
 export const gateway = new MyAgent(socketAgent, stateManager);
 
@@ -23,7 +25,10 @@ export function useDependenciesAfterSetup(): Deps | undefined {
             setMyId(me.id);
 
             // For demo purposes, we use a dummy state to prefill the app.
-            stateManager.setState(dummyState(me.id))
+            if (!stateManager.usedCache) {
+                console.log("Using dummy state");
+                stateManager.setState(dummyState(me.id))
+            }
         });
     }, []);
 

@@ -141,7 +141,7 @@ export function createIDAgent(
 }
 
 export function createMyAgent(idAgent: Agent): [MyAgent, StateManager] {
-    const smgr = new StateManager(new InMemoryCache());
+    const smgr = new StateManager(new InMemoryCache(), new InMemoryCache());
     const agent = new MyAgent(idAgent, smgr);
     return [agent, smgr];
 }
