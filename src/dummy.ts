@@ -47,8 +47,8 @@ export const dummyState = (myId: string): IState => {
         outgoingAuthTemplates: [],
         outgoingVerifTemplates: [],
         profiles: {
-            jan: Jan,
-            piet: Piet,
+            jan: { status: "Verified", profile: Jan },
+            piet: { status: "Verified", profile: Piet },
         },
         succeededIDAuthorize: [],
     };

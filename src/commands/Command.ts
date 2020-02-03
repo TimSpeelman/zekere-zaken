@@ -1,14 +1,14 @@
 import { AuthorizationTransaction } from "../services/identity/authorization/types";
 import { VerificationTransaction } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
-import { AuthorizationTemplate, LegalEntity, Profile, VerificationTemplate } from "../types/State";
+import { AuthorizationTemplate, LegalEntity, VerificationTemplate } from "../types/State";
 
 export type UserCommand =
+    CmdVerifyProfile |
     CmdClearCache |
     CmdToggleConsole |
     CmdNavigateTo |
     CmdResolveReference |
-    CmdAddProfile |
     CmdCreateVReqTemplate |
     CmdRemoveVReqTemplate |
     CmdCreateAReqTemplate |
@@ -23,6 +23,14 @@ export type UserCommand =
 
 // @ts-ignore
 export const factory = <T extends { type: string }>(type: T["type"]) => (req: Omit<T, "type">): T => ({ ...req, type })
+
+export interface CmdVerifyProfile {
+    type: "VerifyProfile",
+    peerId: string,
+}
+
+export const VerifyProfile =
+    factory<CmdVerifyProfile>("VerifyProfile");
 
 export interface CmdClearCache {
     type: "ClearCache",
@@ -54,16 +62,6 @@ export interface CmdResolveReference {
 
 export const ResolveReference =
     factory<CmdResolveReference>("ResolveReference");
-
-
-export interface CmdAddProfile {
-    type: "AddProfile",
-    peerId: string,
-    profile: Profile,
-}
-
-export const AddProfile =
-    factory<CmdAddProfile>("AddProfile");
 
 
 export interface CmdCreateVReqTemplate {

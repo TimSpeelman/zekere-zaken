@@ -18,7 +18,7 @@ import { useSelector } from "../../hooks/useSelector";
 import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
 import { selectOpenInVerReqById } from "../../selectors/selectOpenInVerReqs";
-import { selectProfileById } from "../../selectors/selectProfile";
+import { selectProfileStatusById } from "../../selectors/selectProfile";
 
 export function IncomingVerifReq() {
     console.log("Render");
@@ -28,7 +28,7 @@ export function IncomingVerifReq() {
     const classes = useStyles({});
 
     const inVReq = useSelector(id ? selectOpenInVerReqById(id) : undefined);
-    const profile = useSelector(inVReq ? selectProfileById(inVReq.verifierId) : undefined);
+    const profileResult = useSelector(inVReq ? selectProfileStatusById(inVReq.verifierId) : undefined);
     const auths = useSelector(inVReq ? selectMatchingAuthorizations({ legalEntity: inVReq.legalEntity!, authority: inVReq.authority }) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
@@ -51,57 +51,69 @@ export function IncomingVerifReq() {
         }
     }
 
-    return !inVReq ? <div>Dit verzoek bestaat niet.</div> :
-        !profile ? <div>Wacht op profiel van Verifier..</div> : (
-            <div>
-                <Box p={1}></Box>
+    if (!inVReq) {
+        return <Box p={3}>Dit verzoek bestaat niet.</Box>
+    }
 
-                <PersonCard profile={profile!} />
+    if (!profileResult || profileResult?.status === "Failed") {
+        return <Box p={3}>Er ging iets fout bij het laden van het profiel.</Box>
+    }
 
-                <Box pt={1} pb={1}>
-                    <p><strong>{profile!.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
-                </Box>
+    if (profileResult.status === "Verifying") {
+        return <Box p={3}>We laden even het profiel van deze gebruiker..</Box>
+    }
 
-                <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} />
+    const profile = profileResult.profile;
 
-                {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
-                    <Fragment>
-                        <Box pt={1} pb={1} className={classes.warning}>
-                            <p>Deze bevoegdheid zit niet in uw wallet. </p>
-                        </Box>
-                        <FormActions>
-                            <Button component="a" href="#/home">Annuleren</Button>
-                            <Button variant={"contained"} color={"primary"} component="a"
-                                onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
-                        </FormActions>
-                    </Fragment>
-                }
+    return (
+        <div>
 
-                {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
-                    <Fragment>
-                        <Box pt={1} pb={1} >
-                            <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
-                            <List component="nav" >
-                                {entities.map(entity =>
-                                    <ListItem key={entity.name}>
-                                        <ListItemText primary={entityTxt(entity)} secondary={authorizedMark()} />
-                                        <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
-                                    </ListItem>
-                                )}
-                            </List>
-                        </Box>
-                        <FormActions>
-                            <Button component="a" href="#/home">Annuleren</Button>
-                            <CopyToClipboard text={getURL(authTemplate)} >
-                                <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
-                                    component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
-                            </CopyToClipboard>
-                        </FormActions>
-                    </Fragment>
-                }
+            <PersonCard profile={profile} />
 
-            </div>
-        );
+            <Box pt={1} pb={1}>
+                <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
+            </Box>
+
+            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} />
+
+            {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
+                <Fragment>
+                    <Box pt={1} pb={1} className={classes.warning}>
+                        <p>Deze bevoegdheid zit niet in uw wallet. </p>
+                    </Box>
+                    <FormActions>
+                        <Button component="a" href="#/home">Annuleren</Button>
+                        <Button variant={"contained"} color={"primary"} component="a"
+                            onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
+                    </FormActions>
+                </Fragment>
+            }
+
+            {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
+                <Fragment>
+                    <Box pt={1} pb={1} >
+                        <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
+                        <List component="nav" >
+                            {entities.map(entity =>
+                                <ListItem key={entity.name}>
+                                    <ListItemText primary={entityTxt(entity)} secondary={authorizedMark()} />
+                                    <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
+                                </ListItem>
+                            )}
+                        </List>
+                    </Box>
+                    <FormActions>
+                        <Button component="a" href="#/home">Annuleren</Button>
+                        <CopyToClipboard text={getURL(authTemplate)} >
+                            <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
+                                component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
+                        </CopyToClipboard>
+                    </FormActions>
+                </Fragment>
+            }
+
+        </div>
+    );
 }
 
 function entityTxt(entity: LegalEntity) {

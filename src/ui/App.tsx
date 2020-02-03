@@ -90,7 +90,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
     return (
         <Switch>
             <MyRoute title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
-            <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference"><div>Resolving reference..</div></MyRoute>
+            <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference" backURI={home}><div>Resolving reference..</div></MyRoute>
             <MyRoute title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference" backURI={home}><ReqHandler /></MyRoute>
 

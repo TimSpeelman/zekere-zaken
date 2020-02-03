@@ -42,8 +42,9 @@ export class StateManager {
         verifyNegotiations: [],
     }
 
-    setState(state: Partial<IState>) {
-        this._state = { ...this._state, ...state, };
+    setState(state: Partial<IState> | ((state: IState) => Partial<IState>)) {
+        const newState = typeof state === "function" ? state(this._state) : state;
+        this._state = { ...this._state, ...newState, };
         this.hook.fire(this._state);
         this.stateCache.set("state", { SCHEMA_VERSION, ...this._state });
     }
@@ -55,10 +56,6 @@ export class StateManager {
     setMyProfile(profile: Profile) {
         this.myProfileCache.set("profile", profile);
         this.setState({ profile });
-    }
-
-    addProfile(peerId: string, profile: Profile) {
-        this.setState({ profiles: { ...this.state.profiles, [peerId]: profile } });
     }
 
     addSucceededIDVerify(verified: SucceededIDVerify) {

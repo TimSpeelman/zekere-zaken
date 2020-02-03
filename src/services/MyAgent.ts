@@ -30,7 +30,7 @@ export class MyAgent {
         const messenger = new Messenger<Msg>(agent);
         this.messenger = messenger;
 
-        new ProfileExchangeMiddleware(this.commandHook, this.stateMgr, messenger).setup();
+        new ProfileExchangeMiddleware(this.eventHook, this.commandHook, this.stateMgr, messenger).setup();
 
         new ReferenceMiddleware(messenger, this.commandHook).setup();
 

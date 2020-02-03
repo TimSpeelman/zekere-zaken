@@ -16,7 +16,10 @@ export function AuthReqInbox() {
     const { state } = useLocalState();
     const reqs = useSelector(selectOpenInAuthReqs) || [];
     const given = useSelector(selectGivenAuthorizations) || [];
-    const getProfile = (subjectId: string) => state.profiles[subjectId];
+    const getProfile = (subjectId: string) => {
+        const p = state.profiles[subjectId];
+        return (p && p.status === "Verified") ? p.profile : undefined;
+    }
 
     return (
         <div>

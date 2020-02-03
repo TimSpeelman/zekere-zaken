@@ -1,4 +1,5 @@
-import { AddProfile, UserCommand } from "../../commands/Command";
+import { UserCommand } from "../../commands/Command";
+import { DomainEvent, ProfileRequested, ProfileVerificationFailed, ProfileVerified } from "../../commands/Event";
 import { Hook } from "../../util/Hook";
 import { ProfileExchanger } from "../identity/profiles/ProfileExchanger";
 import { Messenger } from "../messaging/Messenger";
@@ -8,6 +9,7 @@ import { StateManager } from "../state/StateManager";
 export class ProfileExchangeMiddleware {
 
     constructor(
+        private eventHook: Hook<DomainEvent>,
         private commandHook: Hook<UserCommand>,
         private stateMgr: StateManager,
         private messenger: Messenger<Msg>,
@@ -18,12 +20,23 @@ export class ProfileExchangeMiddleware {
         const profileEx = new ProfileExchanger(this.messenger, () => this.stateMgr.state.profile!);
         this.messenger.addRecipient(profileEx);
 
-        // FIXME: For now we send our profile to every peer who sends us a message
-        this.messenger.addHandler((env) => { profileEx.sendProfileToPeer(env.senderId); return false });
+        this.commandHook.on((command) => {
+            if (command.type === "VerifyProfile") {
+                if (!(command.peerId in this.stateMgr.state.profiles)) {
+                    profileEx.requestProfileFromPeer(command.peerId);
+                }
+            }
+        })
 
         // Save profiles after they have been verified
-        profileEx.verifiedProfileHook.on(({ peerId, profile }) =>
-            this.commandHook.fire(AddProfile({ peerId, profile })));
+        profileEx.verifiedProfileHook.on(({ peerId, result }) => {
+            switch (result.status) {
+                case "Verifying": return this.eventHook.fire(ProfileRequested({ peerId }));
+                case "Verified": return this.eventHook.fire(ProfileVerified({ peerId, profile: result.profile }));
+                case "Failed": return this.eventHook.fire(ProfileVerificationFailed({ peerId }));
+            }
+        });
+
     }
 
 }

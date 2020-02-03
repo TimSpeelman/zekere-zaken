@@ -33,7 +33,7 @@ export interface IState {
     profile?: Profile;
 
     /** Profiles of other users (indexed by PeerID) */
-    profiles: Dict<Profile>;
+    profiles: Dict<ProfileResult>;
 }
 
 /** For Verifier. Templates to verify one or more subjects. */
@@ -145,7 +145,14 @@ export enum KVKAuthorityType {
     Onderhoud = "Onderhoud",
 }
 
+export type ProfileResult =
+    { status: "Verifying" } |
+    { status: "Failed" } |
+    { status: "Verified", profile: Profile };
+
 export interface Profile {
     name: string;
     photo: string;
 }
+
+

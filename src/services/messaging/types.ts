@@ -15,6 +15,7 @@ export type Msg =
     AuthorizationMessage |
 
     MsgResolveReference |
+    MsgRequestProfile |
     MsgProfile;
 
 export interface MsgResolveReference {
@@ -25,6 +26,10 @@ export interface MsgResolveReference {
 export interface MsgProfile {
     type: "Profile";
     profile: Profile;
+}
+
+export interface MsgRequestProfile {
+    type: "RequestProfile";
 }
 
 export interface IHandleMessages<MessageType> {

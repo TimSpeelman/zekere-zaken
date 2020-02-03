@@ -1,8 +1,12 @@
 import { AuthorizationTransaction, AuthorizeNegotiation, AuthorizeNegotiationResult } from "../services/identity/authorization/types";
 import { VerificationTransaction, VerifyNegotiation, VerifyNegotiationResult } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
+import { Profile } from "../types/State";
 
 export type DomainEvent =
+    EventProfileRequested |
+    EventProfileVerified |
+    EventProfileVerificationFailed |
     EventRefResolvedToVerify |
     EventRefResolvedToAuthorize |
     EventVTemplateAnswered |
@@ -129,4 +133,29 @@ export interface EventAInReqAnswered {
 
 export const AInReqAnswered =
     factory<EventAInReqAnswered>("AInReqAnswered");
+
+export interface EventProfileVerified {
+    type: "ProfileVerified",
+    peerId: string,
+    profile: Profile,
+}
+
+export const ProfileVerified =
+    factory<EventProfileVerified>("ProfileVerified");
+
+export interface EventProfileRequested {
+    type: "ProfileRequested",
+    peerId: string,
+}
+
+export const ProfileRequested =
+    factory<EventProfileRequested>("ProfileRequested");
+
+export interface EventProfileVerificationFailed {
+    type: "ProfileVerificationFailed",
+    peerId: string,
+}
+
+export const ProfileVerificationFailed =
+    factory<EventProfileVerificationFailed>("ProfileVerificationFailed");
 

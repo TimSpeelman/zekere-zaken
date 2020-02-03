@@ -18,8 +18,6 @@ export class StateMiddleware {
     setup() {
         this.commandHook.on((command) => {
             switch (command.type) {
-                case "AddProfile":
-                    return this.stateMgr.addProfile(command.peerId, command.profile);
                 case "CreateVReqTemplate":
                     return this.stateMgr.addOutVerifTemplate(command.template);
                 case "RemoveVReqTemplate":
@@ -34,6 +32,13 @@ export class StateMiddleware {
         })
         this.eventHook.on((event) => {
             switch (event.type) {
+                case "ProfileVerified":
+                    return this.stateMgr.setState((s) => ({ profiles: { ...s.profiles, [event.peerId]: { status: "Verified", profile: event.profile } } }));
+                case "ProfileRequested":
+                    return this.stateMgr.setState((s) => ({ profiles: { ...s.profiles, [event.peerId]: { status: "Verifying" } } }));
+                case "ProfileVerificationFailed":
+                    return this.stateMgr.setState((s) => ({ profiles: { ...s.profiles, [event.peerId]: { status: "Failed" } } }));
+
                 case "VNegotiationUpdated": {
                     this.stateMgr.updateVerifyNeg(event.negotiation);
                     break;

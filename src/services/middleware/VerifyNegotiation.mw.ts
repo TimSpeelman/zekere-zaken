@@ -1,4 +1,4 @@
-import { InvokeIDVerify, UserCommand } from "../../commands/Command";
+import { InvokeIDVerify, UserCommand, VerifyProfile } from "../../commands/Command";
 import { DomainEvent, RefResolvedToVerify, VNegotiationUpdated, VTemplateAnswered } from "../../commands/Event";
 import { failIfFalsy } from "../../util/failIfFalsy";
 import { Hook } from "../../util/Hook";
@@ -28,6 +28,9 @@ export class VerifyNegotiationMiddleware {
         negHook.on((negotiation) => {
             const isNew = !this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === negotiation.sessionId);
 
+            // FIXME
+            this.commandHook.fire(VerifyProfile({ peerId: negotiation.verifierId }));
+            this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
             this.eventHook.fire(VNegotiationUpdated({ negotiation }))
 
             if (isNew && negotiation.fromReference) {
