@@ -5,7 +5,7 @@ import { VerifyNegotiationResult } from "../../src/services/identity/verificatio
 import { MyAgent } from "../../src/services/MyAgent";
 import { StateManager } from "../../src/services/state/StateManager";
 import { Authority, KVKAuthorityType, LegalEntity } from "../../src/types/State";
-import { InMemoryCache } from "../../src/util/Cache";
+import { InMemoryKeyValueStore } from "../../src/util/Cache";
 import { Hook } from "../../src/util/Hook";
 
 export function mockIDPair(idA: string, idB: string) {
@@ -141,7 +141,7 @@ export function createIDAgent(
 }
 
 export function createMyAgent(idAgent: Agent): [MyAgent, StateManager] {
-    const smgr = new StateManager(new InMemoryCache(), new InMemoryCache());
+    const smgr = new StateManager(new InMemoryKeyValueStore(), new InMemoryKeyValueStore());
     const agent = new MyAgent(idAgent, smgr);
     return [agent, smgr];
 }

@@ -4,14 +4,14 @@ import { SockAgent } from "./services/identity/id-layer/SockAgent";
 import { MyAgent } from "./services/MyAgent";
 import { SocketConnection } from "./services/socket";
 import { StateManager } from "./services/state/StateManager";
-import { LocalStorageJSONCache } from "./util/Cache";
+import { LocalStorageKeyValueStore } from "./util/Cache";
 
 export interface Deps {
     myId: string;
     kicked: boolean;
 }
 
-const localS = new LocalStorageJSONCache();
+const localS = new LocalStorageKeyValueStore();
 export const stateManager = new StateManager(localS, localS);
 
 export const socketAgent = new SockAgent(SocketConnection);

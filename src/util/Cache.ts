@@ -1,33 +1,51 @@
-import { Dict } from "../types/Dict";
 
-export interface Cache<T> {
+export interface IValueStore<T> {
+    set: (value: T) => void,
+    get: () => T | undefined,
+    remove: () => void,
+}
+
+export interface IKeyValueStore<T> {
     set: (key: string, value: T) => void,
     get: (key: string) => T | undefined,
     remove: (key: string) => void,
 }
 
-export class LocalStorageJSONCache<T> implements Cache<T>{
-    set(key: string, value: T) {
-        localStorage.setItem(key, JSON.stringify(value));
+export class LocalStorageValueStore<T> implements IValueStore<T>{
+    constructor(private key: string) { }
+    set = (value: T) => {
+        localStorage.setItem(this.key, JSON.stringify(value));
     }
-    get(key: string) {
-        const d = localStorage.getItem(key);
+    get = () => {
+        const d = localStorage.getItem(this.key);
         return d && JSON.parse(d);
     }
-    remove(key: string) {
-        localStorage.removeItem(key);
+    remove = () => {
+        localStorage.removeItem(this.key);
     }
 }
 
-export class InMemoryCache<T> implements Cache<T>{
-    private data: Dict<T> = {};
-    set(key: string, value: T) {
-        this.data[key] = value;
+export class LocalStorageKeyValueStore<T> implements IKeyValueStore<T>{
+    set = (key: string, value: T) => new LocalStorageValueStore(key).set(value);
+    get = (key: string) => new LocalStorageValueStore(key).get();
+    remove = (key: string) => new LocalStorageValueStore(key).remove();
+}
+
+export class InMemoryValueStore<T> implements IValueStore<T>{
+    private value?: T = undefined;
+    set = (value: T) => {
+        this.value = value;
     }
-    get(key: string) {
-        return this.data[key];
+    get = () => {
+        return this.value;
     }
-    remove(key: string) {
-        delete this.data[key];
+    remove() {
+        this.value = undefined;
     }
+}
+
+export class InMemoryKeyValueStore<T> implements IKeyValueStore<T>{
+    set = (key: string, value: T) => new LocalStorageValueStore(key).set(value);
+    get = (key: string) => new LocalStorageValueStore(key).get();
+    remove = (key: string) => new LocalStorageValueStore(key).remove();
 }
