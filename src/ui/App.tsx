@@ -20,6 +20,7 @@ import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
 import { LoadingScreen } from "./pages/Special/LoadingScreen";
 import { Onboard } from "./pages/Special/Onboard";
+import { Resolve } from "./pages/Special/Resolve";
 import { ScanQR } from "./pages/Special/ScanQR";
 import { Settings } from "./pages/Special/Settings";
 import { IncomingVerifReq } from "./pages/Verifiee/IncomingVerifReq";
@@ -90,7 +91,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
     return (
         <Switch>
             <MyRoute title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
-            <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference" backURI={home}><div>Resolving reference..</div></MyRoute>
+            <MyRoute title="Verbinden.." path="/resolve/:senderId/:reference" backURI={home}><Resolve /></MyRoute>
             <MyRoute title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference" backURI={home}><ReqHandler /></MyRoute>
 
