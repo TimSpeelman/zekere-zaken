@@ -17,8 +17,13 @@ export class LocalStorageValueStore<T> implements IValueStore<T>{
         localStorage.setItem(this.key, JSON.stringify(value));
     }
     get = () => {
-        const d = localStorage.getItem(this.key);
-        return d && JSON.parse(d);
+        try {
+            const d = localStorage.getItem(this.key);
+            const r = d && JSON.parse(d);
+            return r;
+        } catch (e) {
+            return undefined;
+        }
     }
     remove = () => {
         localStorage.removeItem(this.key);
