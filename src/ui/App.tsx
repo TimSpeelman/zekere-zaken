@@ -28,7 +28,7 @@ import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
 
 
-export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
+export function MyRoute({ title, backURI, ...props }: { title: string, backURI?: string } & RouteProps) {
     const classes = useStyles({});
 
     const body = title === "" ? <Route {...props} /> : (
@@ -45,7 +45,7 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
     return (
         <div className={classes.root}>
             <CssBaseline />
-            {title && <TopBar title={title} />}
+            {title && <TopBar title={title} backURI={backURI} />}
 
             <main className={classes.content}>
                 {body}
@@ -55,7 +55,6 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
 }
 
 export const AppBody = withRouter((props: RouteComponentProps) => {
-    console.log("TCL: AppBody -> props", props)
     const { manager, state } = useLocalState();
     const { dispatch } = useCommand();
 
@@ -86,32 +85,34 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
         return <Redirect to={"/onboard/" + encodeURIComponent(props.location.pathname)} />
     }
 
+    const home = "#/home";
+
     return (
         <Switch>
-            <MyRoute title="Instellingen" path="/settings"><Settings /></MyRoute>
+            <MyRoute title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
             <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference"><div>Resolving reference..</div></MyRoute>
-            <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
-            <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference"><ReqHandler /></MyRoute>
+            <MyRoute title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
+            <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference" backURI={home}><ReqHandler /></MyRoute>
 
             {/* Verifiers */}
-            <MyRoute title="Verifiëren" path="/verifs/new"><NewVerification /></MyRoute>
-            <MyRoute title="Verifiëren" path="/verifs/outbox/:reqId"><OutgoingVerifReq /></MyRoute>
-            <MyRoute title="Verificatiegeschiedenis" path="/verifs/outbox"><VerifReqOutbox /></MyRoute>
+            <MyRoute title="Verifiëren" path="/verifs/new" backURI={home}><NewVerification /></MyRoute>
+            <MyRoute title="Verifiëren" path="/verifs/outbox/:reqId" backURI={home}><OutgoingVerifReq /></MyRoute>
+            <MyRoute title="Verificatiegeschiedenis" path="/verifs/outbox" backURI={home}><VerifReqOutbox /></MyRoute>
 
             {/* Subjects */}
-            <MyRoute title="Inkomende Verificate" path="/verifs/inbox/:reqId"><IncomingVerifReq /></MyRoute>
+            <MyRoute title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
             {/* <MyRoute title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
 
-            <MyRoute title="Nieuw Machtigingsverzoek" path="/authreqs/new"><RequestAuthority /></MyRoute>
-            <MyRoute title="Uitgaand Machtigingsverzoek" path="/authreqs/outbox/:reqId"><OutgoingAuthReq /></MyRoute>
-            <MyRoute title="Mijn Bevoegdheden" path="/authreqs/outbox"><AuthReqOutbox /></MyRoute>
-            <MyRoute title="Mijn Bevoegdheid" path="/my-authorizations/:id"><MyAuthorization /></MyRoute>
+            <MyRoute title="Nieuw Machtigingsverzoek" path="/authreqs/new" backURI={home}><RequestAuthority /></MyRoute>
+            <MyRoute title="Uitgaand Machtigingsverzoek" path="/authreqs/outbox/:reqId" backURI={"#/authreqs/outbox"}><OutgoingAuthReq /></MyRoute>
+            <MyRoute title="Mijn Bevoegdheden" path="/authreqs/outbox" backURI={home}><AuthReqOutbox /></MyRoute>
+            <MyRoute title="Mijn Bevoegdheid" path="/my-authorizations/:id" backURI={"#/authreqs/outbox"}><MyAuthorization /></MyRoute>
 
 
             {/* Authorizers */}
-            <MyRoute title="Uitgegeven Machtiging" path="/given-authorizations/:id"><GivenAuthorization /></MyRoute>
-            <MyRoute title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId"><IncomingAuthReq /></MyRoute>
-            <MyRoute title="Machtigingen" path="/authreqs/inbox"><AuthReqInbox /></MyRoute>
+            <MyRoute title="Uitgegeven Machtiging" path="/given-authorizations/:id" backURI={home}><GivenAuthorization /></MyRoute>
+            <MyRoute title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId" backURI={home}><IncomingAuthReq /></MyRoute>
+            <MyRoute title="Machtigingen" path="/authreqs/inbox" backURI={home}><AuthReqInbox /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/home"><Home /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/onboard/:redirectTo"><Onboard /></MyRoute>
             <MyRoute title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
