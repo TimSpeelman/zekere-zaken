@@ -4,6 +4,8 @@ import { BroadcastReference } from "../services/references/types";
 import { AuthorizationTemplate, LegalEntity, Profile, VerificationTemplate } from "../types/State";
 
 export type UserCommand =
+    CmdClearCache |
+    CmdToggleConsole |
     CmdNavigateTo |
     CmdResolveReference |
     CmdAddProfile |
@@ -21,6 +23,20 @@ export type UserCommand =
 
 // @ts-ignore
 export const factory = <T extends { type: string }>(type: T["type"]) => (req: Omit<T, "type">): T => ({ ...req, type })
+
+export interface CmdClearCache {
+    type: "ClearCache",
+}
+
+export const ClearCache =
+    factory<CmdClearCache>("ClearCache");
+
+export interface CmdToggleConsole {
+    type: "ToggleConsole",
+}
+
+export const ToggleConsole =
+    factory<CmdToggleConsole>("ToggleConsole");
 
 export interface CmdNavigateTo {
     type: "NavigateTo",

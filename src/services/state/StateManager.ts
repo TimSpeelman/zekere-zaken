@@ -25,6 +25,10 @@ export class StateManager {
         return this._state;
     }
 
+    public clearCache() {
+        this.stateCache.remove("state");
+    }
+
     private _state: IState = {
         myId: "",
         authorizeNegotiations: [],

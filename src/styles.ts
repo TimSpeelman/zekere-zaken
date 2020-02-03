@@ -85,6 +85,11 @@ const useStyles = makeStyles((theme) => ({
     fixedHeight: {
         height: 240,
     },
+    bottomLeftButton: {
+        position: "absolute",
+        bottom: 32,
+        left: 32,
+    },
     bottomRightButton: {
         position: "absolute",
         bottom: 32,

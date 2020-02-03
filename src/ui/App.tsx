@@ -21,6 +21,7 @@ import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
 import { Onboard } from "./pages/Onboard";
 import { ScanQR } from "./pages/ScanQR";
+import { Settings } from "./pages/Settings";
 import { IncomingVerifReq } from "./pages/Verifiee/IncomingVerifReq";
 import { NewVerification } from "./pages/Verifier/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
@@ -78,6 +79,7 @@ export const AppBody: React.FC = () => {
 
     return !isConnected ? <div>Connecting to ID Gateway</div> : (
         <Switch>
+            <MyRoute title="Instellingen" path="/settings"><Settings /></MyRoute>
             <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference"><div>Resolving reference..</div></MyRoute>
             <MyRoute title="QR-code Scannen" path="/qr"><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference"><ReqHandler /></MyRoute>

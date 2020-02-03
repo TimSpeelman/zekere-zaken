@@ -28,6 +28,8 @@ export class StateMiddleware {
                     return this.stateMgr.addOutAuthTemplate(command.template);
                 case "RemoveAReqTemplate":
                     return this.stateMgr.removeOutAuthTemplate(command.templateId);
+                case "ClearCache":
+                    return this.stateMgr.clearCache();
             }
         })
         this.eventHook.on((event) => {
