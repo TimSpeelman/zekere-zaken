@@ -1,17 +1,26 @@
+import fs from "fs";
 import socket from "socket.io";
 import uuid from "uuid/v4";
 import { Dict } from "../types/Dict";
-import fs from "fs";
+import { requireFromEnv } from "../util/requireFromEnv";
 
-const port = 8080;
-const httpsServer = require('https').createServer({
-  key: fs.readFileSync('/etc/letsencrypt/live/zekerezaken.nl/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/zekerezaken.nl/cert.pem')
-});
+const PORT = requireFromEnv("ZZ_SERVER_PORT");
+const USE_HTTPS = requireFromEnv("ZZ_SERVER_USE_HTTPS") === "1";
+const PATH_TO_KEY = USE_HTTPS ? requireFromEnv("ZZ_PATH_TO_KEY") : "";
+const PATH_TO_CERT = USE_HTTPS ? requireFromEnv("ZZ_PATH_TO_CERT") : "";
 
-const server = socket(httpsServer);
-server.listen(port);
+let server: SocketIO.Server;
 
+if (USE_HTTPS) {
+    const httpsServer = require('https').createServer({
+        key: fs.readFileSync(PATH_TO_KEY),
+        cert: fs.readFileSync(PATH_TO_CERT)
+    });
+    server = socket(httpsServer);
+    httpsServer.listen(PORT);
+} else {
+    server = socket(PORT);
+}
 
 const peers: Dict<socket.Socket> = {};
 
@@ -45,4 +54,4 @@ function tokenIsValid(token: any) {
         token.length > 0;
 }
 
-console.log("Waiting for connections on port", port);
+console.log("Waiting for connections on port", PORT);
