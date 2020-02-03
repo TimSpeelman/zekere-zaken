@@ -8,7 +8,9 @@ const server = socket(port);
 const peers: Dict<socket.Socket> = {};
 
 server.on("connection", function (peer) {
-    const id = uuid();
+    const token = peer.handshake.query.token;
+    const id = tokenIsValid(token) ? token : uuid();
+
     peers[id] = peer;
 
     console.log(`Connected new peer with ID:`, id);
@@ -28,5 +30,11 @@ server.on("connection", function (peer) {
         }
     })
 })
+
+function tokenIsValid(token: any) {
+    return !!token &&
+        (typeof token) === "string" &&
+        token.length > 0;
+}
 
 console.log("Waiting for connections on port", port);
