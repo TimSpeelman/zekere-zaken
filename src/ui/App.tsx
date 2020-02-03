@@ -1,7 +1,7 @@
 import { Container } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import React, { useEffect } from 'react';
-import { HashRouter as Router, Route, RouteProps, Switch, useParams } from "react-router-dom";
+import { HashRouter, Redirect, Route, RouteComponentProps, RouteProps, Switch, useParams, withRouter } from "react-router-dom";
 import { NavigateTo, ResolveReference } from "../commands/Command";
 import { isBroadcastReference } from "../services/references/types";
 import { useStyles } from "../styles";
@@ -9,7 +9,6 @@ import './assets/css/font-awesome.min.css';
 import TopBar from "./components/TopBar";
 import { useCommand } from "./hooks/useCommand";
 import { useLocalState } from "./hooks/useLocalState";
-import { useProfile } from "./hooks/useProfile";
 import { AuthReqOutbox } from "./pages/Authorizee/AuthReqOutbox";
 import { MyAuthorization } from "./pages/Authorizee/MyAuthorization";
 import { OutgoingAuthReq } from "./pages/Authorizee/OutgoingAuthReq";
@@ -19,6 +18,7 @@ import { GivenAuthorization } from "./pages/Authorizer/GivenAuthorization";
 import { IncomingAuthReq } from "./pages/Authorizer/IncomingAuthReq";
 import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
+import { LoadingScreen } from "./pages/LoadingScreen";
 import { Onboard } from "./pages/Onboard";
 import { ScanQR } from "./pages/ScanQR";
 import { Settings } from "./pages/Settings";
@@ -27,7 +27,6 @@ import { NewVerification } from "./pages/Verifier/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
 
-export const App: React.FC = () => <Router><AppBody /></Router>
 
 export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
     const classes = useStyles({});
@@ -55,11 +54,13 @@ export function MyRoute({ title, ...props }: { title: string } & RouteProps) {
     )
 }
 
-export const AppBody: React.FC = () => {
-    const { manager } = useLocalState();
+export const AppBody = withRouter((props: RouteComponentProps) => {
+    console.log("TCL: AppBody -> props", props)
+    const { manager, state } = useLocalState();
     const { dispatch } = useCommand();
-    const { myId } = useProfile();
-    const isConnected = !!myId;
+
+    const isConnected = !!state.myId;
+
 
     const onScanQR = (qr: string) => {
         try {
@@ -77,7 +78,15 @@ export const AppBody: React.FC = () => {
         }
     };
 
-    return !isConnected ? <div>Connecting to ID Gateway</div> : (
+    if (!isConnected) {
+        return <LoadingScreen />
+    }
+
+    if (!state.profile && props.location.pathname !== "/onboard") {
+        return <Redirect to={"/onboard"} />
+    }
+
+    return (
         <Switch>
             <MyRoute title="Instellingen" path="/settings"><Settings /></MyRoute>
             <MyRoute title="Verbinden met peer.." path="/resolve/:senderId/:reference"><div>Resolving reference..</div></MyRoute>
@@ -108,7 +117,7 @@ export const AppBody: React.FC = () => {
             <MyRoute title="" path="/"><Cover /></MyRoute>
         </Switch>
     );
-}
+});
 
 function ReqHandler() {
     const { senderId, reference } = useParams();
@@ -126,3 +135,4 @@ function ReqHandler() {
     }, [senderId, reference, manager]);
     return <div>Momentje..</div>
 }
+export const App = () => <HashRouter><AppBody /></HashRouter>;

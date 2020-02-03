@@ -1,12 +1,13 @@
 import { AuthorizationTemplate } from "../../types/State";
 import { eur } from "../../util/eur";
-import { useProfile } from "./useProfile";
+import { useLocalState } from "./useLocalState";
 
 const url = window.location;
 const baseUrl = `${url.protocol}//${url.host}`;
 
 export function useWhatsappURL() {
-    const { myId } = useProfile();
+    const { state } = useLocalState();
+    const myId = state.myId;
 
     function getURL(template?: AuthorizationTemplate) {
         if (!template) return "";

@@ -8,7 +8,6 @@ import { App } from "./ui/App";
 import "./ui/assets/css/index.css";
 import { CommandContextProvider } from "./ui/hooks/useCommand";
 import { LocalStateContextProvider } from "./ui/hooks/useLocalState";
-import { ProfileContextProvider } from "./ui/hooks/useProfile";
 import { LoadingScreen } from "./ui/pages/LoadingScreen";
 
 function WrappedApp() {
@@ -18,9 +17,7 @@ function WrappedApp() {
 
         <LocalStateContextProvider stateMgr={stateManager}>
             <CommandContextProvider dispatch={(a) => gateway.dispatch(a)}>
-                <ProfileContextProvider myId={deps.myId} myProfile={stateManager.state.profile}>
-                    <App />
-                </ProfileContextProvider>
+                <App />
             </CommandContextProvider>
         </LocalStateContextProvider>
     )

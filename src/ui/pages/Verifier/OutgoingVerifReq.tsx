@@ -16,7 +16,7 @@ import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
-import { useProfile } from "../../hooks/useProfile";
+import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { selectOutVerReqByTemplateId } from "../../selectors/selectOutVerReqs";
 import { selectProfileById } from "../../selectors/selectProfile";
@@ -25,7 +25,8 @@ export function OutgoingVerifReq() {
     const classes = useStyles({});
     const { reqId: id } = useParams();
     const { dispatch } = useCommand();
-    const { myId } = useProfile();
+    const { state } = useLocalState();
+    const myId = state.myId;
 
     const outReq = useSelector(id ? selectOutVerReqByTemplateId(id) : undefined);
     const req = outReq?.template;
