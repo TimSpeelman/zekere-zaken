@@ -82,7 +82,8 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
         return <LoadingScreen />
     }
 
-    if (!state.profile && !props.location.pathname.startsWith("/onboard")) {
+    const currentPath = props.location.pathname;
+    if (!state.profile && !currentPath.startsWith("/onboard") && currentPath !== "/") {
         return <Redirect to={"/onboard/" + encodeURIComponent(props.location.pathname)} />
     }
 
