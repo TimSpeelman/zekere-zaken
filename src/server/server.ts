@@ -1,9 +1,17 @@
 import socket from "socket.io";
 import uuid from "uuid/v4";
 import { Dict } from "../types/Dict";
+import fs from "fs";
 
-const port = 80;
-const server = socket(port);
+const port = 8080;
+const httpsServer = require('https').createServer({
+  key: fs.readFileSync('/etc/letsencrypt/live/zekerezaken.nl/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/zekerezaken.nl/cert.pem')
+});
+
+const server = socket(httpsServer);
+server.listen(port);
+
 
 const peers: Dict<socket.Socket> = {};
 
