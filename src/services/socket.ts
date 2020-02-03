@@ -1,15 +1,16 @@
 import socketIOClient from "socket.io-client";
-import Cookies from "universal-cookie";
+import { LocalStorageValueStore } from "../util/Cache";
 
 const url = window.location;
 const socketUrl = `${url.protocol}//${url.host.replace(/:[0-9]+/, "")}`;
 
-const cookies = new Cookies();
-const token = cookies.get("socket-token");
+export const SessionIDStore = new LocalStorageValueStore("socket-token");
+
+const token = SessionIDStore.get();
 const query = !!token ? { token } : {};
 
 export const SocketConnection = socketIOClient.connect(socketUrl, { query });
 
 SocketConnection.on("id", (id: string) => {
-    cookies.set("socket-token", id);
+    SessionIDStore.set(id);
 })

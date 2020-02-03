@@ -1,12 +1,20 @@
 import { Box, Button, Divider } from "@material-ui/core";
 import { default as React } from "react";
 import { ClearCache, ToggleConsole } from "../../../commands/Command";
+import { SessionIDStore } from "../../../services/socket";
 import { useCommand } from "../../hooks/useCommand";
 import { useLocalState } from "../../hooks/useLocalState";
 
 export function Settings() {
     const { dispatch } = useCommand();
     const { state } = useLocalState();
+
+    const clearCache = () => {
+        SessionIDStore.remove();
+        dispatch(ClearCache({}));
+        window.location.assign("/");
+    }
+
     return (
         <Box pt={3}>
             <Box mb={3}>
@@ -20,7 +28,7 @@ export function Settings() {
             <Box >
                 <Divider />
                 <p>In de browsercache worden de appgegevens opgeslagen.</p>
-                <Button variant="outlined" onClick={() => dispatch(ClearCache({}))} >Cache Legen</Button>
+                <Button variant="outlined" onClick={clearCache} >Cache Legen</Button>
             </Box>
         </Box>
     );
