@@ -15,7 +15,7 @@ import { useCommand } from "../../hooks/useCommand";
 import { useSelector } from "../../hooks/useSelector";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
 import { selectOpenInAuthReqById } from "../../selectors/selectOpenInAuthReqs";
-import { selectProfileById } from "../../selectors/selectProfile";
+import { selectProfileStatusById } from "../../selectors/selectProfile";
 
 export function IncomingAuthReq() {
     const { reqId: id } = useParams();
@@ -23,7 +23,7 @@ export function IncomingAuthReq() {
     const classes = useStyles({});
 
     const req = useSelector(id ? selectOpenInAuthReqById(id) : undefined);
-    const profile = useSelector(req ? selectProfileById(req.subjectId) : undefined);
+    const profileResult = useSelector(req ? selectProfileStatusById(req.subjectId) : undefined);
     const auths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
@@ -41,7 +41,22 @@ export function IncomingAuthReq() {
 
     const rejectRequest = () => { }; // FIXME
 
-    return !req ? <div>Dit verzoek bestaat niet.</div> : (
+
+    if (!req) {
+        return <Box p={3}>Dit verzoek bestaat niet.</Box>
+    }
+
+    if (!profileResult || profileResult?.status === "Failed") {
+        return <Box p={3}>Er ging iets fout bij het laden van het profiel.</Box>
+    }
+
+    if (profileResult.status === "Verifying") {
+        return <Box p={3}>We laden even het profiel van deze gebruiker..</Box>
+    }
+
+    const profile = profileResult.profile;
+
+    return (
         <Box p={1}>
             <PersonCard profile={profile!} />
 
