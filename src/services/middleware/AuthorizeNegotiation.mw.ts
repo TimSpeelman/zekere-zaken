@@ -1,4 +1,4 @@
-import { InvokeIDAuthorize, UserCommand } from "../../commands/Command";
+import { InvokeIDAuthorize, UserCommand, VerifyProfile } from "../../commands/Command";
 import { ANegotiationUpdated, DomainEvent, RefResolvedToAuthorize } from "../../commands/Event";
 import { failIfFalsy } from "../../util/failIfFalsy";
 import { Hook } from "../../util/Hook";
@@ -25,6 +25,9 @@ export class AuthorizeNegotiationMiddleware {
         const negHook = new Hook<AuthorizeNegotiation>('neg-hook');
         negHook.on((negotiation) => {
             const isNew = !this.stateMgr.state.authorizeNegotiations.find(n => n.id === negotiation.id);
+
+            this.commandHook.fire(VerifyProfile({ peerId: negotiation.authorizerId }));
+            this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
 
             this.eventHook.fire(ANegotiationUpdated({ negotiation }))
 
