@@ -1,11 +1,7 @@
-import { ListSubheader } from "@material-ui/core";
-import Avatar from '@material-ui/core/Avatar';
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import { format } from "date-fns";
-import { default as React } from "react";
+import { default as React, Fragment } from "react";
+import { AuthorityCard } from "../../components/AuthorityCard";
+import { PageTitle } from "../../components/PageTitle";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { selectGivenAuthorizations } from "../../selectors/selectGivenAuthorizations";
@@ -23,32 +19,40 @@ export function AuthReqInbox() {
 
     return (
         <div>
+            <PageTitle title={"Machtigingen aan derden"} backURL={"#/home"} />
 
-            <List component="nav" >
-                <ListSubheader>Uitgegeven Machtigingen</ListSubheader>
-                {given.length === 0 && <ListItem disabled>U heeft geen uitgegeven machtigingen.</ListItem>}
-                {given.map(auth => (
-                    <ListItem button key={auth.id} component="a" href={`#/given-authorizations/${auth.id}`}>
-                        <ListItemAvatar>
-                            <Avatar src={getProfile(auth.subjectId)?.photo} />
-                        </ListItemAvatar>
-                        <ListItemText primary={getProfile(auth.subjectId)?.name} secondary={format(new Date(auth.issuedAt), 'dd-MM-yyyy HH:mm')} />
-                    </ListItem>
-                ))}
+            {reqs.length > 0 && (
+                <Fragment>
+                    <div className="subheader">Openstaande Verzoeken</div>
+                    {reqs.map(req => (
+                        <a href={`#/authreqs/inbox/${req.id}`} className="invisible-link">
+                            <AuthorityCard
+                                authType="authorizationRequest"
+                                subject={getProfile(req.subjectId)}
+                                showSubjectName={true}
+                                authority={req.authority}
+                                legalEntity={req.legalEntity}
+                            />
+                        </a>
+                    ))}
+                </Fragment>
+            )}
 
-                <ListSubheader>Openstaande Verzoeken</ListSubheader>
-                {reqs.length === 0 && <ListItem disabled>U heeft geen openstaande verzoeken.</ListItem>}
-                {reqs.map(req => (
-                    <ListItem button key={req.id} component="a" href={`#/authreqs/inbox/${req.id}`}>
-                        <ListItemAvatar>
-                            <Avatar src={getProfile(req.subjectId)?.photo}
-                                style={{ width: 60, height: 60 }} />
-                        </ListItemAvatar>
-                        <ListItemText primary={getProfile(req.subjectId)?.name} secondary={format(new Date(req.datetime), 'dd-MM-yyyy HH:mm')} />
-                    </ListItem>
-                ))}
-            </List>
+            <div className="subheader">Uitgegeven Machtigingen</div>
 
-        </div>
+            {given.length === 0 && <ListItem disabled>U heeft geen uitgegeven machtigingen.</ListItem>}
+            {given.map(auth => (
+                <a href={`#/given-authorizations/${auth.id}`} className="invisible-link">
+                    <AuthorityCard
+                        authType="authorization"
+                        subject={getProfile(auth.subjectId)}
+                        showSubjectName={true}
+                        authority={auth.authority}
+                        legalEntity={auth.legalEntity}
+                    />
+                </a>
+            ))}
+
+        </div >
     );
 }

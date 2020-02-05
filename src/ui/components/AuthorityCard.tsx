@@ -12,11 +12,23 @@ interface Props {
     title?: string;
     showLegalEntity?: boolean;
     showDetails?: boolean;
+    subject?: Profile;
     authorizer?: Profile;
+    showSubjectName?: boolean;
     authType: "authorization" | "authorizationRequest" | "verification";
 }
 
-export function AuthorityCard({ legalEntity, authority, authorizer, showLegalEntity, showDetails, authType, title }: Props) {
+export function AuthorityCard({
+    legalEntity,
+    authority,
+    subject,
+    authorizer,
+    showLegalEntity,
+    showDetails,
+    authType,
+    title,
+    showSubjectName,
+}: Props) {
     const classes = useStyles({});
 
     const typeImg = {
@@ -30,6 +42,7 @@ export function AuthorityCard({ legalEntity, authority, authorizer, showLegalEnt
             <div className="section spec">
                 <img src={typeImg[authType]} />
                 <div>
+                    {showSubjectName && subject && subject.name}
                     <p className="primary">{authorityShort(authority)}</p>
                     {legalEntity && <p className="">namens {legalEntity.name}</p>}
                 </div>
