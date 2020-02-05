@@ -1,17 +1,20 @@
 import { Box, IconButton, Typography } from "@material-ui/core";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
-import { default as React } from "react";
+import CloseIcon from "@material-ui/icons/Close";
+import { default as React, ReactElement } from "react";
 
 interface Props {
     title: string;
     sub?: string;
+    icon?: ReactElement;
     backURL?: string;
+    onQuit?: () => void;
 }
 
-export function PageTitle({ title, sub, backURL }: Props) {
+export function PageTitle({ title, sub, icon, backURL, onQuit }: Props) {
 
     return (
-        <Box pt={3} pb={3} className="page-title">
+        <Box className="page-title">
             {backURL &&
                 <IconButton
                     className="start-icon"
@@ -24,11 +27,23 @@ export function PageTitle({ title, sub, backURL }: Props) {
             }
 
             <Box p={1}>
+                {icon}
                 <Typography component="h2" variant="h6">
                     {title}
                 </Typography>
                 {sub && <span className="sub">{sub}</span>}
             </Box>
+
+            {onQuit && (
+                <IconButton
+                    className="close-icon"
+                    edge="end"
+                    color="inherit"
+                    onClick={onQuit}
+                >
+                    <CloseIcon />
+                </IconButton>
+            )}
         </Box>
     )
 }

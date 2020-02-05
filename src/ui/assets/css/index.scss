@@ -48,11 +48,19 @@ main {
 .page-title {
     text-align: center;
     position: relative;
+    padding: 24px 16px;
 
     .start-icon {
         position: absolute;
+        top: 24px;
         left:0;
         text-align: center;
+    }
+
+    .close-icon {
+        position: absolute;
+        top: 24px;
+        right: 0;
     }
 }
 

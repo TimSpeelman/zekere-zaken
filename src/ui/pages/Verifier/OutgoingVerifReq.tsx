@@ -1,8 +1,6 @@
 import { IconButton } from "@material-ui/core";
-import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import QRCode from "qrcode.react";
 import { default as React } from "react";
@@ -14,7 +12,7 @@ import { last } from "../../../util/last";
 import { AspectRatio } from "../../components/AspectRatio";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
-import { PersonCard } from "../../components/PersonCard";
+import { PageTitle } from "../../components/PageTitle";
 import { useCommand } from "../../hooks/useCommand";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
@@ -45,34 +43,27 @@ export function OutgoingVerifReq() {
 
     return !req ? <div>Dit verzoek bestaat niet. </div> : (
         <div>
-            {/* <Box p={1}></Box> */}
-            <Box pt={1} pb={1}>
-                {!lastVerifiee && <p >Deel deze <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}><strong>QR</strong></CopyToClipboard> code met de te verifiëren persoon:</p>}
-            </Box>
-            {!lastVerifiee ? (
-                <Paper className={classes.paper} >
-                    <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
-                        <AspectRatio heightOverWidth={1}>
-                            <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
-                        </AspectRatio>
-                    </CopyToClipboard>
-                </Paper>
-            ) : (
-                    <div>
-                        <Typography component="h2" variant="h6" color="inherit">
-                            Geverifieerd
-                        </Typography>
-                        <PersonCard profile={lastVerifiee} />
-                    </div>
-                )}
+            <PageTitle
+                title={"Verifiëren"}
+                sub={"Toon de QR aan de persoon die u wilt controleren"}
+                onQuit={() => window.location.assign("#/home")}
+            />
+
+            <Paper className={classes.paper} style={{ marginBottom: 12 }}>
+                <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
+                    <AspectRatio heightOverWidth={1}>
+                        <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
+                    </AspectRatio>
+                </CopyToClipboard>
+            </Paper>
 
             <AuthorityCard legalEntity={lastCompleted ? lastCompleted.spec.legalEntity : req.legalEntity}
                 authority={lastCompleted ? lastCompleted.spec.authority : req.authority} authType="verification" />
 
             <FormActions>
-                <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>
+                <IconButton onClick={deleteItem} color="inherit"><DeleteIcon /></IconButton>
 
-                <Button component="a" href="#/home">Sluiten</Button>
+                <Button color="inherit" component="a" href="#/home">Sluiten</Button>
             </FormActions>
         </div>
     );

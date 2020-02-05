@@ -5,6 +5,7 @@ import { Authority, LegalEntity, Profile } from "../../types/State";
 import { authorityShort } from "../../util/intl";
 import shieldAuthReqImg from "../assets/images/shield-authreq-v2.svg";
 import shieldImg from "../assets/images/shield-purple.svg";
+import shieldVReqImg from "../assets/images/shield-vreq.svg";
 import { AspectRatio } from "./AspectRatio";
 
 interface Props {
@@ -35,9 +36,11 @@ export function AuthorityCard({
     const typeImg = {
         authorization: shieldImg,
         authorizationRequest: shieldAuthReqImg,
-        verification: shieldAuthReqImg,
+        verification: shieldVReqImg,
         givenAuthorization: subject && subject.photo,
     };
+
+    const isVerif = authType === "verification";
 
     const isGiven = authType === "givenAuthorization"
     const showPhoto = isGiven;
@@ -59,7 +62,9 @@ export function AuthorityCard({
                     }
                 </div>
                 <div>
-                    {showSubjectName && subject && subject.name}
+
+                    {isVerif && <p>Verificatieverzoek</p>}
+                    {showSubjectName && subject && <p>{subject.name}</p>}
                     <p className="primary">{authorityShort(authority)}</p>
                     {legalEntity && <p className="">namens {legalEntity.name}</p>}
                 </div>

@@ -52,12 +52,20 @@ main .content {
 .page-title {
   text-align: center;
   position: relative;
+  padding: 24px 16px;
 }
 
 .page-title .start-icon {
   position: absolute;
+  top: 24px;
   left: 0;
   text-align: center;
+}
+
+.page-title .close-icon {
+  position: absolute;
+  top: 24px;
+  right: 0;
 }
 
 main .bg {

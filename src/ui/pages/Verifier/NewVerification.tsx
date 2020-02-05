@@ -7,11 +7,13 @@ import uuid from "uuid/v4";
 import { CreateVReqTemplate } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
 import { KVKAuthorityType, LegalEntity } from "../../../types/State";
+import vreqIcon from "../../assets/images/shield-vreq.svg";
 import { AmountInput } from "../../components/form/AmountInput";
 import { BusinessFinder } from "../../components/form/BusinessFinder";
 import { KVKAuthorityTypeSelect } from "../../components/form/KVKAuthorityTypeSelect";
 import { FormActions } from "../../components/FormActions";
 import { OptionalField } from "../../components/OptionalField";
+import { PageTitle } from "../../components/PageTitle";
 import { useCommand } from "../../hooks/useCommand";
 
 export function NewVerification() {
@@ -46,9 +48,12 @@ export function NewVerification() {
 
     return (
         <div>
-            <Box p={1}></Box>
-
-            <p>Omschrijf de bevoegdheid die u wilt verifiëren?</p>
+            <PageTitle
+                title={"Verifiëren"}
+                sub={"Omschrijf de bevoegdheid die u wilt controleren"}
+                icon={<img src={vreqIcon} style={{ height: 100 }} />}
+                onQuit={() => window.location.assign("#/home")}
+            />
 
             <Paper className={classes.paper} >
                 <Box mb={3}>
@@ -63,14 +68,15 @@ export function NewVerification() {
             </Paper>
 
             <FormActions>
-                <Button onClick={onCancel}>Annuleren</Button>
-                <Button variant={"contained"} color={"primary"} disabled={!canSubmit} onClick={handleSubmit}>Volgende</Button>
+                <Button onClick={onCancel} color="inherit">Annuleren</Button>
+                <Button variant={"contained"} color="inherit" style={{ color: "#2E3192" }}
+                    disabled={!canSubmit} onClick={handleSubmit}>Volgende</Button>
             </FormActions>
 
             <Divider />
 
             <Box style={{ textAlign: "center" }} mt={2}>
-                <Button component="a" href="#/verifs/outbox">Toon Verificatiegeschiedenis</Button>
+                <Button color="inherit" component="a" href="#/verifs/outbox">Toon Verificatiegeschiedenis</Button>
             </Box>
         </div>
     );
