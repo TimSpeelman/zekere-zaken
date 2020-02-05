@@ -117,7 +117,7 @@ main.green .bg.green {
           align-items: center;
 }
 
-.section.spec img {
+.section.spec .icon {
   width: 20%;
   margin-right: 16px;
 }

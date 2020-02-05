@@ -25,7 +25,7 @@ export function AuthReqInbox() {
                 <Fragment>
                     <div className="subheader">Openstaande Verzoeken</div>
                     {reqs.map(req => (
-                        <a href={`#/authreqs/inbox/${req.id}`} className="invisible-link">
+                        <a href={`#/given-authorizations/${req.id}`} className="invisible-link">
                             <AuthorityCard
                                 authType="authorizationRequest"
                                 subject={getProfile(req.subjectId)}

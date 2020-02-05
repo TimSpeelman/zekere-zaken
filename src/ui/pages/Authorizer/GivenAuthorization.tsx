@@ -1,9 +1,8 @@
-import Box from '@material-ui/core/Box';
 import { default as React } from "react";
 import { useParams } from "react-router-dom";
 import { useStyles } from "../../../styles";
 import { AuthorityCard } from "../../components/AuthorityCard";
-import { PersonCard } from "../../components/PersonCard";
+import { PageTitle } from "../../components/PageTitle";
 import { useSelector } from "../../hooks/useSelector";
 import { selectGivenAuthorizationById } from "../../selectors/selectGivenAuthorizations";
 import { selectProfileById } from "../../selectors/selectProfile";
@@ -17,17 +16,16 @@ export function GivenAuthorization() {
 
     return !authorization ? <div>Deze machtiging is niet bekend.</div> : (
         <div>
-            <Box pt={1} pb={1}>
-                <p>U heeft de volgende machtiging uitgegeven:</p>
-            </Box>
+            <PageTitle title={"Machtigingen aan derden"} sub={"Door mij uitgegeven"} backURL={"#/authreqs/inbox"} />
 
-            <AuthorityCard title={"Uitgegeven machtiging"} legalEntity={authorization.legalEntity} authority={authorization.authority} authType={"authorization"} />
-
-            <Box pt={1} pb={1}>
-                <p>Deze machtiging is verleend aan:</p>
-            </Box>
-
-            {subject ? <PersonCard profile={subject} /> : <div>Onbekend</div>}
+            <AuthorityCard
+                authType={"givenAuthorization"}
+                legalEntity={authorization.legalEntity}
+                showSubjectName
+                subject={subject}
+                authority={authorization.authority}
+                showDetails={true}
+            />
 
         </div>
 

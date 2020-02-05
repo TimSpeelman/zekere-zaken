@@ -4,10 +4,11 @@ import { default as React } from "react";
 
 interface Props {
     title: string;
+    sub?: string;
     backURL?: string;
 }
 
-export function PageTitle({ title, backURL }: Props) {
+export function PageTitle({ title, sub, backURL }: Props) {
 
     return (
         <Box pt={3} pb={3} className="page-title">
@@ -26,6 +27,7 @@ export function PageTitle({ title, backURL }: Props) {
                 <Typography component="h2" variant="h6">
                     {title}
                 </Typography>
+                {sub && <span className="sub">{sub}</span>}
             </Box>
         </Box>
     )

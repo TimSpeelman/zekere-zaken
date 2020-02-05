@@ -5,6 +5,7 @@ import { Authority, LegalEntity, Profile } from "../../types/State";
 import { authorityShort } from "../../util/intl";
 import shieldAuthReqImg from "../assets/images/shield-authreq-v2.svg";
 import shieldImg from "../assets/images/shield-purple.svg";
+import { AspectRatio } from "./AspectRatio";
 
 interface Props {
     legalEntity?: LegalEntity;
@@ -15,7 +16,7 @@ interface Props {
     subject?: Profile;
     authorizer?: Profile;
     showSubjectName?: boolean;
-    authType: "authorization" | "authorizationRequest" | "verification";
+    authType: "authorization" | "authorizationRequest" | "verification" | "givenAuthorization";
 }
 
 export function AuthorityCard({
@@ -35,12 +36,28 @@ export function AuthorityCard({
         authorization: shieldImg,
         authorizationRequest: shieldAuthReqImg,
         verification: shieldAuthReqImg,
+        givenAuthorization: subject && subject.photo,
     };
+
+    const isGiven = authType === "givenAuthorization"
+    const showPhoto = isGiven;
 
     return (
         <Paper className="menu-item">
             <div className="section spec">
-                <img src={typeImg[authType]} />
+                <div className="icon">
+                    {showPhoto ?
+                        <AspectRatio heightOverWidth={1.3} style={{
+                            overflow: "hidden",
+                            backgroundImage: `url(${subject?.photo})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}>
+                        </AspectRatio>
+                        :
+                        <img src={typeImg[authType]} />
+                    }
+                </div>
                 <div>
                     {showSubjectName && subject && subject.name}
                     <p className="primary">{authorityShort(authority)}</p>
@@ -59,6 +76,7 @@ export function AuthorityCard({
             {showDetails &&
                 <div className="section details">
                     {authorizer && <p>Uitgegeven door <span>{authorizer.name}</span></p>}
+                    {isGiven && <p>Uitgegeven door <span>mij</span></p>}
                     <p>Uitgegeven op <span>13 januari 2020</span></p> {/** FIXME */}
                     <p>Geldig tot <span>13 januari 2021</span></p> {/** FIXME */}
                 </div>
