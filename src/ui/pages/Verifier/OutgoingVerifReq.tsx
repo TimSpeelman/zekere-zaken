@@ -67,7 +67,7 @@ export function OutgoingVerifReq() {
                 )}
 
             <AuthorityCard legalEntity={lastCompleted ? lastCompleted.spec.legalEntity : req.legalEntity}
-                authority={lastCompleted ? lastCompleted.spec.authority : req.authority} />
+                authority={lastCompleted ? lastCompleted.spec.authority : req.authority} authType="verification" />
 
             <FormActions>
                 <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>

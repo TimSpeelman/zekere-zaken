@@ -21,7 +21,7 @@ export function GivenAuthorization() {
                 <p>U heeft de volgende machtiging uitgegeven:</p>
             </Box>
 
-            <AuthorityCard title={"Uitgegeven machtiging"} legalEntity={authorization.legalEntity} authority={authorization.authority} />
+            <AuthorityCard title={"Uitgegeven machtiging"} legalEntity={authorization.legalEntity} authority={authorization.authority} authType={"authorization"} />
 
             <Box pt={1} pb={1}>
                 <p>Deze machtiging is verleend aan:</p>

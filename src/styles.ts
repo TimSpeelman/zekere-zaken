@@ -69,6 +69,7 @@ const useStyles = makeStyles((theme) => ({
     },
     contentContainer: {
         flexGrow: 1,
+        zIndex: 10,
     },
     paper: {
         padding: theme.spacing(2),

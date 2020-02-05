@@ -1,12 +1,11 @@
 import { Container } from "@material-ui/core";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import clsx from "clsx";
 import React, { useEffect } from 'react';
 import { HashRouter, Redirect, Route, RouteComponentProps, RouteProps, Switch, useParams, withRouter } from "react-router-dom";
 import { NavigateTo, ResolveReference } from "../commands/Command";
 import { isBroadcastReference } from "../services/references/types";
 import { useStyles } from "../styles";
 import './assets/css/font-awesome.min.css';
-import TopBar from "./components/TopBar";
 import { useCommand } from "./hooks/useCommand";
 import { useLocalState } from "./hooks/useLocalState";
 import { AuthReqOutbox } from "./pages/Authorizee/AuthReqOutbox";
@@ -29,13 +28,13 @@ import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
 
 
-export function MyRoute({ title, backURI, ...props }: { title: string, backURI?: string } & RouteProps) {
+export function MyRoute({ title, backURI, ...props }: { title: string, backURI?: string, color: "purple" | "white" | "green" } & RouteProps) {
     const classes = useStyles({});
 
     const body = title === "" ? <Route {...props} /> : (
 
         <React.Fragment>
-            <div className={classes.appBarSpacer}></div>
+            {/* <div className={classes.appBarSpacer}></div> */}
 
             <Container maxWidth="lg" className={classes.contentContainer}>
                 <Route {...props} />
@@ -45,11 +44,16 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
 
     return (
         <div className={classes.root}>
-            <CssBaseline />
-            {title && <TopBar title={title} backURI={backURI} />}
+            {/* <CssBaseline />
+            {title && <TopBar title={title} backURI={backURI} />} */}
 
-            <main className={classes.content}>
-                {body}
+            <main className={clsx(classes.content, props.color)}>
+                <div className="bg purple"></div>
+                <div className="bg green"></div>
+                <div className="bg white"></div>
+                <div className="content">
+                    {body}
+                </div>
             </main>
         </div>
     )
@@ -91,34 +95,34 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
 
     return (
         <Switch>
-            <MyRoute title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
-            <MyRoute title="Verbinden.." path="/resolve/:senderId/:reference" backURI={home}><Resolve /></MyRoute>
-            <MyRoute title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
-            <MyRoute title="Inkomend Verzoek" path="/in/:senderId/:reference" backURI={home}><ReqHandler /></MyRoute>
+            <MyRoute color="white" title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
+            <MyRoute color="white" title="Verbinden.." path="/resolve/:senderId/:reference" backURI={home}><Resolve /></MyRoute>
+            <MyRoute color="white" title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
+            <MyRoute color="white" title="Inkomend Verzoek" path="/in/:senderId/:reference" backURI={home}><ReqHandler /></MyRoute>
 
             {/* Verifiers */}
-            <MyRoute title="Verifiëren" path="/verifs/new" backURI={home}><NewVerification /></MyRoute>
-            <MyRoute title="Verifiëren" path="/verifs/outbox/:reqId" backURI={home}><OutgoingVerifReq /></MyRoute>
-            <MyRoute title="Verificatiegeschiedenis" path="/verifs/outbox" backURI={home}><VerifReqOutbox /></MyRoute>
+            <MyRoute color="purple" title="Verifiëren" path="/verifs/new" backURI={home}><NewVerification /></MyRoute>
+            <MyRoute color="purple" title="Verifiëren" path="/verifs/outbox/:reqId" backURI={home}><OutgoingVerifReq /></MyRoute>
+            <MyRoute color="purple" title="Verificatiegeschiedenis" path="/verifs/outbox" backURI={home}><VerifReqOutbox /></MyRoute>
 
             {/* Subjects */}
-            <MyRoute title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
-            {/* <MyRoute title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
+            <MyRoute color="white" title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
+            {/* <MyRoute color="white" title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
 
-            <MyRoute title="Nieuw Machtigingsverzoek" path="/authreqs/new" backURI={home}><RequestAuthority /></MyRoute>
-            <MyRoute title="Uitgaand Machtigingsverzoek" path="/authreqs/outbox/:reqId" backURI={"#/authreqs/outbox"}><OutgoingAuthReq /></MyRoute>
-            <MyRoute title="Mijn Bevoegdheden" path="/authreqs/outbox" backURI={home}><AuthReqOutbox /></MyRoute>
-            <MyRoute title="Mijn Bevoegdheid" path="/my-authorizations/:id" backURI={"#/authreqs/outbox"}><MyAuthorization /></MyRoute>
+            <MyRoute color="white" title="Nieuw Machtigingsverzoek" path="/authreqs/new" backURI={home}><RequestAuthority /></MyRoute>
+            <MyRoute color="white" title="Uitgaand Machtigingsverzoek" path="/authreqs/outbox/:reqId" backURI={"#/authreqs/outbox"}><OutgoingAuthReq /></MyRoute>
+            <MyRoute color="white" title="Mijn Bevoegdheden" path="/authreqs/outbox" backURI={home}><AuthReqOutbox /></MyRoute>
+            <MyRoute color="white" title="Mijn Bevoegdheid" path="/my-authorizations/:id" backURI={"#/authreqs/outbox"}><MyAuthorization /></MyRoute>
 
 
             {/* Authorizers */}
-            <MyRoute title="Uitgegeven Machtiging" path="/given-authorizations/:id" backURI={home}><GivenAuthorization /></MyRoute>
-            <MyRoute title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId" backURI={home}><IncomingAuthReq /></MyRoute>
-            <MyRoute title="Machtigingen" path="/authreqs/inbox" backURI={home}><AuthReqInbox /></MyRoute>
-            <MyRoute title="Zekere Zaken App" path="/home"><Home /></MyRoute>
-            <MyRoute title="Zekere Zaken App" path="/onboard/:redirectTo"><Onboard /></MyRoute>
-            <MyRoute title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
-            <MyRoute title="" path="/"><Cover /></MyRoute>
+            <MyRoute color="white" title="Uitgegeven Machtiging" path="/given-authorizations/:id" backURI={home}><GivenAuthorization /></MyRoute>
+            <MyRoute color="white" title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId" backURI={home}><IncomingAuthReq /></MyRoute>
+            <MyRoute color="white" title="Machtigingen" path="/authreqs/inbox" backURI={home}><AuthReqInbox /></MyRoute>
+            <MyRoute color="white" title="Zekere Zaken App" path="/home"><Home /></MyRoute>
+            <MyRoute color="white" title="Zekere Zaken App" path="/onboard/:redirectTo"><Onboard /></MyRoute>
+            <MyRoute color="white" title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
+            <MyRoute color="white" title="" path="/"><Cover /></MyRoute>
         </Switch>
     );
 });

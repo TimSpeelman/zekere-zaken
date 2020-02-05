@@ -1,9 +1,9 @@
-import Box from '@material-ui/core/Box';
+import { Button } from "@material-ui/core";
 import { default as React } from "react";
 import { useParams } from "react-router-dom";
 import { useStyles } from "../../../styles";
 import { AuthorityCard } from "../../components/AuthorityCard";
-import { PersonCard } from "../../components/PersonCard";
+import { PageTitle } from "../../components/PageTitle";
 import { useSelector } from "../../hooks/useSelector";
 import { selectMyAuthorizationById } from "../../selectors/selectMyAuthorizations";
 import { selectProfileById } from "../../selectors/selectProfile";
@@ -16,19 +16,21 @@ export function MyAuthorization() {
     const authorizer = useSelector(!authorization ? undefined : selectProfileById(authorization.issuerId));
 
     return !authorization ? <div>Deze machtiging is niet bekend.</div> : (
-        <div>
-            <Box pt={1} pb={1}>
-                <p>U heeft de volgende bevoegdheid:</p>
-            </Box>
+        <div className="my-auth">
+            <PageTitle title={"Mijn Bevoegdheden"} backURL={"#/authreqs/outbox"} />
 
-            <AuthorityCard title={"Ontvangen machtiging"} legalEntity={authorization.legalEntity} authority={authorization.authority} />
+            <AuthorityCard
+                authority={authorization.authority}
+                legalEntity={authorization.legalEntity}
+                authorizer={authorizer}
+                showLegalEntity={true}
+                showDetails={true}
+                authType="authorization"
+            />
 
-            <Box pt={1} pb={1}>
-                <p>U bent hiervoor gemachtigd door:</p>
-            </Box>
-
-            {authorizer ? <PersonCard profile={authorizer} /> : <div>Onbekend</div>}
-
+            <div className="show-all">
+                <Button component="a" href="#/authreqs/outbox">Toon alles</Button>
+            </div>
         </div>
 
     );

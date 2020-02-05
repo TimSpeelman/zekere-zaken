@@ -74,7 +74,7 @@ export function IncomingVerifReq() {
                 <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
             </Box>
 
-            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} />
+            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
 
             {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                 <Fragment>

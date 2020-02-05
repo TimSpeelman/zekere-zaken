@@ -1,45 +1,55 @@
-import { List, ListItem, ListItemText, Paper, Typography } from "@material-ui/core";
+import { Paper } from "@material-ui/core";
 import { default as React } from "react";
 import { useStyles } from "../../styles";
-import { Authority, LegalEntity } from "../../types/State";
-import { eur } from "../../util/eur";
+import { Authority, LegalEntity, Profile } from "../../types/State";
+import { authorityShort } from "../../util/intl";
+import shieldAuthReqImg from "../assets/images/shield-authreq-v2.svg";
+import shieldImg from "../assets/images/shield-purple.svg";
 
 interface Props {
     legalEntity?: LegalEntity;
     authority: Authority;
     title?: string;
+    showLegalEntity?: boolean;
+    showDetails?: boolean;
+    authorizer?: Profile;
+    authType: "authorization" | "authorizationRequest" | "verification";
 }
 
-export function AuthorityCard({ legalEntity, authority, title }: Props) {
+export function AuthorityCard({ legalEntity, authority, authorizer, showLegalEntity, showDetails, authType, title }: Props) {
     const classes = useStyles({});
 
+    const typeImg = {
+        authorization: shieldImg,
+        authorizationRequest: shieldAuthReqImg,
+        verification: shieldAuthReqImg,
+    };
+
     return (
-        <Paper className={classes.paper} >
-            {title &&
-                <div className={classes.paperTitle}>
-                    <Typography component="h2" variant="h6" color="inherit" noWrap>
-                        {title}
-                    </Typography>
+        <Paper className="menu-item">
+            <div className="section spec">
+                <img src={typeImg[authType]} />
+                <div>
+                    <p className="primary">{authorityShort(authority)}</p>
+                    {legalEntity && <p className="">namens {legalEntity.name}</p>}
+                </div>
+            </div>
+
+            {showLegalEntity && legalEntity &&
+                <div className="section legal-entity">
+                    <p className="primary">{legalEntity.name}</p>
+                    <p>KVK-nr {legalEntity.kvknr}</p>
+                    <p>{legalEntity.address}</p>
                 </div>
             }
-            <List dense >
 
-                <ListItem>
-                    <ListItemText
-                        primary={authority.type}
-                        secondary={"Type Handeling"} />
-                </ListItem>
-                <ListItem >
-                    <ListItemText
-                        primary={eur(authority.amount)}
-                        secondary={"Financiële Beperking"} />
-                </ListItem>
-            </List>
-
-            {legalEntity && (
-                <p>Namens <strong>{legalEntity.name}</strong> (KVK-nummer: <strong>{legalEntity.kvknr}</strong>),
-        gevestigd te <strong>{legalEntity.address}</strong>.</p>
-            )}
+            {showDetails &&
+                <div className="section details">
+                    {authorizer && <p>Uitgegeven door <span>{authorizer.name}</span></p>}
+                    <p>Uitgegeven op <span>13 januari 2020</span></p> {/** FIXME */}
+                    <p>Geldig tot <span>13 januari 2021</span></p> {/** FIXME */}
+                </div>
+            }
         </Paper>
     );
 }

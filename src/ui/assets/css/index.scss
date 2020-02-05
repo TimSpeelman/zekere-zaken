@@ -31,3 +31,144 @@ body {
     }
 }
 
+main {
+    height: 100%;
+    font-family: Lato;
+    position: relative;
+    background:transparent;
+
+    .content {
+        height: 100%;
+        overflow-y: auto;
+        z-index:10;
+        overflow-x: hidden;
+    }
+}
+
+.page-title {
+    text-align: center;
+    position: relative;
+
+    .start-icon {
+        position: absolute;
+        left:0;
+        text-align: center;
+    }
+}
+
+main .bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    opacity: 0;
+    transition: all .5s;
+    background: linear-gradient(10deg, #bbb, #fff);
+
+    &.white {
+        opacity: 1;
+        z-index: 0;
+    }
+    
+    &.purple {
+        z-index: 1;
+        background: linear-gradient(10deg, #1C1565, #312B73);
+    }
+    &.green {
+        z-index: 1;
+        background: linear-gradient(10deg, #006837, #006837);
+    }
+}
+
+main.purple {
+    color: white;
+    .bg.purple {
+        opacity: 1;
+    }
+}
+
+main.green {
+    color: white;
+    .bg.green {
+        opacity: 1;
+    }
+}
+
+.section {
+    border-bottom: 1px solid #aaa;
+    padding: 24px;
+}
+
+.section.spec{ 
+    display: flex;
+    align-items: center;
+    img {
+        width: 20%;
+        margin-right: 16px;
+    }
+}
+
+.section:last-child {
+    border-bottom: 0;
+}
+
+.section p {
+    margin: 0;
+    font-size: 1.2em;
+    line-height: 1.4em;
+
+    &.small {
+        font-size: .8em;
+    }
+}
+
+.primary {
+    font-weight: 700;
+    color: #2E3192;
+    &.gray {
+        color: #000;
+    }
+}
+
+.section.details  p {
+    font-size: .9em;
+    line-height: 1.4em;
+
+    span {
+        color: #2E3192
+    }
+
+}
+
+.button-area {
+    text-align:right;
+    margin-top: 16px;
+}
+
+.show-all {
+    margin-top: 16px;
+    text-align: center;
+    display: block;
+}
+
+.menu-item {
+    margin-bottom: 8px;
+}
+
+.invisible-link {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.empty-message {
+    color: #999;
+    text-align: center;
+}
+
+.subheader {
+    text-align: center;
+    font-weight: 700;
+    padding: 32px 0;
+}

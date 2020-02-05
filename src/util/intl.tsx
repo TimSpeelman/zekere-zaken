@@ -1,5 +1,5 @@
 import React from "react";
-import { Authorization, InAuthorizationRequest, InVerificationRequest, LegalEntity, OutAuthorizationRequest, VerificationTemplate } from "../types/State";
+import { Authority, Authorization, InAuthorizationRequest, InVerificationRequest, LegalEntity, OutAuthorizationRequest, VerificationTemplate } from "../types/State";
 import { eur } from "./eur";
 
 type Request =
@@ -14,3 +14,5 @@ export const entityText = (entity: LegalEntity) =>
     <span><strong>{entity.name}</strong> (KVK-nummer: <strong>{entity.kvknr}</strong>),
         gevestigd te <strong>{entity.address}</strong></span>
 
+export const authorityShort = (auth: Authority) => `${auth.type} tot ${eur(auth.amount)}`;
+export const entityShort = (entity: LegalEntity) => `namens ${entity.name}`;

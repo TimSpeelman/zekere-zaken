@@ -1,5 +1,4 @@
 import { IconButton, List, ListItem } from "@material-ui/core";
-import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { default as React, useEffect } from "react";
@@ -7,6 +6,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
+import { PageTitle } from "../../components/PageTitle";
 import { useLocalState } from "../../hooks/useLocalState";
 import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 
@@ -32,8 +32,10 @@ export function OutgoingAuthReq() {
     }
 
     return !template ? <div>Dit verzoek bestaat niet</div> : (
-        <Box pt={3}>
-            <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} />
+        <div>
+            <PageTitle title={"Mijn Machtigingsverzoek"} backURL={"#/authreqs/outbox"} />
+
+            <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} authType="authorizationRequest" />
 
             <List >
                 <ListItem disabled>Dit verzoek is nog niet beantwoord. Deel dit verzoek via Whatsapp met een bevoegd persoon, om u te laten machtigen.</ListItem>
@@ -46,6 +48,6 @@ export function OutgoingAuthReq() {
                     <Button variant={"contained"} color={"primary"} component="a" href={getWhatsappURL(template)} target='_blank' >Delen via Whatsapp</Button>
                 </CopyToClipboard>
             </FormActions>
-        </Box>
+        </div>
     );
 }

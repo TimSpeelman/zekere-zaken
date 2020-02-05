@@ -64,7 +64,7 @@ export function IncomingAuthReq() {
                 <p><strong>{profile!.name}</strong> vraagt de volgende machtiging:</p>
             </Box>
 
-            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} />
+            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} authType="authorizationRequest" />
 
             {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                 <Fragment>
