@@ -73,7 +73,7 @@ main .bg {
 
     opacity: 0;
     transition: all .5s;
-    background: linear-gradient(10deg, #bbb, #fff);
+    background: linear-gradient(10deg, #d5d5d5, #fff);
 
     &.white {
         opacity: 1;
@@ -179,4 +179,31 @@ main.green {
     text-align: center;
     font-weight: 700;
     padding: 32px 0;
+}
+
+.badge {
+    margin: 0 32px;
+    .top {
+        background: #2E3192;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+
+        img {
+            width: 40%;
+            margin: 16px auto -16px auto;
+        }
+    }
+
+    .name {
+        font-size: 1.6em;
+        text-align: center;
+        color: #2E3192;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .qr {
+        padding: 16px;
+    }
 }

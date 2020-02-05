@@ -10,6 +10,7 @@ import { useLocalState } from "../hooks/useLocalState";
 export function Home() {
     const classes = useStyles({});
     const items = [
+        { path: "#/badge", label: "Mijn Badge", sub: "Laat u controleren." },
         { path: "#/verifs/new", label: "Verifiëren", sub: "Controleer iemand anders" },
         { path: "#/authreqs/outbox", label: "Mijn Bevoegdheden", sub: "Beheer, deel, vraag aan." },
         { path: "#/authreqs/inbox", label: "Machtigingen", sub: "Machtig derden namens uw organisatie(s)." },

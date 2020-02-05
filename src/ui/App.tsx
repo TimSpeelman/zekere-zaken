@@ -10,6 +10,7 @@ import { useCommand } from "./hooks/useCommand";
 import { useLocalState } from "./hooks/useLocalState";
 import { AuthReqOutbox } from "./pages/Authorizee/AuthReqOutbox";
 import { MyAuthorization } from "./pages/Authorizee/MyAuthorization";
+import { MyBadge } from "./pages/Authorizee/MyBadge";
 import { OutgoingAuthReq } from "./pages/Authorizee/OutgoingAuthReq";
 import { RequestAuthority } from "./pages/Authorizee/RequestAuthority";
 import { AuthReqInbox } from "./pages/Authorizer/AuthReqInbox";
@@ -106,6 +107,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
             <MyRoute color="purple" title="Verificatiegeschiedenis" path="/verifs/outbox" backURI={home}><VerifReqOutbox /></MyRoute>
 
             {/* Subjects */}
+            <MyRoute color="purple" title="Badge" path="/badge" backURI={home}><MyBadge /></MyRoute>
             <MyRoute color="white" title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
             {/* <MyRoute color="white" title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
 
