@@ -32,7 +32,7 @@ export function Settings() {
             timeout={{ appear: 1000, enter: 100, exit: 1 }}
             classNames={"items"}
         >
-         <div>
+            <div>
                 <PageTitle title="Instellingen" showBackButton />
                 <Box mb={3}>
                     <p>Uw ID: {state.myId}</p>
@@ -47,7 +47,7 @@ export function Settings() {
                     <p>In de browsercache worden de appgegevens opgeslagen.</p>
                     <Button variant="outlined" onClick={clearCache} >Cache Legen</Button>
                 </Box>
-                </div>
+            </div>
         </CSSTransition>
     );
 }
