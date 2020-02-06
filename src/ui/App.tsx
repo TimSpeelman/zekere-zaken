@@ -1,4 +1,3 @@
-import { Container } from "@material-ui/core";
 import clsx from "clsx";
 import React, { useEffect } from 'react';
 import { HashRouter, Redirect, Route, RouteComponentProps, RouteProps, Switch, useParams, withRouter } from "react-router-dom";
@@ -34,13 +33,7 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
 
     const body = title === "" ? <Route {...props} /> : (
 
-        <React.Fragment>
-            {/* <div className={classes.appBarSpacer}></div> */}
-
-            <Container maxWidth="lg" className={classes.contentContainer}>
-                <Route {...props} />
-            </Container>
-        </React.Fragment>
+        <Route {...props} />
     );
 
     return (
@@ -51,8 +44,8 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
             <main className={clsx(classes.content, props.color)}>
                 <div className="bg purple"></div>
                 <div className="bg green"></div>
-                <div className="bg white"></div>
-                <div className="content">
+                <div className="bg white"><div className={classes.whiteShieldBg}></div></div>
+                <div className="content container">
                     {body}
                 </div>
             </main>
@@ -98,7 +91,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
         <Switch>
             <MyRoute color="white" title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
             <MyRoute color="white" title="Verbinden.." path="/resolve/:senderId/:reference" backURI={home}><Resolve /></MyRoute>
-            <MyRoute color="white" title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
+            <MyRoute color="purple" title="QR-code Scannen" path="/qr" backURI={home}><ScanQR onScanQR={onScanQR} /></MyRoute>
             <MyRoute color="white" title="Inkomend Verzoek" path="/in/:senderId/:reference" backURI={home}><ReqHandler /></MyRoute>
 
             {/* Verifiers */}
@@ -108,7 +101,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
 
             {/* Subjects */}
             <MyRoute color="purple" title="Badge" path="/badge" backURI={home}><MyBadge /></MyRoute>
-            <MyRoute color="white" title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
+            <MyRoute color="purple" title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
             {/* <MyRoute color="white" title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
 
             <MyRoute color="white" title="Nieuw Machtigingsverzoek" path="/authreqs/new" backURI={home}><RequestAuthority /></MyRoute>
@@ -121,7 +114,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
             <MyRoute color="white" title="Uitgegeven Machtiging" path="/given-authorizations/:id" backURI={home}><GivenAuthorization /></MyRoute>
             <MyRoute color="white" title="Inkomend Machtigingsverzoek" path="/authreqs/inbox/:reqId" backURI={home}><IncomingAuthReq /></MyRoute>
             <MyRoute color="white" title="Machtigingen" path="/authreqs/inbox" backURI={home}><AuthReqInbox /></MyRoute>
-            <MyRoute color="white" title="Zekere Zaken App" path="/home"><Home /></MyRoute>
+            <MyRoute color="purple" title="Zekere Zaken App" path="/home"><Home /></MyRoute>
             <MyRoute color="white" title="Zekere Zaken App" path="/onboard/:redirectTo"><Onboard /></MyRoute>
             <MyRoute color="white" title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
             <MyRoute color="white" title="" path="/"><Cover /></MyRoute>

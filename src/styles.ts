@@ -1,11 +1,24 @@
 import { makeStyles } from "@material-ui/core";
-
+import purpleShield from "./ui/assets/images/shield-purple-deep.svg";
+import whiteShield from "./ui/assets/images/shield-white.svg";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     root: {
         display: "flex",
         height: "100%",
+    },
+    homeLogo: {
+        backgroundImage: `url(${purpleShield})`,
+        backgroundPositionX: "center",
+        backgroundRepeat: "no-repeat",
+        marginBottom: 16,
+        height: "30%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "2em",
+        fontWeight: 700,
     },
     toolbarIcon: {
         display: "flex",
@@ -90,6 +103,7 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         bottom: 32,
         left: 32,
+        color: "#ddd",
     },
     bottomRightButton: {
         position: "absolute",
@@ -118,6 +132,14 @@ const useStyles = makeStyles((theme) => ({
     warning: {
         color: "red",
         fontWeight: "bold",
+    },
+    whiteShieldBg: {
+        width: "100%",
+        height: "100%",
+        backgroundImage: `url(${whiteShield})`,
+        backgroundPosition: 'center',
+        backgroundSize: '50%',
+        backgroundRepeat: 'no-repeat',
     }
 }));
 

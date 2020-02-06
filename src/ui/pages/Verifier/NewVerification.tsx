@@ -3,6 +3,7 @@ import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import { default as React, useState } from "react";
+import { CSSTransition } from "react-transition-group";
 import uuid from "uuid/v4";
 import { CreateVReqTemplate } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
@@ -47,37 +48,46 @@ export function NewVerification() {
     }
 
     return (
-        <div>
-            <PageTitle
-                title={"Verifiëren"}
-                sub={"Omschrijf de bevoegdheid die u wilt controleren"}
-                icon={<img src={vreqIcon} style={{ height: 100 }} />}
-                onQuit={() => window.location.assign("#/home")}
-            />
+        <CSSTransition
+            in={true}
+            appear={true}
+            timeout={{ appear: 1000, enter: 100, exit: 1 }}
+            classNames={"items"}
+        >
+            <div>
+                <PageTitle
+                    title={"Verifiëren"}
+                    sub={"Omschrijf de bevoegdheid die u wilt controleren"}
+                    icon={<img src={vreqIcon} style={{ height: 100 }} />}
+                    onQuit={() => window.location.assign("#/home")}
+                />
 
-            <Paper className={classes.paper} >
-                <Box mb={3}>
-                    <KVKAuthorityTypeSelect value={type} onChange={setType} helperText={"Welke handeling wil de persoon uitvoeren?"} />
+                <div className="enter-item">
+                    <Paper className={classes.paper} >
+                        <Box mb={3}>
+                            <KVKAuthorityTypeSelect value={type} onChange={setType} helperText={"Welke handeling wil de persoon uitvoeren?"} />
+                        </Box>
+                        <Box mb={3}>
+                            <AmountInput value={amount} onChange={setAmount} helperText={"Welk bedrag wil de persoon besteden?"} />
+                        </Box>
+                        <OptionalField label={"Organisatie Specificeren"}>
+                            <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
+                        </OptionalField>
+                    </Paper>
+                </div>
+
+                <FormActions>
+                    <Button onClick={onCancel} color="inherit">Annuleren</Button>
+                    <Button variant={"contained"} color="inherit" style={{ color: "#2E3192" }}
+                        disabled={!canSubmit} onClick={handleSubmit}>Volgende</Button>
+                </FormActions>
+
+                <Divider />
+
+                <Box style={{ textAlign: "center" }} mt={2}>
+                    <Button color="inherit" component="a" href="#/verifs/outbox">Toon Verificatiegeschiedenis</Button>
                 </Box>
-                <Box mb={3}>
-                    <AmountInput value={amount} onChange={setAmount} helperText={"Welk bedrag wil de persoon besteden?"} />
-                </Box>
-                <OptionalField label={"Organisatie Specificeren"}>
-                    <BusinessFinder onSelect={setEntity} helperText={"Namens welke organisatie wil de persoon handelen?"} />
-                </OptionalField>
-            </Paper>
-
-            <FormActions>
-                <Button onClick={onCancel} color="inherit">Annuleren</Button>
-                <Button variant={"contained"} color="inherit" style={{ color: "#2E3192" }}
-                    disabled={!canSubmit} onClick={handleSubmit}>Volgende</Button>
-            </FormActions>
-
-            <Divider />
-
-            <Box style={{ textAlign: "center" }} mt={2}>
-                <Button color="inherit" component="a" href="#/verifs/outbox">Toon Verificatiegeschiedenis</Button>
-            </Box>
-        </div>
+            </div>
+        </CSSTransition>
     );
 }

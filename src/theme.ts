@@ -1,13 +1,13 @@
 import { createMuiTheme } from "@material-ui/core";
 
-const kvkBlue = "#00526e";
+const primaryColor = "#2E3192";
 export const theme = createMuiTheme({
     palette: {
         primary: {
             contrastText: "#fff",
-            dark: kvkBlue,
-            light: kvkBlue,
-            main: kvkBlue,
+            dark: primaryColor,
+            light: primaryColor,
+            main: primaryColor,
         },
         background: {
             default: "#fff",

@@ -6,6 +6,7 @@ import QRCode from "qrcode.react";
 import { default as React } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
+import { CSSTransition } from "react-transition-group";
 import { RemoveVReqTemplate } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
 import { last } from "../../../util/last";
@@ -42,29 +43,40 @@ export function OutgoingVerifReq() {
     }
 
     return !req ? <div>Dit verzoek bestaat niet. </div> : (
-        <div>
-            <PageTitle
-                title={"Verifiëren"}
-                sub={"Toon de QR aan de persoon die u wilt controleren"}
-                onQuit={() => window.location.assign("#/home")}
-            />
+        <CSSTransition
+            in={true}
+            appear={true}
+            timeout={{ appear: 1000, enter: 100, exit: 1 }}
+            classNames={"items"}
+        >
+            <div>
+                <PageTitle
+                    title={"Verifiëren"}
+                    sub={"Toon de QR aan de persoon die u wilt controleren"}
+                    onQuit={() => window.location.assign("#/home")}
+                />
 
-            <Paper className={classes.paper} style={{ marginBottom: 12 }}>
+                <div className={"enter-item delay-2"}>
+                    <Paper className={classes.paper} style={{ marginBottom: 12 }}>
+                        <AspectRatio heightOverWidth={1}>
+                            <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
+                        </AspectRatio>
+                    </Paper>
+                </div>
+
                 <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
-                    <AspectRatio heightOverWidth={1}>
-                        <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
-                    </AspectRatio>
+                    <div className={"enter-item delay-4"}>
+                        <AuthorityCard legalEntity={lastCompleted ? lastCompleted.spec.legalEntity : req.legalEntity}
+                            authority={lastCompleted ? lastCompleted.spec.authority : req.authority} authType="verification" />
+                    </div>
                 </CopyToClipboard>
-            </Paper>
 
-            <AuthorityCard legalEntity={lastCompleted ? lastCompleted.spec.legalEntity : req.legalEntity}
-                authority={lastCompleted ? lastCompleted.spec.authority : req.authority} authType="verification" />
+                <FormActions>
+                    <IconButton onClick={deleteItem} color="inherit"><DeleteIcon /></IconButton>
 
-            <FormActions>
-                <IconButton onClick={deleteItem} color="inherit"><DeleteIcon /></IconButton>
-
-                <Button color="inherit" component="a" href="#/home">Sluiten</Button>
-            </FormActions>
-        </div>
+                    <Button color="inherit" component="a" href="#/home">Sluiten</Button>
+                </FormActions>
+            </div>
+        </CSSTransition>
     );
 }

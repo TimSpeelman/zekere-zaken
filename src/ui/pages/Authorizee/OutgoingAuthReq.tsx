@@ -4,6 +4,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { default as React, useEffect } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
+import { CSSTransition } from "react-transition-group";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
 import { PageTitle } from "../../components/PageTitle";
@@ -32,22 +33,31 @@ export function OutgoingAuthReq() {
     }
 
     return !template ? <div>Dit verzoek bestaat niet</div> : (
-        <div>
-            <PageTitle title={"Mijn Machtigingsverzoek"} backURL={"#/authreqs/outbox"} />
+        <CSSTransition
+            in={true}
+            appear={true}
+            timeout={{ appear: 1000, enter: 100, exit: 1 }}
+            classNames={"items"}
+        >
+            <div>
+                <PageTitle title={"Mijn Machtigingsverzoek"} showBackButton />
 
-            <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} authType="authorizationRequest" />
+                <div className="enter-item">
+                    <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} authType="authorizationRequest" />
+                </div>
 
-            <List >
-                <ListItem disabled>Dit verzoek is nog niet beantwoord. Deel dit verzoek via Whatsapp met een bevoegd persoon, om u te laten machtigen.</ListItem>
-            </List>
+                <List >
+                    <ListItem disabled>Dit verzoek is nog niet beantwoord. Deel dit verzoek via Whatsapp met een bevoegd persoon, om u te laten machtigen.</ListItem>
+                </List>
 
-            <FormActions>
-                <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>
+                <FormActions>
+                    <IconButton onClick={deleteItem}><DeleteIcon /></IconButton>
 
-                <CopyToClipboard text={getURL(template)} >
-                    <Button variant={"contained"} color={"primary"} component="a" href={getWhatsappURL(template)} target='_blank' >Delen via Whatsapp</Button>
-                </CopyToClipboard>
-            </FormActions>
-        </div>
+                    <CopyToClipboard text={getURL(template)} >
+                        <Button variant={"contained"} color={"primary"} component="a" href={getWhatsappURL(template)} target='_blank' >Delen via Whatsapp</Button>
+                    </CopyToClipboard>
+                </FormActions>
+            </div>
+        </CSSTransition>
     );
 }

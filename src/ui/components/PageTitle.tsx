@@ -2,31 +2,33 @@ import { Box, IconButton, Typography } from "@material-ui/core";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
 import CloseIcon from "@material-ui/icons/Close";
 import { default as React, ReactElement } from "react";
+import { useHistory } from "react-router-dom";
 
 interface Props {
     title: string;
     sub?: string;
     icon?: ReactElement;
-    backURL?: string;
+    showBackButton?: boolean;
     onQuit?: () => void;
 }
 
-export function PageTitle({ title, sub, icon, backURL, onQuit }: Props) {
+export function PageTitle({ title, sub, icon, showBackButton, onQuit }: Props) {
+    const history = useHistory();
 
     return (
         <Box className="page-title">
-            {backURL &&
+            {showBackButton &&
                 <IconButton
                     className="start-icon"
                     edge="start"
                     color="inherit"
-                    onClick={() => window.location.assign(backURL)}
+                    onClick={() => history.goBack()}
                 >
                     <ArrowBackIos />
                 </IconButton>
             }
 
-            <Box p={1}>
+            <Box p={1} className={"enter-item"}>
                 {icon}
                 <Typography component="h2" variant="h6">
                     {title}

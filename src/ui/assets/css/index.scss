@@ -48,18 +48,21 @@ main {
 .page-title {
     text-align: center;
     position: relative;
-    padding: 24px 16px;
+    // padding: 0 16px;
+    margin-bottom: 32px;
 
     .start-icon {
+        z-index: 10;
         position: absolute;
-        top: 24px;
+        top: 0;
         left:0;
         text-align: center;
     }
 
     .close-icon {
+        z-index: 10;
         position: absolute;
-        top: 24px;
+        top: 0;
         right: 0;
     }
 }
@@ -72,7 +75,7 @@ main .bg {
     bottom: 0;
 
     opacity: 0;
-    transition: all .5s;
+    transition: all .4s;
     background: linear-gradient(10deg, #d5d5d5, #fff);
 
     &.white {
@@ -200,10 +203,134 @@ main.green {
         text-align: center;
         color: #2E3192;
         font-weight: 700;
-        margin-bottom: 16px;
     }
 
     .qr {
-        padding: 16px;
+        padding: 16px 48px;
     }
+}
+
+.full-height {
+    height: 100%;
+}
+.container {
+    padding: 16px;
+}
+
+.home-menu {    
+
+    & .row      {
+        display: flex;
+        margin-bottom: 16px;
+    }
+    
+    .purple {
+        padding: 16px;
+        background: #1C1565;
+        color: white;
+        display: flex;
+        align-items: center;
+
+        &:first-child {
+            margin-right: 16px;
+        }
+
+        img {
+            height: 60px;
+            margin-right: 16px;
+        }
+    }
+    
+    .white {
+        margin-bottom: 16px;
+        padding: 16px;
+        display: block;
+
+        width: 100%;
+        flex: 0;
+        background: white;
+        color: black;
+        text-align: center;
+
+    }
+
+    .title {
+        font-size: 1em;
+        font-weight: bold;
+        display: block;
+    }
+
+    .shield-with-number {
+        width: 30px;
+        position: relative;
+        margin: 0 auto;
+        span {
+            position: absolute;
+            top: 50%;
+            margin-top:-.75em;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 1;
+            line-height: 100%;
+            font-weight: 700; 
+            color :white;
+        }
+    }
+}
+
+.enter-item {
+    opacity : 0;
+    transform: scale(0.95);
+    transition: all 500ms;
+}
+
+.delay-1 {
+    transition-delay: 100ms;
+}
+.delay-2 {
+    transition-delay: 200ms;
+}
+.delay-3 {
+    transition-delay: 300ms;
+}
+.delay-4 {
+    transition-delay: 400ms;
+}
+.delay-5 {
+    transition-delay: 500ms;
+}
+.delay-6 {
+    transition-delay: 600ms;
+}
+.delay-7 {
+    transition-delay: 700ms;
+}
+.delay-8 {
+    transition-delay: 800ms;
+}
+.delay-9 {
+    transition-delay: 900ms;
+}
+
+.items-appear-active,
+.items-enter-done,
+.items-appear-done {
+    .enter-item {
+    opacity: 1;
+    transform: scale(1);
+    }
+}
+
+@keyframes animex {
+    0% {transform: scaleX(0);}
+    50% {transform: scaleX(1);}
+    100% {transform: scaleX(0);}
+}
+
+.wiggle {
+    animation-name: animex;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
 }

@@ -6,12 +6,15 @@ import { isEqual, uniqWith } from "lodash";
 import { default as React, Fragment } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
+import { CSSTransition } from "react-transition-group";
 import uuid from "uuid/v4";
 import { AcceptVNegWithLegalEntity as AcceptVNegWithLegalEntity, CreateAReqTemplate } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
 import { AuthorizationTemplate, LegalEntity } from "../../../types/State";
+import iconVerif from "../../assets/images/shield-vreq.svg";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
+import { PageTitle } from "../../components/PageTitle";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
 import { useSelector } from "../../hooks/useSelector";
@@ -19,7 +22,6 @@ import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
 import { selectOpenInVerReqById } from "../../selectors/selectOpenInVerReqs";
 import { selectProfileStatusById } from "../../selectors/selectProfile";
-
 export function IncomingVerifReq() {
     console.log("Render");
 
@@ -66,53 +68,65 @@ export function IncomingVerifReq() {
     const profile = profileResult.profile;
 
     return (
-        <div>
+        <CSSTransition
+            in={true}
+            appear={true}
+            timeout={{ appear: 1000, enter: 100, exit: 1 }}
+            classNames={"items"}
+        >
+            <div>
+                <PageTitle
+                    title={"Bevoegdheidscontrole"}
+                    sub={"Wilt u dit toestaan?"}
+                    icon={<img src={iconVerif} style={{ height: 100 }} />}
+                    onQuit={() => window.location.assign("#/home")} />
 
-            <PersonCard profile={profile} />
+                <PersonCard profile={profile} />
 
-            <Box pt={1} pb={1}>
-                <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
-            </Box>
+                <Box pt={1} pb={1}>
+                    <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
+                </Box>
 
-            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
+                <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
 
-            {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
-                <Fragment>
-                    <Box pt={1} pb={1} className={classes.warning}>
-                        <p>Deze bevoegdheid zit niet in uw wallet. </p>
-                    </Box>
-                    <FormActions>
-                        <Button component="a" href="#/home">Annuleren</Button>
-                        <Button variant={"contained"} color={"primary"} component="a"
-                            onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
-                    </FormActions>
-                </Fragment>
-            }
+                {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
+                    <Fragment>
+                        <Box pt={1} pb={1} className={classes.warning}>
+                            <p>Deze bevoegdheid zit niet in uw wallet. </p>
+                        </Box>
+                        <FormActions>
+                            <Button component="a" href="#/home">Annuleren</Button>
+                            <Button variant={"contained"} color={"primary"} component="a"
+                                onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
+                        </FormActions>
+                    </Fragment>
+                }
 
-            {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
-                <Fragment>
-                    <Box pt={1} pb={1} >
-                        <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
-                        <List component="nav" >
-                            {entities.map(entity =>
-                                <ListItem key={entity.name}>
-                                    <ListItemText primary={entityTxt(entity)} secondary={authorizedMark()} />
-                                    <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
-                                </ListItem>
-                            )}
-                        </List>
-                    </Box>
-                    <FormActions>
-                        <Button component="a" href="#/home">Annuleren</Button>
-                        <CopyToClipboard text={getURL(authTemplate)} >
-                            <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
-                                component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
-                        </CopyToClipboard>
-                    </FormActions>
-                </Fragment>
-            }
+                {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
+                    <Fragment>
+                        <Box pt={1} pb={1} >
+                            <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
+                            <List component="nav" >
+                                {entities.map(entity =>
+                                    <ListItem key={entity.name}>
+                                        <ListItemText primary={entityTxt(entity)} />
+                                        <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
+                                    </ListItem>
+                                )}
+                            </List>
+                        </Box>
+                        <FormActions>
+                            <Button color={"inherit"} component="a" href="#/home">Annuleren</Button>
+                            <CopyToClipboard text={getURL(authTemplate)} >
+                                <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
+                                    component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
+                            </CopyToClipboard>
+                        </FormActions>
+                    </Fragment>
+                }
 
-        </div>
+            </div>
+        </CSSTransition>
     );
 }
 
@@ -132,7 +146,7 @@ function authorizedMark() {
             size="small"
             icon={<CheckIcon />}
             label={`Bevoegd`}
-            color="primary"
+            color="inherit"
             variant="outlined"
         />
     )

@@ -52,19 +52,21 @@ main .content {
 .page-title {
   text-align: center;
   position: relative;
-  padding: 24px 16px;
+  margin-bottom: 32px;
 }
 
 .page-title .start-icon {
+  z-index: 10;
   position: absolute;
-  top: 24px;
+  top: 0;
   left: 0;
   text-align: center;
 }
 
 .page-title .close-icon {
+  z-index: 10;
   position: absolute;
-  top: 24px;
+  top: 0;
   right: 0;
 }
 
@@ -75,8 +77,8 @@ main .bg {
   right: 0;
   bottom: 0;
   opacity: 0;
-  -webkit-transition: all .5s;
-  transition: all .5s;
+  -webkit-transition: all .4s;
+  transition: all .4s;
   background: linear-gradient(10deg, #d5d5d5, #fff);
 }
 
@@ -218,10 +220,185 @@ main.green .bg.green {
   text-align: center;
   color: #2E3192;
   font-weight: 700;
-  margin-bottom: 16px;
 }
 
 .badge .qr {
+  padding: 16px 48px;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.container {
   padding: 16px;
+}
+
+.home-menu .row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.home-menu .purple {
+  padding: 16px;
+  background: #1C1565;
+  color: white;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.home-menu .purple:first-child {
+  margin-right: 16px;
+}
+
+.home-menu .purple img {
+  height: 60px;
+  margin-right: 16px;
+}
+
+.home-menu .white {
+  margin-bottom: 16px;
+  padding: 16px;
+  display: block;
+  width: 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0;
+          flex: 0;
+  background: white;
+  color: black;
+  text-align: center;
+}
+
+.home-menu .title {
+  font-size: 1em;
+  font-weight: bold;
+  display: block;
+}
+
+.home-menu .shield-with-number {
+  width: 30px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.home-menu .shield-with-number span {
+  position: absolute;
+  top: 50%;
+  margin-top: -.75em;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 1;
+  line-height: 100%;
+  font-weight: 700;
+  color: white;
+}
+
+.enter-item {
+  opacity: 0;
+  -webkit-transform: scale(0.95);
+          transform: scale(0.95);
+  -webkit-transition: all 500ms;
+  transition: all 500ms;
+}
+
+.delay-1 {
+  -webkit-transition-delay: 100ms;
+          transition-delay: 100ms;
+}
+
+.delay-2 {
+  -webkit-transition-delay: 200ms;
+          transition-delay: 200ms;
+}
+
+.delay-3 {
+  -webkit-transition-delay: 300ms;
+          transition-delay: 300ms;
+}
+
+.delay-4 {
+  -webkit-transition-delay: 400ms;
+          transition-delay: 400ms;
+}
+
+.delay-5 {
+  -webkit-transition-delay: 500ms;
+          transition-delay: 500ms;
+}
+
+.delay-6 {
+  -webkit-transition-delay: 600ms;
+          transition-delay: 600ms;
+}
+
+.delay-7 {
+  -webkit-transition-delay: 700ms;
+          transition-delay: 700ms;
+}
+
+.delay-8 {
+  -webkit-transition-delay: 800ms;
+          transition-delay: 800ms;
+}
+
+.delay-9 {
+  -webkit-transition-delay: 900ms;
+          transition-delay: 900ms;
+}
+
+.items-appear-active .enter-item,
+.items-enter-done .enter-item,
+.items-appear-done .enter-item {
+  opacity: 1;
+  -webkit-transform: scale(1);
+          transform: scale(1);
+}
+
+@-webkit-keyframes animex {
+  0% {
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
+  50% {
+    -webkit-transform: scaleX(1);
+            transform: scaleX(1);
+  }
+  100% {
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
+}
+
+@keyframes animex {
+  0% {
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
+  50% {
+    -webkit-transform: scaleX(1);
+            transform: scaleX(1);
+  }
+  100% {
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
+}
+
+.wiggle {
+  -webkit-animation-name: animex;
+          animation-name: animex;
+  -webkit-animation-duration: 1000ms;
+          animation-duration: 1000ms;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
 }
 /*# sourceMappingURL=index.css.map */

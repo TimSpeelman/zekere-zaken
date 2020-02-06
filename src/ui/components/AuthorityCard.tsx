@@ -3,7 +3,7 @@ import { default as React } from "react";
 import { useStyles } from "../../styles";
 import { Authority, LegalEntity, Profile } from "../../types/State";
 import { authorityShort } from "../../util/intl";
-import shieldAuthReqImg from "../assets/images/shield-authreq-v2.svg";
+import shieldAuthReqImg from "../assets/images/shield-authreq-v3.svg";
 import shieldImg from "../assets/images/shield-purple.svg";
 import shieldVReqImg from "../assets/images/shield-vreq.svg";
 import { AspectRatio } from "./AspectRatio";
