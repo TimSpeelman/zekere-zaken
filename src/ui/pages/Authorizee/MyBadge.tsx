@@ -1,6 +1,7 @@
 import { Paper } from "@material-ui/core";
 import QRCode from "qrcode.react";
 import { default as React, useState } from "react";
+import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { useStyles } from "../../../styles";
@@ -34,9 +35,11 @@ export function MyBadge() {
                         <div className="top">
                             <img src={profile?.photo} onLoad={onLoad} />
                         </div>
-                        <div className="name">
-                            {profile?.name}
-                        </div>
+                        <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
+                            <div className="name">
+                                {profile?.name}
+                            </div>
+                        </CopyToClipboard>
                         <div className="qr">
                             <AspectRatio heightOverWidth={1}>
                                 <QRCode value={qrValue} size={256} level={"M"} onLoad={onLoad} style={{ width: "100%", height: "100%" }} />
@@ -50,3 +53,4 @@ export function MyBadge() {
 
     );
 }
+
