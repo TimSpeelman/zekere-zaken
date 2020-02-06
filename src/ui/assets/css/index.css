@@ -92,6 +92,11 @@ main .bg.purple {
   background: linear-gradient(10deg, #1C1565, #312B73);
 }
 
+main .bg.yellow {
+  z-index: 1;
+  background: linear-gradient(10deg, #ffd400, #ffe048);
+}
+
 main .bg.green {
   z-index: 1;
   background: linear-gradient(10deg, #006837, #006837);
@@ -102,6 +107,14 @@ main.purple {
 }
 
 main.purple .bg.purple {
+  opacity: 1;
+}
+
+main.yellow {
+  color: #1C1565;
+}
+
+main.yellow .bg.yellow {
   opacity: 1;
 }
 

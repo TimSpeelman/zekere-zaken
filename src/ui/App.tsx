@@ -28,7 +28,9 @@ import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
 
 
-export function MyRoute({ title, backURI, ...props }: { title: string, backURI?: string, color: "purple" | "white" | "green" } & RouteProps) {
+type Color = "purple" | "white" | "green" | "yellow"
+
+export function MyRoute({ title, backURI, ...props }: { title: string, backURI?: string, color: Color } & RouteProps) {
     const classes = useStyles({});
 
     const body = title === "" ? <Route {...props} /> : (
@@ -43,6 +45,7 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
 
             <main className={clsx(classes.content, props.color)}>
                 <div className="bg purple"></div>
+                <div className="bg yellow"></div>
                 <div className="bg green"></div>
                 <div className="bg white"><div className={classes.whiteShieldBg}></div></div>
                 <div className="content container">
@@ -100,7 +103,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
             <MyRoute color="purple" title="Verificatiegeschiedenis" path="/verifs/outbox" backURI={home}><VerifReqOutbox /></MyRoute>
 
             {/* Subjects */}
-            <MyRoute color="purple" title="Badge" path="/badge" backURI={home}><MyBadge /></MyRoute>
+            <MyRoute color="yellow" title="Badge" path="/badge" backURI={home}><MyBadge /></MyRoute>
             <MyRoute color="purple" title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
             {/* <MyRoute color="white" title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
 

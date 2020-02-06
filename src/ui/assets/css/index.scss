@@ -87,6 +87,12 @@ main .bg {
         z-index: 1;
         background: linear-gradient(10deg, #1C1565, #312B73);
     }
+
+    &.yellow {
+        z-index: 1;
+        background: linear-gradient(10deg, #ffd400, #ffe048);
+    }
+
     &.green {
         z-index: 1;
         background: linear-gradient(10deg, #006837, #006837);
@@ -96,6 +102,12 @@ main .bg {
 main.purple {
     color: white;
     .bg.purple {
+        opacity: 1;
+    }
+}
+main.yellow {
+    color: #1C1565;
+    .bg.yellow {
         opacity: 1;
     }
 }
@@ -188,6 +200,7 @@ main.green {
     margin: 0 32px;
     .top {
         background: #2E3192;
+        // background: #ffd400;
         margin-bottom: 32px;
         display: flex;
         align-items: center;
