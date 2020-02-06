@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import { isEqual, uniqWith } from "lodash";
-import { default as React, Fragment } from "react";
+import { default as React, Fragment, useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
@@ -22,7 +22,14 @@ import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
 import { selectOpenInVerReqById } from "../../selectors/selectOpenInVerReqs";
 import { selectProfileStatusById } from "../../selectors/selectProfile";
-export function IncomingVerifReq() {
+
+type Mode = "idle" | "pending" | "succeeded" | "failed";
+
+interface Props {
+    onMoodChange: (val: Mode) => void; // Ugly way of changing the background
+}
+
+export function IncomingVerifReq({ onMoodChange }: Props) {
     console.log("Render");
 
     const { dispatch } = useCommand();
@@ -37,6 +44,7 @@ export function IncomingVerifReq() {
     const { getURL, getWhatsappURL } = useWhatsappURL();
 
     function goVerify(legalEntity: LegalEntity) {
+        setMode("succeeded");
         dispatch(AcceptVNegWithLegalEntity({ negotiationId: inVReq!.id, legalEntity }))
     }
 
@@ -52,6 +60,20 @@ export function IncomingVerifReq() {
             dispatch(CreateAReqTemplate({ template: authTemplate }))
         }
     }
+    const [mode, setMode] = useState<Mode>("idle");
+    useEffect(() => onMoodChange(mode), [mode]);
+
+    const subtitles: { [k in Mode]: string } = {
+        idle: "Wilt u dit toestaan?",
+        pending: "Bezig met bewijs aanleveren..",
+        succeeded: "Geslaagd!",
+        failed: "Er ging iets fout..",
+    }
+
+    const isIdle = mode === "idle";
+    const isPending = mode === "pending";
+    const isSucceeded = mode === "succeeded";
+    const isFailed = mode === "failed";
 
     if (!inVReq) {
         return <Box p={3}>Dit verzoek bestaat niet.</Box>
@@ -77,57 +99,83 @@ export function IncomingVerifReq() {
             <div>
                 <PageTitle
                     title={"Bevoegdheidscontrole"}
-                    sub={"Wilt u dit toestaan?"}
+                    sub={subtitles[mode]}
                     icon={<img src={iconVerif} style={{ height: 100 }} />}
                     onQuit={() => window.location.assign("#/home")} />
 
-                <div className="enter-item">
-                    <PersonCard profile={profile} />
-                </div>
+                {isIdle && (
+                    <div>
+                        <div className="enter-item">
+                            <PersonCard profile={profile} />
+                        </div>
 
-                <Box pt={1} pb={1}>
-                    <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
-                </Box>
-
-                <div className="enter-item">
-                    <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
-                </div>
-
-                {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
-                    <Fragment>
-                        <Box pt={1} pb={1} className={classes.warning}>
-                            <p>Deze bevoegdheid zit niet in uw wallet. </p>
+                        <Box pt={1} pb={1}>
+                            <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
                         </Box>
-                        <FormActions>
-                            <Button component="a" href="#/home">Annuleren</Button>
-                            <Button variant={"contained"} color={"primary"} component="a"
-                                onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
-                        </FormActions>
-                    </Fragment>
-                }
 
-                {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
-                    <Fragment>
-                        <Box pt={1} pb={1} >
-                            <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
-                            <List component="nav" >
-                                {entities.map(entity =>
-                                    <ListItem key={entity.name}>
-                                        <ListItemText primary={entityTxt(entity)} />
-                                        <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
-                                    </ListItem>
-                                )}
-                            </List>
+                        <div className="enter-item">
+                            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
+                        </div>
+
+                        {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
+                            <Fragment>
+                                <Box pt={1} pb={1} className={classes.warning}>
+                                    <p>Deze bevoegdheid zit niet in uw wallet. </p>
+                                </Box>
+                                <FormActions>
+                                    <Button component="a" href="#/home">Annuleren</Button>
+                                    <Button variant={"contained"} color={"primary"} component="a"
+                                        onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
+                                </FormActions>
+                            </Fragment>
+                        }
+
+                        {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
+                            <Fragment>
+                                <Box pt={1} pb={1} >
+                                    <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
+                                    <List component="nav" >
+                                        {entities.map(entity =>
+                                            <ListItem key={entity.name}>
+                                                <ListItemText primary={entityTxt(entity)} />
+                                                <Button variant="contained" color={"primary"} onClick={() => goVerify(entity)}>Delen</Button>
+                                            </ListItem>
+                                        )}
+                                    </List>
+                                </Box>
+                                <FormActions>
+                                    <Button color={"inherit"} component="a" href="#/home">Annuleren</Button>
+                                    <CopyToClipboard text={getURL(authTemplate)} >
+                                        <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
+                                            component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
+                                    </CopyToClipboard>
+                                </FormActions>
+                            </Fragment>
+                        }
+                    </div>
+
+                )}
+
+                {isSucceeded && (
+                    <div>
+                        <div className="enter-item">
+                            <PersonCard profile={profile} />
+                        </div>
+
+                        <Box pt={1} pb={1}>
+                            <p><strong>{profile.name}</strong> heeft uw bevoegdheid gecontroleerd voor het volgende:</p>
                         </Box>
+
+                        <div className="enter-item">
+                            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
+                        </div>
+
                         <FormActions>
-                            <Button color={"inherit"} component="a" href="#/home">Annuleren</Button>
-                            <CopyToClipboard text={getURL(authTemplate)} >
-                                <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}
-                                    component="a" href={getWhatsappURL(authTemplate)} target="_blank">Andere Organisatie</Button>
-                            </CopyToClipboard>
+                            <Button color="inherit" component="a" href="#/home">Sluiten</Button>
                         </FormActions>
-                    </Fragment>
-                }
+                    </div>
+                )}
+
 
             </div>
         </CSSTransition>

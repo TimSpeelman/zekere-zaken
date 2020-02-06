@@ -1,5 +1,6 @@
+import { Snackbar } from "@material-ui/core";
 import clsx from "clsx";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HashRouter, Redirect, Route, RouteComponentProps, RouteProps, Switch, useParams, withRouter } from "react-router-dom";
 import { NavigateTo, ResolveReference } from "../commands/Command";
 import { isBroadcastReference } from "../services/references/types";
@@ -27,7 +28,6 @@ import { NewVerification } from "./pages/Verifier/NewVerification";
 import { OutgoingVerifReq } from "./pages/Verifier/OutgoingVerifReq";
 import { VerifReqOutbox } from "./pages/Verifier/VerifReqOutbox";
 
-
 type Color = "purple" | "white" | "green" | "yellow"
 
 export function MyRoute({ title, backURI, ...props }: { title: string, backURI?: string, color: Color } & RouteProps) {
@@ -38,8 +38,18 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
         <Route {...props} />
     );
 
+    const [open, setOpen] = useState(false);
+
     return (
         <div className={classes.root}>
+            <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={() => setOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                message="You have a new verification"
+            />
+
             {/* <CssBaseline />
             {title && <TopBar title={title} backURI={backURI} />} */}
 
@@ -48,7 +58,7 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
                 <div className="bg yellow"></div>
                 <div className="bg green"></div>
                 <div className="bg white"><div className={classes.whiteShieldBg}></div></div>
-                <div className="content container">
+                <div className="content container" onClick={() => setOpen(true)}>
                     {body}
                 </div>
             </main>
@@ -62,6 +72,9 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
 
     const isConnected = !!state.myId;
 
+    // Ugly way for determining the background color from within a page.
+    const [mood, setMood] = useState("normal");
+    const isSuccess = mood === "succeeded";
 
     const onScanQR = (qr: string) => {
         try {
@@ -90,6 +103,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
 
     const home = "#/home";
 
+
     return (
         <Switch>
             <MyRoute color="white" title="Instellingen" path="/settings" backURI={home}><Settings /></MyRoute>
@@ -99,12 +113,12 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
 
             {/* Verifiers */}
             <MyRoute color="purple" title="Verifiëren" path="/verifs/new" backURI={home}><NewVerification /></MyRoute>
-            <MyRoute color="purple" title="Verifiëren" path="/verifs/outbox/:reqId" backURI={home}><OutgoingVerifReq /></MyRoute>
+            <MyRoute color={isSuccess ? "green" : "purple"} title="Verifiëren" path="/verifs/outbox/:reqId" backURI={home}><OutgoingVerifReq onMoodChange={setMood} /></MyRoute>
             <MyRoute color="purple" title="Verificatiegeschiedenis" path="/verifs/outbox" backURI={home}><VerifReqOutbox /></MyRoute>
 
             {/* Subjects */}
             <MyRoute color="yellow" title="Badge" path="/badge" backURI={home}><MyBadge /></MyRoute>
-            <MyRoute color="purple" title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq /></MyRoute>
+            <MyRoute color={isSuccess ? "green" : "purple"} title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq onMoodChange={setMood} /></MyRoute>
             {/* <MyRoute color="white" title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
 
             <MyRoute color="white" title="Nieuw Machtigingsverzoek" path="/authreqs/new" backURI={home}><RequestAuthority /></MyRoute>
