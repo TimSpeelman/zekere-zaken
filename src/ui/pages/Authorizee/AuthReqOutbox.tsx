@@ -19,7 +19,7 @@ export function AuthReqOutbox() {
             classNames={"items"}
         >
             <div>
-                <PageTitle title={"Mijn Bevoegdheden"} showBackButton />
+                <PageTitle title={"Mijn Bevoegdheden"} showBackButton backURL="#/home" />
 
                 {auths.length === 0 &&
                     <div className="empty-message">U heeft nog geen bevoegdheden.</div>}

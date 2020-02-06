@@ -111,13 +111,16 @@ const useStyles = makeStyles((theme) => ({
         right: 32,
     },
     bottomCenterButton: {
-        width: 70,
-        height: 70,
         position: "absolute",
         bottom: 32,
         left: "50%",
-        marginLeft: -70 / 2,
-        marginBottom: (56 - 70) / 2,
+        marginLeft: -56 / 2,
+        // marginBottom: (56 - 70) / 2,
+
+        a: {
+            width: 70,
+            height: 70,
+        }
     },
     cover: {
         background: theme.palette.primary.main,

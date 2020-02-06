@@ -23,10 +23,11 @@ export function GivenAuthorization() {
             classNames={"items"}
         >
             <div>
-                <PageTitle title={"Machtigingen aan derden"} sub={"Door mij uitgegeven"} showBackButton />
+                <PageTitle title={"Machtigingen aan derden"} sub={"Door mij uitgegeven"} showBackButton backURL={"#/authreqs/inbox"} />
 
                 <div className="enter-item">
                     <AuthorityCard
+
                         authType={"givenAuthorization"}
                         legalEntity={authorization.legalEntity}
                         showSubjectName

@@ -9,20 +9,21 @@ interface Props {
     sub?: string;
     icon?: ReactElement;
     showBackButton?: boolean;
+    backURL?: string;
     onQuit?: () => void;
 }
 
-export function PageTitle({ title, sub, icon, showBackButton, onQuit }: Props) {
+export function PageTitle({ title, sub, icon, backURL, showBackButton, onQuit }: Props) {
     const history = useHistory();
 
     return (
         <Box className="page-title">
-            {showBackButton &&
+            {(showBackButton || !!backURL) &&
                 <IconButton
                     className="start-icon"
                     edge="start"
                     color="inherit"
-                    onClick={() => history.goBack()}
+                    onClick={() => backURL ? window.location.assign(backURL) : history.goBack()}
                 >
                     <ArrowBackIos />
                 </IconButton>

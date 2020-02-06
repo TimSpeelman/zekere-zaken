@@ -54,7 +54,7 @@ export function RequestAuthority() {
                     title={"Bevoegdheid aanvragen"}
                     sub={"Vraag een bevoegd persoon u te machtigen"}
                     icon={<img src={iconAuthReq} style={{ height: 100 }} />}
-                    showBackButton />
+                    showBackButton backURL="#/authreqs/outbox" />
 
                 <div className="enter-item">
                     <Paper className={classes.paper} >

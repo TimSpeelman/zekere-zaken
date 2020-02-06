@@ -40,7 +40,7 @@ export function OutgoingAuthReq() {
             classNames={"items"}
         >
             <div>
-                <PageTitle title={"Mijn Machtigingsverzoek"} showBackButton />
+                <PageTitle title={"Mijn Machtigingsverzoek"} showBackButton backURL="#/authreqs/outbox" />
 
                 <div className="enter-item">
                     <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} authType="authorizationRequest" />

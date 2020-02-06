@@ -1,4 +1,3 @@
-import { Snackbar } from "@material-ui/core";
 import clsx from "clsx";
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Redirect, Route, RouteComponentProps, RouteProps, Switch, useParams, withRouter } from "react-router-dom";
@@ -38,17 +37,8 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
         <Route {...props} />
     );
 
-    const [open, setOpen] = useState(false);
-
     return (
         <div className={classes.root}>
-            <Snackbar
-                open={open}
-                autoHideDuration={6000}
-                onClose={() => setOpen(false)}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                message="You have a new verification"
-            />
 
             {/* <CssBaseline />
             {title && <TopBar title={title} backURI={backURI} />} */}
@@ -58,7 +48,7 @@ export function MyRoute({ title, backURI, ...props }: { title: string, backURI?:
                 <div className="bg yellow"></div>
                 <div className="bg green"></div>
                 <div className="bg white"><div className={classes.whiteShieldBg}></div></div>
-                <div className="content container" onClick={() => setOpen(true)}>
+                <div className="content container">
                     {body}
                 </div>
             </main>
@@ -134,7 +124,7 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
             <MyRoute color="purple" title="Zekere Zaken App" path="/home"><Home /></MyRoute>
             <MyRoute color="white" title="Zekere Zaken App" path="/onboard/:redirectTo"><Onboard /></MyRoute>
             <MyRoute color="white" title="Zekere Zaken App" path="/onboard"><Onboard /></MyRoute>
-            <MyRoute color="white" title="" path="/"><Cover /></MyRoute>
+            <MyRoute color="purple" title="" path="/"><Cover /></MyRoute>
         </Switch>
     );
 });

@@ -71,7 +71,8 @@ export function IncomingAuthReq() {
                     title="Machtigingsverzoek"
                     sub={`Wilt u ${profile!.name} machtigen?`}
                     icon={<img src={iconAuthReq} style={{ height: 100 }} />}
-                    showBackButton />
+                    showBackButton
+                    backURL="#/authreqs/inbox" />
 
                 <div className="enter-item">
                     <PersonCard profile={profile!} />

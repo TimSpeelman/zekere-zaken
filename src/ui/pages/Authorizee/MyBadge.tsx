@@ -28,7 +28,7 @@ export function MyBadge() {
         >
             <div >
                 <PageTitle title={"Mijn Badge"} sub={"Laat deze scannen om uw bevoegdheid te bewijzen"}
-                    onQuit={() => window.location.assign("#/home")} />
+                    onQuit={() => window.location.assign("#/home")} backURL="#/home" />
 
                 <div className=" enter-item">
                     <Paper className="badge" elevation={6}>

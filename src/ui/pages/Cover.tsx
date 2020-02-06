@@ -1,9 +1,7 @@
-import { Button } from "@material-ui/core";
-import Box from '@material-ui/core/Box';
-import { default as React } from "react";
+import { default as React, useEffect, useState } from "react";
+import { CSSTransition } from "react-transition-group";
 import { useStyles } from "../../styles";
-import { fullScreen } from "../../util/fullScreenOnClick";
-import logo from "../assets/images/ZekereZakenLogo-white.svg";
+import purpleShield from "../assets/images/shield-purple-deep.svg";
 import { useLocalState } from "../hooks/useLocalState";
 
 export function Cover() {
@@ -11,11 +9,30 @@ export function Cover() {
     const { state } = useLocalState();
 
     const url = state.profile ? "#/home" : "#/onboard";
-    return (
-        <Box className={classes.cover}>
-            <img src={logo} alt="Zekere Zaken App" style={{ width: "100%", display: "block" }} />
+    const [ready, setReady] = useState(false);
 
-            <Button component="a" variant="contained" href={url} onClick={fullScreen}>Starten</Button>
-        </Box>
+    const [exit, setExit] = useState(false);
+    useEffect(() => {
+        setTimeout(() => {
+            setReady(false);
+        }, 3000);
+    }, [])
+
+    return (
+        <CSSTransition
+            in={ready}
+            appear={true}
+            onExited={() => window.location.assign("#/home")}
+            timeout={{ appear: 2000, enter: 1, exit: 1000 }}
+            classNames={"items"}
+        >
+            <div className="cover">
+                <img
+                    src={purpleShield}
+                    alt="Zekere Zaken App"
+                    onLoad={() => setReady(true)} style={{ width: "80%", display: "block", margin: "auto" }}
+                />
+            </div>
+        </CSSTransition>
     );
 }

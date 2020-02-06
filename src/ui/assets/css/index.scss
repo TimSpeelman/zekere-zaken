@@ -358,3 +358,26 @@ main.green {
         display: none;
     }
 }
+
+
+.cover {
+    height: 100%;
+    text-align: center;
+    display: flex;   
+    flex-direction: column;
+    align-items: space-evenly;
+
+    img {
+        transition: all 200ms;
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    &.items-appear-active img,
+    &.items-enter-done img,
+    &.items-appear-done img{
+        transition: all 2000ms;
+        transform: scale(1);
+        opacity: 1;
+    }
+}
