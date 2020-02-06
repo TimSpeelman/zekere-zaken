@@ -5,11 +5,14 @@ import CheckIcon from "@material-ui/icons/Check";
 import { isEqual, uniqWith } from "lodash";
 import { default as React, Fragment, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { CSSTransition } from "react-transition-group";
 import { AcceptANegWithLegalEntity } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
 import { LegalEntity } from "../../../types/State";
+import iconAuthReq from "../../assets/images/shield-authreq-v3.svg";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
+import { PageTitle } from "../../components/PageTitle";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
 import { useSelector } from "../../hooks/useSelector";
@@ -57,47 +60,64 @@ export function IncomingAuthReq() {
     const profile = profileResult.profile;
 
     return (
-        <Box p={1}>
-            <PersonCard profile={profile!} />
+        <CSSTransition
+            in={true}
+            appear={true}
+            timeout={{ appear: 3000, enter: 1, exit: 1 }}
+            classNames={"items"}
+        >
+            <div>
+                <PageTitle
+                    title="Machtigingsverzoek"
+                    sub={`Wilt u ${profile!.name} machtigen?`}
+                    icon={<img src={iconAuthReq} style={{ height: 100 }} />}
+                    showBackButton />
 
-            <Box pt={1} pb={1}>
-                <p><strong>{profile!.name}</strong> vraagt de volgende machtiging:</p>
-            </Box>
+                <div className="enter-item">
+                    <PersonCard profile={profile!} />
+                </div>
 
-            <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} authType="authorizationRequest" />
+                <Box pt={1} pb={1}>
+                    <p><strong>{profile!.name}</strong> vraagt de volgende machtiging:</p>
+                </Box>
 
-            {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
-                <Fragment>
-                    <Box pt={1} pb={1} className={classes.warning}>
-                        <p>Deze bevoegdheid zit niet in uw wallet. </p>
-                    </Box>
-                    <FormActions>
-                        <Button component="a" href="#/home">Annuleren</Button>
-                        {/* <Button variant={"contained"} color={"primary"} component="a" href={getURL(req)}>Aanvragen</Button> */}
-                    </FormActions>
-                </Fragment>
-            }
+                <div className="enter-item">
+                    <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} authType="authorizationRequest" />
+                </div>
 
-            {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
-                <Fragment>
-                    <Box pt={1} pb={1} >
-                        <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
-                        <List component="nav" >
-                            {entities.map(entity =>
-                                <ListItem key={entity.name}>
-                                    <ListItemText primary={entityTxt(entity)} secondary={authorizedMark()} />
-                                    <Button variant="contained" color={"primary"} onClick={() => acceptRequest(entity)}>Delen</Button>
-                                </ListItem>
-                            )}
-                        </List>
-                    </Box>
-                    <FormActions>
-                        <Button component="a" href="#/home">Annuleren</Button>
-                        {/* <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}>Andere Organisatie</Button> */}
-                    </FormActions>
-                </Fragment>
-            }
-        </Box>
+                {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
+                    <Fragment>
+                        <Box pt={1} pb={1} className={classes.warning}>
+                            <p>Deze bevoegdheid zit niet in uw wallet. </p>
+                        </Box>
+                        <FormActions>
+                            <Button component="a" href="#/home">Annuleren</Button>
+                            {/* <Button variant={"contained"} color={"primary"} component="a" href={getURL(req)}>Aanvragen</Button> */}
+                        </FormActions>
+                    </Fragment>
+                }
+
+                {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
+                    <Fragment>
+                        <Box pt={1} pb={1} >
+                            <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>
+                            <List component="nav" >
+                                {entities.map(entity =>
+                                    <ListItem key={entity.name}>
+                                        <ListItemText primary={entityTxt(entity)} secondary={authorizedMark()} />
+                                        <Button variant="contained" color={"primary"} onClick={() => acceptRequest(entity)}>Delen</Button>
+                                    </ListItem>
+                                )}
+                            </List>
+                        </Box>
+                        <FormActions>
+                            <Button component="a" href="#/home">Annuleren</Button>
+                            {/* <Button variant={"contained"} color={"primary"} onClick={fastAuthReq}>Andere Organisatie</Button> */}
+                        </FormActions>
+                    </Fragment>
+                }
+            </div>
+        </CSSTransition>
     );
 }
 

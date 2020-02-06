@@ -81,13 +81,17 @@ export function IncomingVerifReq() {
                     icon={<img src={iconVerif} style={{ height: 100 }} />}
                     onQuit={() => window.location.assign("#/home")} />
 
-                <PersonCard profile={profile} />
+                <div className="enter-item">
+                    <PersonCard profile={profile} />
+                </div>
 
                 <Box pt={1} pb={1}>
                     <p><strong>{profile.name}</strong> wil uw bevoegdheid controleren voor het volgende:</p>
                 </Box>
 
-                <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
+                <div className="enter-item">
+                    <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
+                </div>
 
                 {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                     <Fragment>
