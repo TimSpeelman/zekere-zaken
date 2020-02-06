@@ -347,3 +347,14 @@ main.green {
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
+
+.logo-only {
+    .home-logo {
+        height: 100%!important;
+        background-size: 50%;
+    }
+    .home-menu,
+    .bottom-tools {
+        display: none;
+    }
+}

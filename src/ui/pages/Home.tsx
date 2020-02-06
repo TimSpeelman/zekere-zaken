@@ -29,7 +29,7 @@ export function Home() {
             classNames={"items"}
         >
             <div className="full-height">
-                <div className={classes.homeLogo + " enter-item"}>Zekere Zaken</div>
+                <div className={classes.homeLogo + " enter-item home-logo"}>Zekere Zaken</div>
                 <div className="home-menu">
 
                     <div>
@@ -63,7 +63,9 @@ export function Home() {
                     </div>
                 </div>
 
-                <BottomTools showQR />
+                <div className="bottom-tools">
+                    <BottomTools showQR />
+                </div>
             </div>
         </CSSTransition>
     );

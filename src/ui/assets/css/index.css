@@ -414,4 +414,14 @@ main.green .bg.green {
   -webkit-animation-timing-function: linear;
           animation-timing-function: linear;
 }
+
+.logo-only .home-logo {
+  height: 100% !important;
+  background-size: 50%;
+}
+
+.logo-only .home-menu,
+.logo-only .bottom-tools {
+  display: none;
+}
 /*# sourceMappingURL=index.css.map */

@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
     },
     homeLogo: {
         backgroundImage: `url(${purpleShield})`,
-        backgroundPositionX: "center",
+        backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         marginBottom: 16,
         height: "30%",

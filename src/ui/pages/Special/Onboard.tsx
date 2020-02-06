@@ -51,7 +51,6 @@ export function Onboard() {
 
     return (
         <div>
-            <Box p={1}></Box>
 
             <p>Voor deze demo maakt u handmatig uw profiel aan. In volgende versies zullen deze gegevens echter uit uw paspoort komen.</p>
 
