@@ -33,7 +33,7 @@ export class ProfileExchanger implements IHandleMessages<MsgProfile> {
 
                 return true;
             } case "RequestProfile": {
-                this.sendProfileToPeer(senderId);
+                this.sendProfileToPeer(senderId, true);
             }
         }
 

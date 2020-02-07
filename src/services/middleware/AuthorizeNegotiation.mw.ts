@@ -26,8 +26,11 @@ export class AuthorizeNegotiationMiddleware {
         negHook.on((negotiation) => {
             const isNew = !this.stateMgr.state.authorizeNegotiations.find(n => n.id === negotiation.id);
 
-            this.commandHook.fire(VerifyProfile({ peerId: negotiation.authorizerId }));
-            this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
+            if (this.stateMgr.state.myId === negotiation.subjectId) {
+                this.commandHook.fire(VerifyProfile({ peerId: negotiation.authorizerId }));
+            } else {
+                this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
+            }
 
             this.eventHook.fire(ANegotiationUpdated({ negotiation }))
 

@@ -29,8 +29,11 @@ export class VerifyNegotiationMiddleware {
             const isNew = !this.stateMgr.state.verifyNegotiations.find(n => n.sessionId === negotiation.sessionId);
 
             // FIXME
-            this.commandHook.fire(VerifyProfile({ peerId: negotiation.verifierId }));
-            this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
+            if (this.stateMgr.state.myId === negotiation.subjectId) {
+                this.commandHook.fire(VerifyProfile({ peerId: negotiation.verifierId }));
+            } else {
+                this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
+            }
             this.eventHook.fire(VNegotiationUpdated({ negotiation }))
 
             if (isNew && negotiation.fromReference) {

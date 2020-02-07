@@ -16,6 +16,7 @@ import { PageTitle } from "../../components/PageTitle";
 import { PersonCard } from "../../components/PersonCard";
 import { useCommand } from "../../hooks/useCommand";
 import { useSelector } from "../../hooks/useSelector";
+import { selectGivenAuthorizations } from "../../selectors/selectGivenAuthorizations";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
 import { selectOpenInAuthReqById } from "../../selectors/selectOpenInAuthReqs";
 import { selectProfileStatusById } from "../../selectors/selectProfile";
@@ -28,16 +29,17 @@ export function IncomingAuthReq() {
     const req = useSelector(id ? selectOpenInAuthReqById(id) : undefined);
     const profileResult = useSelector(req ? selectProfileStatusById(req.subjectId) : undefined);
     const auths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
+    const givenAuths = useSelector(selectGivenAuthorizations) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
     const history = useHistory();
 
     useEffect(() => {
-        if (req?.resultedInAuthId) {
-            history.push(`/given-authorizations/${req!.resultedInAuthId}`);
-            // history.go(0);
+        const given = givenAuths.find(a => a.sessionId === id);
+        if (given) {
+            history.push(`/given-authorizations/${given.id}`);
         }
-    }, [req])
+    }, [givenAuths])
 
     const acceptRequest = (legalEntity: LegalEntity) => {
         if (req) {
