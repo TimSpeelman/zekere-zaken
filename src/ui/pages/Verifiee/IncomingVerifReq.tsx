@@ -123,7 +123,7 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
                                     <p>Deze bevoegdheid zit niet in uw wallet. </p>
                                 </Box>
                                 <FormActions>
-                                    <Button component="a" href="#/home">Annuleren</Button>
+                                    <Button component="a" href="#/home" color="inherit">Annuleren</Button>
                                     <Button variant={"contained"} color={"primary"} component="a"
                                         onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
                                 </FormActions>
