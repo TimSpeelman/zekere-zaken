@@ -21,6 +21,9 @@ export function Home() {
     const profile = state.profile;
     const [loaded, setLoaded] = useState(0);
 
+    const numMyAuths = state.myAuthorizations.length;
+    const numGivenAuths = state.givenAuthorizations.length;
+
     return (
         <CSSTransition
             in={loaded === 4}
@@ -28,7 +31,7 @@ export function Home() {
             timeout={{ appear: 1000, enter: 100, exit: 1 }}
             classNames={"items"}
         >
-            <div className="full-height">
+            <div className="full-height home-container">
                 <div className={classes.homeLogo + " enter-item home-logo"}>Zekere Zaken</div>
                 <div className="home-menu">
 
@@ -46,19 +49,20 @@ export function Home() {
                         <a className="invisible-link white enter-item delay-3" href="#/authreqs/outbox">
                             <div className="shield-with-number">
                                 <img src={iconShieldYellow} onLoad={() => setLoaded(loaded + 1)} />
-                                <span>3</span>
+                                <span>{numMyAuths}</span>
                             </div>
                             <span className="title">Mijn Bevoegdheden</span>
-                            <span className="sub">U heeft nieuwe bevoegdheden</span>
+                            <span className="sub">U heeft {numMyAuths} bevoegdheden</span>
                         </a>
 
                         <a className="invisible-link white enter-item delay-4" href="#/authreqs/inbox">
                             <div className="shield-with-number">
                                 <img src={iconShieldYellowHalf} onLoad={() => setLoaded(loaded + 1)} />
-                                <span>0</span>
+                                <span>{numGivenAuths}</span>
                             </div>
                             <span className="title">Mijn Machtigingen</span>
-                            <span className="sub">U heeft nog niemand gemachtigd</span>
+                            <span className="sub">{numGivenAuths === 0 ? "U heeft nog niemand gemachtigd" :
+                                `U heeft ${numGivenAuths} machtigingen uitgegeven`}</span>
                         </a>
                     </div>
                 </div>

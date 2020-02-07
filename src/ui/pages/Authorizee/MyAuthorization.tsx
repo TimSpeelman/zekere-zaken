@@ -24,7 +24,7 @@ export function MyAuthorization() {
             classNames={"items"}
         >
             <div className="my-auth">
-                <PageTitle title={"Mijn Bevoegdheden"} showBackButton backURL={"#/authreqs/outbox"} />
+                <PageTitle title={"Mijn Bevoegdheden"} showBackButton backURL={"/authreqs/outbox"} />
 
                 <div className="enter-item">
                     <AuthorityCard

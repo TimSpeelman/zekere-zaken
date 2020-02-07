@@ -4,7 +4,7 @@ import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import { isEqual, uniqWith } from "lodash";
 import { default as React, Fragment, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { AcceptANegWithLegalEntity } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
@@ -30,9 +30,12 @@ export function IncomingAuthReq() {
     const auths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
     const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
+    const history = useHistory();
+
     useEffect(() => {
         if (req?.resultedInAuthId) {
-            window.location.assign(`#/given-authorizations/${req!.resultedInAuthId}`);
+            history.push(`/given-authorizations/${req!.resultedInAuthId}`);
+            // history.go(0);
         }
     }, [req])
 
@@ -72,7 +75,7 @@ export function IncomingAuthReq() {
                     sub={`Wilt u ${profile!.name} machtigen?`}
                     icon={<img src={iconAuthReq} style={{ height: 100 }} />}
                     showBackButton
-                    backURL="#/authreqs/inbox" />
+                    backURL="/authreqs/inbox" />
 
                 <div className="enter-item">
                     <PersonCard profile={profile!} />

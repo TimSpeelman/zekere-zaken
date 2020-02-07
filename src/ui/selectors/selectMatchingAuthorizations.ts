@@ -1,3 +1,4 @@
+import { isEqual } from "lodash";
 import { VerificationSpec } from "../../services/identity/verification/types";
 import { Authority, Authorization, IState } from "../../types/State";
 import { selectMyAuthorizations } from "./selectMyAuthorizations";
@@ -7,7 +8,7 @@ export function selectMatchingAuthorizations(spec: VerificationSpec) {
 }
 
 function match(spec: VerificationSpec, auth: Authorization): boolean {
-    const correctLegalEntity = !spec.legalEntity || spec.legalEntity === auth.legalEntity;
+    const correctLegalEntity = !spec.legalEntity || isEqual(spec.legalEntity, auth.legalEntity);
     return correctLegalEntity && matchAuthority(spec.authority, auth.authority);
 }
 

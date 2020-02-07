@@ -31,6 +31,10 @@ body {
     }
 }
 
+#root {
+    height: 100%;
+}
+
 main {
     height: 100%;
     font-family: Lato;
@@ -230,7 +234,18 @@ main.green {
     padding: 16px;
 }
 
+.home-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.home-logo {
+    flex-grow: 1;
+}
+
 .home-menu {    
+
+    margin-bottom: 72px;
 
     & .row      {
         display: flex;
@@ -245,7 +260,7 @@ main.green {
         align-items: center;
 
         &:first-child {
-            margin-right: 16px;
+            margin-right: 4px;
         }
 
         img {

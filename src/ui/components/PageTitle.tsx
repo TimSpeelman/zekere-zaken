@@ -23,7 +23,7 @@ export function PageTitle({ title, sub, icon, backURL, showBackButton, onQuit }:
                     className="start-icon"
                     edge="start"
                     color="inherit"
-                    onClick={() => backURL ? window.location.assign(backURL) : history.goBack()}
+                    onClick={() => backURL ? history.replace(backURL) : history.goBack()}
                 >
                     <ArrowBackIos />
                 </IconButton>

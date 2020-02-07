@@ -5,7 +5,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import QRCode from "qrcode.react";
 import { default as React, useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { RemoveVReqTemplate } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
@@ -33,6 +33,7 @@ export function OutgoingVerifReq({ onMoodChange }: Props) {
     const { reqId: id } = useParams();
     const { dispatch } = useCommand();
     const { state } = useLocalState();
+    const history = useHistory();
     const myId = state.myId;
 
     const outReq = useSelector(id ? selectOutVerReqByTemplateId(id) : undefined);
@@ -52,7 +53,7 @@ export function OutgoingVerifReq({ onMoodChange }: Props) {
     const deleteItem = () => {
         if (req) {
             dispatch(RemoveVReqTemplate({ templateId: req.id }))
-            window.location.assign("#/verifs/outbox");
+            history.replace("#/verifs/outbox");
         }
     }
 

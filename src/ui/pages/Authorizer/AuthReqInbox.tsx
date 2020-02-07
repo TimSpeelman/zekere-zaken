@@ -26,7 +26,7 @@ export function AuthReqInbox() {
             classNames={"items"}
         >
             <div>
-                <PageTitle title={"Machtigingen aan derden"} showBackButton backURL="#/home" />
+                <PageTitle title={"Machtigingen aan derden"} showBackButton backURL="/home" />
 
                 {reqs.length > 0 && (
                     <Fragment>

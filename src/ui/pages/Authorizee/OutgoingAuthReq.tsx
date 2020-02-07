@@ -3,7 +3,7 @@ import Button from "@material-ui/core/Button";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { default as React, useEffect } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { AuthorityCard } from "../../components/AuthorityCard";
 import { FormActions } from "../../components/FormActions";
@@ -13,6 +13,7 @@ import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 
 export function OutgoingAuthReq() {
     const { reqId: id } = useParams();
+    const history = useHistory();
     const { state, manager } = useLocalState();
 
     const template = state.outgoingAuthTemplates.find(r => r.id === id)
@@ -21,14 +22,14 @@ export function OutgoingAuthReq() {
 
     useEffect(() => {
         if (template?.answeredWithAuthorizationId) {
-            window.location.assign(`#/my-authorizations/${template!.answeredWithAuthorizationId}`);
+            history.replace(`#/my-authorizations/${template!.answeredWithAuthorizationId}`);
         }
     }, [template])
 
     const deleteItem = () => {
         if (template) {
             manager.removeOutAuthTemplate(template.id);
-            window.location.assign("#/authreqs/outbox");
+            history.replace("#/authreqs/outbox");
         }
     }
 
@@ -40,7 +41,7 @@ export function OutgoingAuthReq() {
             classNames={"items"}
         >
             <div>
-                <PageTitle title={"Mijn Machtigingsverzoek"} showBackButton backURL="#/authreqs/outbox" />
+                <PageTitle title={"Mijn Machtigingsverzoek"} showBackButton backURL="/authreqs/outbox" />
 
                 <div className="enter-item">
                     <AuthorityCard title={"Uw Machtigingsverzoek"} legalEntity={template.legalEntity} authority={template.authority} authType="authorizationRequest" />

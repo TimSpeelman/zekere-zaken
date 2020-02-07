@@ -20,7 +20,7 @@ export function VerifReqOutbox() {
                 <PageTitle
                     title={"Verificatiegeschiedenis"}
                     showBackButton
-                    backURL="#/verifs/new"
+                    backURL="/verifs/new"
                 />
 
                 {reqs.length === 0 && <div className="empty-message">Uw verificatiegeschiedenis is leeg.</div>}
