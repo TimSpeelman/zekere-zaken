@@ -51,6 +51,7 @@ export const dummyState = (myId: string): IState => {
             piet: { status: "Verified", profile: Piet },
         },
         succeededIDAuthorize: [],
+        myLegalEntities: [],
     };
 }
 

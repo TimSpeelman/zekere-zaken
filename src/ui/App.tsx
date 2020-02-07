@@ -17,6 +17,8 @@ import { GivenAuthorization } from "./pages/Authorizer/GivenAuthorization";
 import { IncomingAuthReq } from "./pages/Authorizer/IncomingAuthReq";
 import { Cover } from "./pages/Cover";
 import { Home } from "./pages/Home";
+import { MyLegalEntity } from "./pages/LegalEntityOfficial/MyLegalEntity";
+import { RequestLegalEntity } from "./pages/LegalEntityOfficial/RequestLegalEntity";
 import { LoadingScreen } from "./pages/Special/LoadingScreen";
 import { Onboard } from "./pages/Special/Onboard";
 import { Resolve } from "./pages/Special/Resolve";
@@ -110,6 +112,9 @@ export const AppBody = withRouter((props: RouteComponentProps) => {
             <MyRoute color="yellow" title="Badge" path="/badge" backURI={home}><MyBadge /></MyRoute>
             <MyRoute color={isSuccess ? "green" : "purple"} title="Inkomende Verificate" path="/verifs/inbox/:reqId" backURI={home}><IncomingVerifReq onMoodChange={setMood} /></MyRoute>
             {/* <MyRoute color="white" title="Verificaties" path="/verifs/inbox"><Verifications tab={"inbox"} /></MyRoute> */}
+
+            <MyRoute color="white" title="" path="/my-legal-entities/new" backURI={home}><RequestLegalEntity /></MyRoute>
+            <MyRoute color="white" title="" path="/my-legal-entities/:id" backURI={home}><MyLegalEntity /></MyRoute>
 
             <MyRoute color="white" title="Nieuw Machtigingsverzoek" path="/authreqs/new" backURI={home}><RequestAuthority /></MyRoute>
             <MyRoute color="white" title="Uitgaand Machtigingsverzoek" path="/authreqs/outbox/:reqId" backURI={"#/authreqs/outbox"}><OutgoingAuthReq /></MyRoute>

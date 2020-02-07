@@ -20,6 +20,7 @@ import { useCommand } from "../../hooks/useCommand";
 import { useSelector } from "../../hooks/useSelector";
 import { useWhatsappURL } from "../../hooks/useWhatsappURL";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
+import { selectMyLegalEntities } from "../../selectors/selectMyLegalEntities";
 import { selectOpenInVerReqById } from "../../selectors/selectOpenInVerReqs";
 import { selectProfileStatusById } from "../../selectors/selectProfile";
 
@@ -37,9 +38,12 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
     const classes = useStyles({});
 
     const inVReq = useSelector(id ? selectOpenInVerReqById(id) : undefined);
+
     const profileResult = useSelector(inVReq ? selectProfileStatusById(inVReq.verifierId) : undefined);
-    const auths = useSelector(inVReq ? selectMatchingAuthorizations({ legalEntity: inVReq.legalEntity!, authority: inVReq.authority }) : undefined) || [];
-    const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
+    const myAuths = useSelector(inVReq ? selectMatchingAuthorizations({ legalEntity: inVReq.legalEntity!, authority: inVReq.authority }) : undefined) || [];
+    const myEntities = useSelector(selectMyLegalEntities) || [];
+    const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myEntities.map((e) => e.entity)];
+    const entities = uniqWith(availableEntities, isEqual);
 
     const { getURL, getWhatsappURL } = useWhatsappURL();
 
@@ -117,7 +121,7 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
                             <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
                         </div>
 
-                        {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
+                        {entities.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                             <Fragment>
                                 <Box pt={1} pb={1} className={classes.warning}>
                                     <p>Deze bevoegdheid zit niet in uw wallet. </p>
@@ -130,7 +134,7 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
                             </Fragment>
                         }
 
-                        {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
+                        {entities.length > 0 && // When we have one or more Authorizations, the user must pick.
                             <Fragment>
                                 <Box pt={1} pb={1} >
                                     <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>

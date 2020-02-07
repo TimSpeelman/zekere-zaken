@@ -18,6 +18,7 @@ import { useCommand } from "../../hooks/useCommand";
 import { useSelector } from "../../hooks/useSelector";
 import { selectGivenAuthorizations } from "../../selectors/selectGivenAuthorizations";
 import { selectMatchingAuthorizations } from "../../selectors/selectMatchingAuthorizations";
+import { selectMyLegalEntities } from "../../selectors/selectMyLegalEntities";
 import { selectOpenInAuthReqById } from "../../selectors/selectOpenInAuthReqs";
 import { selectProfileStatusById } from "../../selectors/selectProfile";
 
@@ -28,9 +29,13 @@ export function IncomingAuthReq() {
 
     const req = useSelector(id ? selectOpenInAuthReqById(id) : undefined);
     const profileResult = useSelector(req ? selectProfileStatusById(req.subjectId) : undefined);
-    const auths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
+
+    const myAuths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
+    const myEntities = useSelector(selectMyLegalEntities) || [];
+    const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myEntities.map((e) => e.entity)];
+    const entities = uniqWith(availableEntities, isEqual);
+
     const givenAuths = useSelector(selectGivenAuthorizations) || [];
-    const entities = uniqWith(auths.map((a) => a.legalEntity), isEqual);
 
     const history = useHistory();
 
@@ -91,7 +96,7 @@ export function IncomingAuthReq() {
                     <AuthorityCard legalEntity={req.legalEntity} authority={req.authority} authType="authorizationRequest" />
                 </div>
 
-                {auths.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
+                {entities.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
                     <Fragment>
                         <Box pt={1} pb={1} className={classes.warning}>
                             <p>Deze bevoegdheid zit niet in uw wallet. </p>
@@ -103,7 +108,7 @@ export function IncomingAuthReq() {
                     </Fragment>
                 }
 
-                {auths.length > 0 && // When we have one or more Authorizations, the user must pick.
+                {entities.length > 0 && // When we have one or more Authorizations, the user must pick.
                     <Fragment>
                         <Box pt={1} pb={1} >
                             <p>Vanuit welke organisatie wilt u uw bevoegdheid delen?</p>

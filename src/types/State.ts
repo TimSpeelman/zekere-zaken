@@ -29,6 +29,9 @@ export interface IState {
     /** For Authorizer. Authorizations issued by the current user to other subjects. */
     givenAuthorizations: Authorization[];
 
+    /** For Owners. Legal Entity attestations issued to the current user. */
+    myLegalEntities: LegalEntityAttestation[];
+
     /** Profile of current user */
     profile?: Profile;
 
@@ -122,6 +125,11 @@ export function AuthorizationFromNeg(neg: AuthorizeNegotiation): Authorization |
 export interface Actor {
     name: string;
     photo: string;
+}
+
+export interface LegalEntityAttestation {
+    id: string;
+    entity: LegalEntity;
 }
 
 export interface LegalEntity {

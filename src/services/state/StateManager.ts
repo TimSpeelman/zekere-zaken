@@ -42,6 +42,7 @@ export class StateManager {
         myAuthorizations: [],
         givenAuthorizations: [],
         verifyNegotiations: [],
+        myLegalEntities: [],
     }
 
     setState(state: Partial<IState> | ((state: IState) => Partial<IState>)) {
