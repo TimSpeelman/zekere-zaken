@@ -41,8 +41,8 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
 
     const profileResult = useSelector(inVReq ? selectProfileStatusById(inVReq.verifierId) : undefined);
     const myAuths = useSelector(inVReq ? selectMatchingAuthorizations({ legalEntity: inVReq.legalEntity!, authority: inVReq.authority }) : undefined) || [];
-    const myEntities = useSelector(selectMyLegalEntities) || [];
-    const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myEntities.map((e) => e.entity)];
+    const myMatchingEntities = (useSelector(selectMyLegalEntities) || []).filter((e) => !inVReq?.legalEntity || isEqual(e.entity, inVReq.legalEntity));
+    const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myMatchingEntities.map((e) => e.entity)];
     const entities = uniqWith(availableEntities, isEqual);
 
     const { getURL, getWhatsappURL } = useWhatsappURL();

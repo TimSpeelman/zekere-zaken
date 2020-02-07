@@ -31,8 +31,8 @@ export function IncomingAuthReq() {
     const profileResult = useSelector(req ? selectProfileStatusById(req.subjectId) : undefined);
 
     const myAuths = useSelector(req ? selectMatchingAuthorizations({ authority: req.authority, legalEntity: req.legalEntity! }) : undefined) || [];
-    const myEntities = useSelector(selectMyLegalEntities) || [];
-    const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myEntities.map((e) => e.entity)];
+    const myMatchingEntities = (useSelector(selectMyLegalEntities) || []).filter((e) => !req?.legalEntity || isEqual(e.entity, req.legalEntity));
+    const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myMatchingEntities.map((e) => e.entity)];
     const entities = uniqWith(availableEntities, isEqual);
 
     const givenAuths = useSelector(selectGivenAuthorizations) || [];

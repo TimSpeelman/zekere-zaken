@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { dummyState } from "./dummy";
 import { SockAgent } from "./services/identity/id-layer/SockAgent";
 import { MyAgent } from "./services/MyAgent";
 import { SocketConnection } from "./services/socket";
@@ -28,10 +27,10 @@ export function useDependenciesAfterSetup(): Deps | undefined {
             setMyId(me.id);
 
             // For demo purposes, we use a dummy state to prefill the app.
-            if (!stateManager.usedCache) {
-                console.log("Using dummy state");
-                stateManager.setState(dummyState(me.id))
-            }
+            // if (!stateManager.usedCache) {
+            //     console.log("Using dummy state");
+            //     stateManager.setState(dummyState(me.id))
+            // }
         });
     }, []);
 
