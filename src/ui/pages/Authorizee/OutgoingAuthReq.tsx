@@ -22,14 +22,14 @@ export function OutgoingAuthReq() {
 
     useEffect(() => {
         if (template?.answeredWithAuthorizationId) {
-            history.replace(`#/my-authorizations/${template!.answeredWithAuthorizationId}`);
+            history.replace(`/my-authorizations/${template!.answeredWithAuthorizationId}`);
         }
     }, [template])
 
     const deleteItem = () => {
         if (template) {
             manager.removeOutAuthTemplate(template.id);
-            history.replace("#/authreqs/outbox");
+            history.replace("/authreqs/outbox");
         }
     }
 

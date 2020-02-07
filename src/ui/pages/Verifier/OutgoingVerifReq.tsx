@@ -53,7 +53,7 @@ export function OutgoingVerifReq({ onMoodChange }: Props) {
     const deleteItem = () => {
         if (req) {
             dispatch(RemoveVReqTemplate({ templateId: req.id }))
-            history.replace("#/verifs/outbox");
+            history.replace("/verifs/outbox");
         }
     }
 

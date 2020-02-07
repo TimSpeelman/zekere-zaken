@@ -1,3 +1,4 @@
+import { Button } from "@material-ui/core";
 import { default as React } from "react";
 import { useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
@@ -37,6 +38,9 @@ export function GivenAuthorization() {
                     />
                 </div>
 
+                <div className="show-all">
+                    <Button component="a" href="#/authreqs/inbox">Toon alles</Button>
+                </div>
             </div>
         </CSSTransition>
 
