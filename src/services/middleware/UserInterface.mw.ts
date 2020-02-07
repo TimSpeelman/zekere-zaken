@@ -13,6 +13,7 @@ export class UserInterfaceMiddleware {
         this.eventHook.on((e) => {
             switch (e.type) {
                 case "RefResolvedToVerify":
+                case "ReceivedVerifyRequest":
                     return this.commandHook.fire(NavigateTo({ path: `#/verifs/inbox/${e.negotiationId}` }));
                 case "RefResolvedToAuthorize":
                     return this.commandHook.fire(NavigateTo({ path: `#/authreqs/inbox/${e.negotiationId}` }));

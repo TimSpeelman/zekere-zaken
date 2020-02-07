@@ -1,5 +1,5 @@
-import { InvokeIDVerify, UserCommand, VerifyProfile } from "../../commands/Command";
-import { DomainEvent, RefResolvedToVerify, VNegotiationUpdated, VTemplateAnswered } from "../../commands/Event";
+import { InvokeIDVerify, RequestVerify, UserCommand, VerifyProfile } from "../../commands/Command";
+import { DomainEvent, ReceivedVerifyRequest, RefResolvedToVerify, VNegotiationUpdated, VTemplateAnswered } from "../../commands/Event";
 import { failIfFalsy } from "../../util/failIfFalsy";
 import { Hook } from "../../util/Hook";
 import { specIsComplete } from "../identity/authorization/types";
@@ -30,14 +30,19 @@ export class VerifyNegotiationMiddleware {
 
             // FIXME
             if (this.stateMgr.state.myId === negotiation.subjectId) {
+                if (isNew) {
+                    this.eventHook.fire(ReceivedVerifyRequest({ negotiationId: negotiation.sessionId }))
+                }
                 this.commandHook.fire(VerifyProfile({ peerId: negotiation.verifierId }));
             } else {
                 this.commandHook.fire(VerifyProfile({ peerId: negotiation.subjectId }));
             }
             this.eventHook.fire(VNegotiationUpdated({ negotiation }))
 
-            if (isNew && negotiation.fromReference) {
-                this.eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
+            if (isNew) {
+                if (negotiation.fromReference) {
+                    this.eventHook.fire(RefResolvedToVerify({ negotiationId: negotiation.sessionId, reference: negotiation.fromReference }));
+                }
             }
         })
 
@@ -69,6 +74,8 @@ export class VerifyNegotiationMiddleware {
 
                     stgVerifiee.reject(session!); // FIXME, always verifiee?
                     break;
+                } case "RequestVerify": {
+                    stgVerifier.startVerify(this.stateMgr.state.myId, cmd.subjectId, cmd.spec, cmd.reference, cmd.templateId);
                 }
             }
 
@@ -91,7 +98,6 @@ export class VerifyNegotiationMiddleware {
         this.setupTriggerVerifyOnResolve(stgVerifier);
     }
 
-
     protected setupTriggerVerifyOnResolve(stgVerifier: VerifierNegotiationStrategy) {
 
         this.messenger.addHandler(({ senderId, message }) => {
@@ -101,7 +107,7 @@ export class VerifyNegotiationMiddleware {
                 if (template) {
                     const { legalEntity, authority } = template
 
-                    stgVerifier.startVerify(this.messenger.me!.id, senderId, { legalEntity, authority }, reference, template.id);
+                    this.commandHook.fire(RequestVerify({ subjectId: senderId, spec: { legalEntity, authority }, reference, templateId: template.id }))
 
                     return true;
                 }

@@ -1,5 +1,5 @@
 import { AuthorizationTransaction } from "../services/identity/authorization/types";
-import { VerificationTransaction } from "../services/identity/verification/types";
+import { VerificationSpec, VerificationTransaction } from "../services/identity/verification/types";
 import { BroadcastReference } from "../services/references/types";
 import { AuthorizationTemplate, LegalEntity, VerificationTemplate } from "../types/State";
 
@@ -9,6 +9,7 @@ export type UserCommand =
     CmdToggleConsole |
     CmdNavigateTo |
     CmdResolveReference |
+    CmdRequestVerify |
     CmdCreateVReqTemplate |
     CmdRemoveVReqTemplate |
     CmdCreateAReqTemplate |
@@ -62,6 +63,18 @@ export interface CmdResolveReference {
 
 export const ResolveReference =
     factory<CmdResolveReference>("ResolveReference");
+
+
+export interface CmdRequestVerify {
+    type: "RequestVerify",
+    subjectId: string,
+    spec: Partial<VerificationSpec>,
+    templateId?: string,
+    reference?: string,
+}
+
+export const RequestVerify =
+    factory<CmdRequestVerify>("RequestVerify");
 
 
 export interface CmdCreateVReqTemplate {

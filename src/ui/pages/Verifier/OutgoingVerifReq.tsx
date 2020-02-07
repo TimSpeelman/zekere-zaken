@@ -7,7 +7,7 @@ import { default as React, useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useHistory, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
-import { RemoveVReqTemplate } from "../../../commands/Command";
+import { RemoveVReqTemplate, RequestVerify } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
 import { authorityShort } from "../../../util/intl";
 import { last } from "../../../util/last";
@@ -21,6 +21,7 @@ import { useLocalState } from "../../hooks/useLocalState";
 import { useSelector } from "../../hooks/useSelector";
 import { selectOutVerReqByTemplateId } from "../../selectors/selectOutVerReqs";
 import { selectProfileById } from "../../selectors/selectProfile";
+import { ScanQR } from "../Special/ScanQR";
 
 type Mode = "idle" | "pending" | "succeeded" | "failed";
 
@@ -72,6 +73,34 @@ export function OutgoingVerifReq({ onMoodChange }: Props) {
     const isSucceeded = mode === "succeeded";
     const isFailed = mode === "failed";
 
+    const [isScanning, setScanning] = useState(false);
+    const [waitingForSub, setWaitingForSub] = useState(false);
+
+    const scanQR = () => {
+        setScanning(true);
+    }
+
+    const handleScan = (qr: string): boolean => {
+        try {
+            const val: any = JSON.parse(qr);
+            if (!val.peerId) {
+                return false;
+            } else {
+                const spec = { legalEntity: req?.legalEntity, authority: req?.authority };
+                dispatch(RequestVerify({ subjectId: val.peerId, spec, templateId: req?.id }))
+                setScanning(false);
+                setWaitingForSub(true);
+                return true;
+            }
+        } catch (e) {
+            return false;
+        }
+    }
+
+    if (isScanning) return (
+        <ScanQR onScanQR={handleScan} />
+    )
+
     return !req ? <div>Dit verzoek bestaat niet. </div> : (
         <CSSTransition
             in={true}
@@ -82,19 +111,21 @@ export function OutgoingVerifReq({ onMoodChange }: Props) {
             <div>
                 <PageTitle
                     title={"Verifiëren"}
-                    sub={subtitles[mode]}
+                    sub={waitingForSub ? "We wachten op bevestiging van de gescande persoon.." : subtitles[mode]}
                     onQuit={() => window.location.assign("#/home")}
                 />
 
                 {isIdle && (
                     <div>
-                        <div className={"enter-item delay-2"}>
-                            <Paper className={classes.paper} style={{ marginBottom: 12 }}>
-                                <AspectRatio heightOverWidth={1}>
-                                    <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
-                                </AspectRatio>
-                            </Paper>
-                        </div>
+                        {!waitingForSub && (
+                            <div className={"enter-item delay-2"}>
+                                <Paper className={classes.paper} style={{ marginBottom: 12 }}>
+                                    <AspectRatio heightOverWidth={1}>
+                                        <QRCode value={qrValue} size={256} level={"M"} style={{ width: "100%", height: "100%" }} />
+                                    </AspectRatio>
+                                </Paper>
+                            </div>
+                        )}
 
                         <CopyToClipboard text={qrValue} onCopy={() => console.log("Copied to clipboard:", qrValue)}>
                             <div className={"enter-item delay-4"}>
@@ -105,6 +136,7 @@ export function OutgoingVerifReq({ onMoodChange }: Props) {
 
                         <FormActions>
                             <IconButton onClick={deleteItem} color="inherit"><DeleteIcon /></IconButton>
+                            <Button color="inherit" onClick={scanQR}>Scan QR</Button>
 
                             <Button color="inherit" component="a" href="#/home">Sluiten</Button>
                         </FormActions>

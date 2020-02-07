@@ -8,6 +8,7 @@ export type DomainEvent =
     EventProfileVerified |
     EventProfileVerificationFailed |
     EventRefResolvedToVerify |
+    EventReceivedVerifyRequest |
     EventRefResolvedToAuthorize |
     EventVTemplateAnswered |
     EventATemplateAnswered |
@@ -31,6 +32,15 @@ export interface EventRefResolvedToVerify {
 
 export const RefResolvedToVerify =
     factory<EventRefResolvedToVerify>("RefResolvedToVerify");
+
+
+export interface EventReceivedVerifyRequest {
+    type: "ReceivedVerifyRequest",
+    negotiationId: string,
+}
+
+export const ReceivedVerifyRequest =
+    factory<EventReceivedVerifyRequest>("ReceivedVerifyRequest");
 
 
 export interface EventRefResolvedToAuthorize {
