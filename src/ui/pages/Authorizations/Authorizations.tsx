@@ -31,7 +31,7 @@ export function Authorizations({ tab }: Props) {
             </Tabs>
             {content}
 
-            <BottomTools showQR plusURL={"#/authreqs/new"} />
+            <BottomTools plusURL={"#/authreqs/new"} />
         </div>
     );
 }

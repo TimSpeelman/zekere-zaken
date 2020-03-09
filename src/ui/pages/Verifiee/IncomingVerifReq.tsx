@@ -8,7 +8,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import { useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import uuid from "uuid/v4";
-import { AcceptVNegWithLegalEntity as AcceptVNegWithLegalEntity, CreateAReqTemplate } from "../../../commands/Command";
+import { AcceptVNegWithLegalEntity as AcceptVNegWithLegalEntity, CreateAReqTemplate, VerifyProfile } from "../../../commands/Command";
 import { useStyles } from "../../../styles";
 import { AuthorizationTemplate, LegalEntity } from "../../../types/State";
 import iconVerif from "../../assets/images/shield-vreq.svg";
@@ -45,6 +45,12 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
     const availableEntities = [...myAuths.map((a) => a.legalEntity), ...myMatchingEntities.map((e) => e.entity)];
     const entities = uniqWith(availableEntities, isEqual);
 
+    useEffect(() => {
+        if (inVReq && !profileResult) {
+            dispatch(VerifyProfile({ peerId: inVReq.verifierId }))
+        }
+    }, [inVReq, profileResult])
+
     const { getURL, getWhatsappURL } = useWhatsappURL();
 
     function goVerify(legalEntity: LegalEntity) {
@@ -52,8 +58,11 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
         dispatch(AcceptVNegWithLegalEntity({ negotiationId: inVReq!.id, legalEntity }))
     }
 
+    const [authId, setAuthId] = useState(""); // cache this
+    useEffect(() => setAuthId(uuid()), []);
+
     const authTemplate: AuthorizationTemplate | undefined = inVReq && {
-        id: uuid(),
+        id: authId,
         datetime: new Date().toISOString(),
         authority: inVReq.authority,
         legalEntity: inVReq.legalEntity,
@@ -61,6 +70,7 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
 
     function fastAuthReq() {
         if (authTemplate) {
+            console.log("Created auth req ", authTemplate.id);
             dispatch(CreateAReqTemplate({ template: authTemplate }))
         }
     }
@@ -83,12 +93,12 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
         return <Box p={3}>Dit verzoek bestaat niet.</Box>
     }
 
-    if (!profileResult || profileResult?.status === "Failed") {
-        return <Box p={3}>Er ging iets fout bij het laden van het profiel.</Box>
+    if (!profileResult || profileResult.status === "Verifying") {
+        return <Box p={3}>We laden even het profiel van deze gebruiker..</Box>
     }
 
-    if (profileResult.status === "Verifying") {
-        return <Box p={3}>We laden even het profiel van deze gebruiker..</Box>
+    if (profileResult?.status === "Failed") {
+        return <Box p={3}>Er ging iets fout bij het laden van het profiel.</Box>
     }
 
     const profile = profileResult.profile;
@@ -110,6 +120,7 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
                 {isIdle && (
                     <div>
                         <div className="enter-item">
+                            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
                             <PersonCard profile={profile} />
                         </div>
 
@@ -118,7 +129,6 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
                         </Box>
 
                         <div className="enter-item">
-                            <AuthorityCard legalEntity={inVReq.legalEntity} authority={inVReq.authority} authType="verification" />
                         </div>
 
                         {entities.length === 0 && // When we have ZERO authorizations, we can ask the Subject to request one.
@@ -129,7 +139,7 @@ export function IncomingVerifReq({ onMoodChange }: Props) {
                                 <FormActions>
                                     <Button component="a" href="#/home" color="inherit">Annuleren</Button>
                                     <Button variant={"contained"} color={"primary"} component="a"
-                                        onClick={fastAuthReq} href={getWhatsappURL(inVReq)} target="_blank">Aanvragen</Button>
+                                        onClick={fastAuthReq} href={getWhatsappURL(authTemplate)} target="_blank">Aanvragen</Button>
                                 </FormActions>
                             </Fragment>
                         }

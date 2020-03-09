@@ -16,7 +16,6 @@ export function PersonCard({ profile }: Props) {
             <Box
                 display="flex"
                 alignItems="center"
-                bgcolor="background.paper"
             >
                 <Box p={1}>
                     <Avatar src={profile.photo}

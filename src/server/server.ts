@@ -47,7 +47,7 @@ server.on("connection", function (peer) {
     peer.emit("id", id);
 
     peer.on("msg", function (m: any) {
-        console.log(`Received message from`, id, ':', m);
+        console.log(`Received message from`, id);
 
         const peerId = m.peerId;
         if (peerId in peers) {

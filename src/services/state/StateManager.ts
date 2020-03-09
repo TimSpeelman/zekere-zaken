@@ -1,4 +1,5 @@
 import debug from "debug";
+import { pickBy } from "lodash";
 import { Authorization, AuthorizationTemplate, IState, OutAuthorizationRequest, Profile, SucceededIDAuthorize, SucceededIDVerify, VerificationTemplate } from "../../types/State";
 import { IValueStore } from "../../util/Cache";
 import { Hook } from "../../util/Hook";
@@ -6,7 +7,7 @@ import { AuthorizeNegotiation } from "../identity/authorization/types";
 import { VerifyNegotiation } from "../identity/verification/types";
 
 /** Use this to clear cache when the schema changes */
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 type CachedState = IState & { SCHEMA_VERSION: number };
 
 const log = debug("oa:state-manager");
@@ -117,11 +118,18 @@ export class StateManager {
         if (state && state.SCHEMA_VERSION === SCHEMA_VERSION) {
             log("using cached state", state);
             this.usedCache = true;
-            this.setState(state);
+            this.setState(this.cleanUpState(state));
         } else {
             log("using fresh state");
             this.stateCache.remove();
         }
+    }
+
+    protected cleanUpState(state: IState) {
+        // We are no longer verifying these profiles.
+        state.profiles = pickBy(state.profiles, p => p.status === "Verified");
+
+        return state;
     }
 
 }

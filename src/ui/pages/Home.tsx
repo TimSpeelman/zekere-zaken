@@ -68,7 +68,7 @@ export function Home() {
                 </div>
 
                 <div className="bottom-tools">
-                    <BottomTools showQR />
+                    <BottomTools />
                 </div>
             </div>
         </CSSTransition>
